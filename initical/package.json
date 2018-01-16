@@ -1,0 +1,15 @@
+{
+  "name": "projeto_inicial",
+  "version": "1.0.0",
+  "description": "um projeto de começo",
+  "main": "noticias.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "carloshml",
+  "license": "ISC",
+  "dependencies": {
+    "ejs": "^2.5.7",
+    "express": "^4.16.2"
+  }
+}
