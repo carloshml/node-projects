@@ -1,24 +1,8 @@
-var express = require('express');
-var app=express();
+var app = require('./config/server') ;
 
-app.set('view engine','ejs');
 app.listen(3000, function(){
-
-
-  app.get('/tecnologia',function(req, res){
-    res.render("secao/tecnologia");
-  });
-
-  app.get('/formulario',function(req, res){
-    res.render("admin/form_add_noticia");
-  });
-
-  app.get('/noticias',function(req, res){
-    res.render("noticias/noticias");
-  });
-
-  app.get('/',function(req, res){
-    res.render("home/index");
-  });
+var rotaNoticias = require('./app/routes/noticias')(app);
+var rotaHome = require('./app/routes/home')(app);
+var rotaFormulario = require('./app/routes/formulario_inclusao_noticia')(app);
   console.log('Servidor Rodando');
 });
