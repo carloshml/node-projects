@@ -1,17 +1,17 @@
 //var dbConection = require('./../../config/db_connection')
 
-module.exports = function(app){
+module.exports = function(application){
 
 
 
-app.get('/noticias',function(req, res){
+application.get('/noticias',function(req, res){
 
-  var connection = app.config.db_connection() ;
-  connection.query('select * from noticias', function(error, resultado){
+  var connection = application.config.db_connection() ;
+  var noticiasModel = application.app.models.noticiasModel;
+  noticiasModel.getNoticias(connection, function(error, resultado){
+
        res.render("noticias/noticias", {noticias: resultado });
-  });
-
-
 
     });
+});
 }
