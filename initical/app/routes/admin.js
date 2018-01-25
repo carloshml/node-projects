@@ -1,19 +1,30 @@
 module.exports = function(app){
     app.get('/formulario',function(req, res){
-      res.render("admin/form_add_noticia");
+      res.render("admin/form_add_noticia",{validacao:{}});
     });
 
     app.post('/noticias/salvar',function(req, res){
       var noticia = req.body ;
 
-      console.log(noticia);
+      req.assert('titulo','Título é obrigatório').notEmpty();
+      req.assert('resumo','Resumo é obrigatório').notEmpty();
+      req.assert('autor','Resumo é obrigatório').notEmpty();
+      req.assert('noticia','Notícia é obrigatória').notEmpty();
+      req.assert('data_noticia','Noticia é obrigatório').notEmpty();
+      req.assert('resumo','Resumo [10,100]').len(10,100);
+      var errors = req.validationErrors();
+         if(errors){
+           res.render("admin/form_add_noticia",{validacao:errors, noticia:noticia});
+           return ;
+         }
+
       // conexao
 
       var connection = app.config.db_connection();
       //model
-      var noticiasModel = app.app.models.noticiasModel;
+      var noticiasModel = new app.app.models.NoticiasDao(connection);
       // enviar em uma função de salvar
-      noticiasModel.salvarNoticia(noticia, connection, function(error, resultado){
+      noticiasModel.salvarNoticia(noticia, function(error, resultado){
 
            res.redirect("/noticias");
 

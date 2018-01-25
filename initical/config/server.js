@@ -1,13 +1,17 @@
 var consign = require('consign');
 var express = require('express');
-var app=express();
 var bodyParser = require('body-parser');
+var expressValidator = require('express-validator');
+
+
+//acessando do app.js para baixo
+var app=express();
 
 app.set('view engine','ejs');
-//acessando do app.js para baixo
 app.set('views','./app/views');
 //por ele ser um midleware
 app.use(bodyParser.urlencoded({extended:true}));
+app.use(expressValidator());
 //consign reclonhece todos as rotos da pasta routes
 //e coloca-as no app
 consign()
