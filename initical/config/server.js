@@ -4,12 +4,14 @@ var bodyParser = require('body-parser');
 var expressValidator = require('express-validator');
 
 
+
 //acessando do app.js para baixo
 var app=express();
 
 app.set('view engine','ejs');
 app.set('views','app/views');
 //por ele ser um midleware
+app.use(express.static('./app/public'))
 app.use(bodyParser.urlencoded({extended:true}));
 app.use(expressValidator());
 //consign reclonhece todos as rotos da pasta routes
