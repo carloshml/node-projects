@@ -4,14 +4,13 @@ module.exports = function(application){
 
 
 
+application.get('/noticia',function(req, res){
+      application.app.controllers.noticias.noticia( application,req, res );
+
+});
+
 application.get('/noticias',function(req, res){
+      application.app.controllers.noticias.noticias( application,req, res );
 
-  var connection = application.config.db_connection() ;
-  var noticiasModel = new application.app.models.NoticiasDao(connection);
-  noticiasModel.getNoticias(function(error, resultado){
-
-       res.render("noticias/noticias", {noticias: resultado });
-
-    });
 });
 }

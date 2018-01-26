@@ -17,26 +17,26 @@
 			</ul>
 			<%}%>
 
-		<form class="" action="noticias/salvar" method="post">
+		<form class="" action="/noticias/salvar" method="post">
 			<label for="titulo">Titulo</label>
-			<input id="titulo" type="text" name="titulo" placeholder="titulo" value="">
+			<input id="titulo" type="text" value="<%=noticia.titulo%>"name="titulo" placeholder="titulo" value="">
 			<div class="">
 
 			</div>
 			<label for="noticia">Noticia</label>
-			<textarea id="noticia" name="noticia" rows="8" cols="80"></textarea>
+			<textarea id="noticia" name="noticia" ><%=noticia.noticia%></textarea>
 
 			<div class="">
 
 			</div>
 			<label for="resumo">Resumo</label>
-			<input id="resumo" name="resumo" />
+			<input id="resumo" value="<%=noticia.resumo%>" name="resumo" />
 
 			<div class="">
 
 			</div>
 			<label for="autor">Autor</label>
-			<input id="autor" name="autor" >
+			<input id="autor" value="<%=noticia.autor%>" name="autor" >
 			<div class="">
 
 			</div>
@@ -44,7 +44,7 @@
 
 			</div>
 			<label for="data_noticia">Data dos fatos</label>
-			<input type="date" id="data_noticia" name="data_noticia" r>
+			<input type="date" id="data_noticia" value="<%=noticia.data_noticia%>" name="data_noticia" r>
 			<div class="">
 
 			</div>
