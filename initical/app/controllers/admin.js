@@ -1,7 +1,7 @@
 module.exports.formulario = function(application,req,res){
    res.render("admin/form_add_noticia",{validacao:{},noticia:{}});
 }
-module.exports.noticias_salvar = function(application,req,res){
+module.exports.noticias_salvar = function(app,req,res){
   var noticia = req.body ;
 
   req.assert('titulo','Título é obrigatório').notEmpty();

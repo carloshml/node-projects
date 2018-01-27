@@ -48,8 +48,8 @@
 						<div class="col-md-12">
 							<div class="noticia_wrapper">
 								<span class="noticia_autor">Por Jorge</span>
-								<a href="noticia.html" class="noticia_titulo"><%= noticias[i].titulo %></a>
-								<span class="noticia_data"><%= noticias[i].noticia_data %></span>
+								<a href="noticia?id_noticia=<%=noticias[i].id %>" class="noticia_titulo"><%= noticias[i].titulo %></a>
+								<span class="noticia_data"><%=noticias[i].data_noticia %></span>
 								<br />
 								<p class="noticia_resumo">
 									<%= noticias[i].resumo %>
