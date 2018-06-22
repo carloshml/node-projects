@@ -18,5 +18,10 @@ module.exports.cadastar = function(application, req, res){
         return;
     }
 
+    var connection = application.config.dbConection;
+ 
+    var UsuariosDAO = new application.app.models.UsuariosDAO(connection);
+    UsuariosDAO.inserirUsuario(dadosForm); 
+
     res.send('tudo certo');
 }
