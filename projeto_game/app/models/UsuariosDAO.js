@@ -6,13 +6,15 @@ function UsuarioDAO(connection){
 }
 
 UsuarioDAO.prototype.inserirUsuario = function(usuario){
-    // this._connection.open(function(err, mongoclient){
-    //     mongoclient.collection("usuarios",
-    //     function(erro, collection){
-    //         collection.insert(usuario);
+    this._connection.open(function(err, mongoclient){
+        mongoclient.collection("usuarios",
+        function(erro, collection){
+            collection.insert(usuario); 
 
-    //     });
-    // });   
+            mongoclient.close();
+
+        });
+    });   
 
     console.log(this._connection);    
     
