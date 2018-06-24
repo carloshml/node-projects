@@ -30,7 +30,7 @@
 		</nav>
 
 	    <div class="container">
-			<% if(validacao){%>
+			<% if(validacao.length>0){%>
 				<div class="alert alert-danger">
 					<strong>Atenção</strong>
 					<ul>
@@ -38,10 +38,8 @@
 								<li> <%= validacao[i].msg%> </li>
 							<%}%>
 					</ul>
-					
-
 				</div>
-				<%}%>
+			<%}%>
 				 
 	    		
 			<form class="form-cadastro" action="cadastrar" method="POST">
