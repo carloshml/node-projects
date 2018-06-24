@@ -1,7 +1,6 @@
 var mongo = require('mongodb');
 
 var connMongoDB = function(){
-    console.log('Entrou na funcao de conexoa')
     var db = new mongo.Db(
         'got',
         new mongo.Server(
@@ -10,13 +9,10 @@ var connMongoDB = function(){
             {}
         ),
         {}
-
     );
-    return db;
-    
+    return db;    
 }
 
 module.exports =  function () {
-    return connMongoDB;
-   
+    return connMongoDB;   
 }
