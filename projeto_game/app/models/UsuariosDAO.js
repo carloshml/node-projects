@@ -34,8 +34,8 @@ UsuarioDAO.prototype.autenticar = function(usuario, req, res){
                 var errors= [
                     { msg:'Usuario ou senha Incorreto'}
                 ]
-                   res.render('index',{validacao:errors});
-               } 
+                   res.render('index',{validacao:errors,aviso:{}});
+                }                    
            });
            mongoclient.close();
         });

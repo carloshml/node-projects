@@ -1,5 +1,6 @@
 module.exports.render = function(application, req, res){
-    res.render('index',{validacao:{}}); 
+    res.render('index',{validacao:{},aviso:{}});  
+               
 }
 
 module.exports.autenticar = function(application, req, res){
@@ -10,7 +11,7 @@ module.exports.autenticar = function(application, req, res){
     var errors = req.validationErrors();
 
     if(errors){
-        res.render('index',{validacao:errors}); 
+        res.render('index',{validacao:{},aviso:{}});        
         return;
     }
     var connection = application.config.dbConection;

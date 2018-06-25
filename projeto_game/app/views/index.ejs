@@ -31,6 +31,17 @@
 					</div>
 				<%}%>
 
+				<%if(aviso.length>0){%>
+					<div class="alert alert-success">
+						<strong>Atenção</strong>
+						<ul>
+							<% for( var i=0; i< aviso.length; i++ ){%>
+							<li> <%= aviso[i].msg%></li>
+							<%}%>
+						</ul>
+					</div>
+				<%}%>
+
 				<form class="form-inline form-entrar" action="/autenticar" method="POST">
 					<div class="form-group">				
 						<input type="text" name="usuario" id="usuario" placeholder="Usuário" class="form-control" autocomplete="off" />
