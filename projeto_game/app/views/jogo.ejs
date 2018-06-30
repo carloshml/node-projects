@@ -20,7 +20,7 @@
 					window.location.href ='/sair';
 				});
 				$('#btn-suditos').click(function(){
-					$('#msg-errors').hide();
+					$('#msg').hide();
 					$.ajax({
 						url:"/suditos",
 						method:"get",
@@ -30,7 +30,7 @@
 					});
 				});
 				$('#btn-pergaminhos').click(function(){
-					$('#msg-errors').hide();
+					$('#msg').hide();
 					$.ajax({
 						url:'/pergaminhos',
 						method:'get',
@@ -60,10 +60,18 @@
 
 	    <div class="container">
 
-			<%if(comandoInvalido){%>
-				<div class="alert alert-danger" id='msg-errors'>					
+			<%if(msg === 'erro'){%>
+				<div class="alert alert-danger" id='msg'>					
 					<ul>
-						<li> Operação Invalida, verifique se todos os campos foram informados!</li>							
+						<li> <strong> Operação Invalida, verifique se todos os campos foram informados! </strong></li>							
+					</ul>
+				</div>
+			<%}%>
+
+			<%if(msg === 'acerto'){%>
+				<div class="alert alert-info" id='msg'>					
+					<ul>
+						<li> <strong> Operação realizada com sucesso! </strong> </li>							
 					</ul>
 				</div>
 			<%}%>

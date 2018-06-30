@@ -4,13 +4,13 @@ module.exports.render = function(application, req, res){
     var JogoDAO = new application.app.models.JogoDAO(connection);
   
     var  comandoInvalido = false;
-
-    if(req.query.comando_invalido == 'true'){
-        comandoInvalido = true;
+    var msg ='';
+    if(req.query.msg !== ''){
+        msg = req.query.msg;
     }
-    console.log('----------',comandoInvalido);
+    
 
-    JogoDAO.iniciaJogo(res, req.session.usuario, req.session.casa,comandoInvalido );
+    JogoDAO.iniciaJogo(res, req.session.usuario, req.session.casa,msg );
 
    }else{
         var errors= [
@@ -64,10 +64,12 @@ module.exports.sair = function(application, req, res){
     var erros = req.validationErrors();
 
     if(erros){
-        res.redirect('jogo?comando_invalido=true');
+        res.redirect('jogo?msg=erro');
         return;
     }
-    console.log(dadosForm);
-    res.send('tudo ok!');
-
+    var connection = application.config.dbConection;
+    var JogoDAO = new application.app.models.JogoDAO(connection);
+    dadosForm.usuario = req.session.usuario;
+    JogoDAO.acao(dadosForm);
+    res.redirect('jogo?msg=acerto');
 }
