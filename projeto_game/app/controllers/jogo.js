@@ -46,7 +46,10 @@ module.exports.sair = function(application, req, res){
         res.render('index',{validacao:errors,aviso:{}}); 
         return;
     }
-    res. render('pergaminhos');
+    var connection = application.config.dbConection;
+    var JogoDAO = new application.app.models.JogoDAO(connection);   
+    JogoDAO.getAcoes(req.session.usuario ,res); 
+    
  }
 
  module.exports.gerarOrdemSuditos = function(application, req, res){

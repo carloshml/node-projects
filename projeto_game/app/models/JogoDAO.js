@@ -38,28 +38,42 @@ JogoDAO.prototype.acao = function(acao){
     this._connection.open(function(err, mongoclient){
         mongoclient.collection("acao",
         function(erro, collection){            
-            let acao_termina_em = new Date().getTime();
+            let acao_termina_em = new Date().getTime();            
             
-            switch (acao.acao) {
-                case 1: acao_termina_em + 60*60000 ;                  
+            switch ( parseInt(acao.acao) ) {
+                case 1: acao_termina_em = acao_termina_em + 60*60000 ;                  
                     break;
-                case 2: acao_termina_em + 2* 60*60000   ;                
+                case 2: acao_termina_em =  acao_termina_em + 2* 60*60000   ;                
                     break;
-                case 3: acao_termina_em + 5* 60*60000   ;                    
+                case 3: acao_termina_em =  acao_termina_em + 5* 60*60000   ;                    
                     break;
-                case 4: acao_termina_em + 5*  60*60000   ;                  
+                case 4: acao_termina_em =  acao_termina_em + 5*  60*60000   ;                  
                     break;            
                 default: console.log("error");
                     break;
             }
 
             acao.acao_termina_em = acao_termina_em;
-            console.log(acao);
 
             collection.insert(
                 acao
             ); 
             mongoclient.close();
+        });
+    }); 
+}
+
+JogoDAO.prototype.getAcoes = function(usuario, res){
+
+    console.log(usuario)
+    this._connection.open(function(err, mongoclient){
+        mongoclient.collection("acao",
+        function(erro, collection){
+           const momento_atual = new Date().getTime(); 
+           collection.find({usuario:usuario, acao_termina_em : {$gt : momento_atual} }).toArray(function(err, result){        
+            res. render('pergaminhos',{ acoes: result} );   
+           });
+           mongoclient.close();
         });
     }); 
 }

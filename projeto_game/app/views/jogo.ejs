@@ -36,9 +36,22 @@
 						method:'get',
 						success:function(htmlRequisicao){
 							$('#acoes').html(htmlRequisicao);
+							clearTimeout(timerId);
+							cronometro();
 						}
 					});
 				});
+
+				let timerId = null
+
+				function cronometro(){	
+				    $('.tempo_restante').each(function(){
+					let segundos = $(this).html()
+					let segundo_atuais = parseInt(segundos)-1;
+					$(this).html(segundo_atuais)						
+					});
+					timerId = setTimeout(function(){ cronometro(); }, 1000);
+				}
 			});
 		</script>
 
