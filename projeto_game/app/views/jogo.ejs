@@ -48,7 +48,13 @@
 				    $('.tempo_restante').each(function(){
 					let segundos = $(this).html()
 					let segundo_atuais = parseInt(segundos)-1;
-					$(this).html(segundo_atuais)						
+					if(segundo_atuais<0){
+						window.location.href ="/jogo?msg=C";
+					}else{
+						$(this).html(segundo_atuais)	
+					}
+
+										
 					});
 					timerId = setTimeout(function(){ cronometro(); }, 1000);
 				}
@@ -88,6 +94,24 @@
 					</ul>
 				</div>
 			<%}%>
+
+			<%if(msg === 'C'){%>
+				<div class="alert alert-info" id='msg'>					
+					<ul>
+						<li> <strong> Senhor, ação ordenada foi finalizada! </strong> </li>							
+					</ul>
+				</div>
+			<%}%>
+
+			<%if(msg === 'Deleted'){%>
+				<div class="alert alert-info" id='msg'>					
+					<ul>
+						<li> <strong> Senhor, sua ordem foi revogada com sucesso! </strong> </li>							
+					</ul>
+				</div>
+			<%}%>
+
+			
 	    	
 			<div class="row">
 	    		<div class="col-sm-3 casa">

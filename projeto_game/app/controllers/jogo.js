@@ -76,3 +76,10 @@ module.exports.sair = function(application, req, res){
     JogoDAO.acao(dadosForm);
     res.redirect('jogo?msg=acerto');
 }
+
+module.exports.revogarAcao = function(application, req, res){
+  let url_query = req.query;  
+  var connection = application.config.dbConection;
+  var JogoDAO = new application.app.models.JogoDAO(connection);
+  JogoDAO.revogarAcao(url_query.id_acao,res);
+}

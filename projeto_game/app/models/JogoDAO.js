@@ -1,3 +1,5 @@
+let ObjectID = require('mongodb').ObjectID;
+
 function JogoDAO(connection){
    this._connection = connection(); 
 }
@@ -57,15 +59,39 @@ JogoDAO.prototype.acao = function(acao){
 
             collection.insert(
                 acao
-            ); 
-            mongoclient.close();
+            );           
         });
+
+        mongoclient.collection("jogo", function(erro, collection){  
+
+            let moedas = null; 
+
+            switch ( parseInt(acao.acao) ) {
+                case 1: moedas = -2 *  acao.quantidade ;                  
+                    break;
+                case 2: moedas =  -3 * acao.quantidade  ;                
+                    break;
+                case 3: moedas =  -1 * acao.quantidade  ;                    
+                    break;
+                case 4: moedas =  -1  * acao.quantidade ;                  
+                    break;            
+                default: console.log("error");
+                    break;
+            }
+            
+            collection.update({ usuario: acao.usuario},
+                             // { $set:{moeda:moedas} },
+                              { $inc: {moeda:moedas} },
+                             // {} como é apenas uma conexao esse permanece falso
+                            );
+              mongoclient.close();
+        });       
     }); 
 }
 
 JogoDAO.prototype.getAcoes = function(usuario, res){
 
-    console.log(usuario)
+    
     this._connection.open(function(err, mongoclient){
         mongoclient.collection("acao",
         function(erro, collection){
@@ -78,6 +104,21 @@ JogoDAO.prototype.getAcoes = function(usuario, res){
     }); 
 }
 
+JogoDAO.prototype.revogarAcao = function(idAcao, res){
+
+    this._connection.open(function(err, mongoclient){
+        mongoclient.collection("acao",
+        function(erro, collection){            
+            collection.remove(
+                {_id: ObjectID(idAcao) },
+                function(err, result){
+                    res.redirect('jogo?msg=Deleted');
+                    mongoclient.close();
+                }
+            );   
+        });
+    }); 
+}
 module.exports = function(){
     return JogoDAO;
 }
