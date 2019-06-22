@@ -15,10 +15,7 @@
 		<link href="css/style.css" rel="stylesheet">
 
 		<script>
-			$(document).ready(function(){
-				$('#btn-sair').click(function(){
-					window.location.href ='/sair';
-				});
+			$(document).ready(function(){				
 				$('#btn-suditos').click(function(){
 					$('#msg').hide();
 					$.ajax({
@@ -66,13 +63,13 @@
 	<body class="body-jogo">
 
 		<nav class="navbar navbar-default navbar-static-top">
-			<a class="navbar-brand" href="#">
+			<a class="navbar-brand" href="/home">
 				<img src="images/casa_<%=img_casa%>.jpg" width="30" height="30" class="display-logo align-top" alt="">    
-				Este é seu jogo, <%=jogo.usuario%>! 
+				Este é seu jogo, <%=jogo.nome%>! 
 			</a>
 			<div class="container">
 				<div class="form-group sair">
-					<button type="button" id="btn-sair" class="btn btn-info pull-right">Sair</button>
+					<a   href="/sair"  id="btn-sair" class="btn btn-info pull-right">Sair</a>
 				</div>
 			</div>
 		</nav>

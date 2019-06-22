@@ -10,7 +10,7 @@ module.exports.render = function(application, req, res){
     }
     
 
-    JogoDAO.iniciaJogo(res, req.session.usuario, req.session.casa,msg );
+    JogoDAO.iniciaJogo(res, req, req.session.casa );
 
    }else{
         var errors= [

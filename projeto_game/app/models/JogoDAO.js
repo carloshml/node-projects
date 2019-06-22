@@ -22,14 +22,16 @@ JogoDAO.prototype.gerarParametros = function(usuario){
     });  
 }
 
-JogoDAO.prototype.iniciaJogo = function( res, usuario, casa, msg){
+JogoDAO.prototype.iniciaJogo = function( res, req, casa, msg){
+    const usuarioId = req.session._id;
     this._connection.open(function(err, mongoclient){
         mongoclient.collection("jogo",
         function(erro, collection){
            // collection.find({usuario:{$eq:usuario.usuario}, senha:{$eq: usuario.senha}});
            //collection.find({usuario:usuario.usuario, senha: usuario.senha});
-           collection.find({usuario:usuario}).toArray(function(err, result){
-               res.render('jogo',{img_casa:casa, jogo: result[0], msg:msg});                                              
+           collection.find({usuario: ObjectID(usuarioId)}).toArray(function(err, result){             
+             result[0].nome = req.session.nome;
+             res.render('jogo',{img_casa:casa, jogo: result[0], msg:msg});                                              
            });
            mongoclient.close();
         });

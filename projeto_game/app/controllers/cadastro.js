@@ -20,11 +20,7 @@ module.exports.cadastar = function(application, req, res){
     var connection = application.config.dbConection;
  
     var UsuariosDAO = new application.app.models.UsuariosDAO(connection);
-    UsuariosDAO.inserirUsuario(dadosForm); 
-       // geração dos parametros
-    var JogoDAO = new application.app.models.JogoDAO(connection);
-    JogoDAO.gerarParametros(dadosForm.usuario);
-
+    UsuariosDAO.inserirUsuario(dadosForm,application);    
     var avisos= [
         { msg:'Você Foi Cadastrado com Sucesso!!'}
     ]   

@@ -1,0 +1,57 @@
+<!DOCTYPE HTML>
+<html lang="pt-br">
+	<head>
+		<meta charset="UTF-8">
+
+		<title>MMORPG - Game of Thrones</title>
+		
+		<!-- JQuery -->
+		<script src="js/jquery-2.2.1.js"></script>
+
+		<!-- bootstrap - link cdn -->
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+	
+		<!-- incluindo css -->
+		<link href="css/style.css" rel="stylesheet">
+
+		<script type="text/javascript">
+				document.addEventListener("DOMContentLoaded", function() {        
+				  $('#btn-jogar').click(function(){
+							window.location.href ='/jogo';
+				  });				
+
+				  $('#btn-sair').click(function(){
+					window.location.href ='/sair';
+				  });
+				});	
+		</script>
+	</head>
+
+	<body class="body-index">
+		<nav class="navbar navbar-default navbar-static-top">
+			<a class="navbar-brand" href="#">
+				<img src="images/casa_<%=img_casa%>.jpg" width="30" height="30" class="display-logo align-top" alt="">    
+				 Oi, <%=jogo.nome%>! 
+			</a>
+			<div class="container">
+				<div class="form-group sair">
+					<button type="button" id="btn-sair" class="btn btn-info pull-right">Sair</button>
+				</div>
+			</div>
+		</nav>
+	    <div class="container">
+	    	<div class="row">
+	    		<div class="col-md-6">
+					<button id="btn-jogar" class="btn btn-success " > jogar </button>
+				</div>
+	    	
+	    		<div class="col-md-6">
+						<a href="/usuarios?img_casa=<%=img_casa%>&jogo=<%=JSON.stringify(jogo)%>&msg=" 
+							id="btn-ver-usuario"  class="btn btn-success " > 
+							ver usuario						
+						</a>				 
+				</div>
+		    </div>
+	    </div>	
+	</body>
+</html>
