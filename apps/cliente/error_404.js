@@ -3,7 +3,7 @@ let http = require('http');
 const opcoes ={
     hostname:'localhost',
     port:8000,
-    path:'/',
+    path:'/t',
     method : 'get',
     headers:{
         'Accept': 'application/json'
