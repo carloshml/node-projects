@@ -3,7 +3,7 @@ module.exports = function(application){
 		application.app.controllers.cadastro.render(application,req, res );
     });
     
-    application.post('/cadastrar', function(req, res){
-		application.app.controllers.cadastro.cadastar(application,req, res );
+    application.post('/inserirUsuario', function(req, res){
+		application.app.controllers.usuario.inserirUsuario(application,req, res );
 	});
 }

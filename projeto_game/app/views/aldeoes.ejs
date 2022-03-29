@@ -1,17 +1,17 @@
 <div id="aldecoes">					
-	<h3>Aldeões</h3>
+	<h3>Súdito</h3>
 	
-	<form class="form-cadastro" action="/ordenar_acao_sudito" method="post" >
+	<form class="form-cadastro" action="/gerarOrdemSuditos" method="post" >
 
 		<div class="row">
 			<div class="col-xs-5">
 				<div class="form-group">
 					<select name="acao" class="form-control">
 						<option value="">-- Escolha a ação</option>
-						<option value="1">Coletar recursos (1min)</option>
-						<option value="2">Enforcar aldeão (2min)</option>
-						<option value="3">Ensinar história (3min)</option>
-						<option value="4">Ensinar magia (4min)</option>
+						<option value="1">Coletar recursos (Custa 2 mooeda,  Dura:1min)</option>
+						<option value="2">Enforcar aldeão (Custa 3 mooeda,  Dura:2min)</option>
+						<option value="3">Ensinar história (Custa 1 mooeda,  Dura:3min)</option>
+						<option value="4">Ensinar magia (Custa 1 mooeda,  Dura:4min)</option>
 					</select>										
 				</div>
 			</div>
@@ -21,6 +21,10 @@
 					<input type="text" name="quantidade" class="form-control" id="quantidade" placeholder="Quantidade">									
 				</div>
 			</div>
+
+			<input type="hidden" name="jogo" class="form-control" id="jogo"   value="<%=JSON.stringify(jogo)%>">		
+
+			
 			
 			<div class="col-xs-4">
 				<div class="form-group row">
@@ -33,7 +37,9 @@
 		<hr />
 		<div class="row">
 			<div class="col-xs-12">
-				<span>Senhor, você possui 8 aldeões desocupados e 2 aldeões em atividade.</span>
+				<span>Senhor, você possui 
+					<span id="numero-de-suditos-livres" > </span> sudito(s) desocupados e 
+					<span id="numero-de-suditos-trab" ></span>  sudito(s) em atividade.
 			</div>
 		</div>
 	</form>

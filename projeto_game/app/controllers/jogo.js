@@ -16,19 +16,6 @@ module.exports.render = function (application, req, res) {
     }
 }
 
-module.exports.buscarUsuario = function (application, req, res) {
-    if (!req.session.autorizado) {
-        var errors = [
-            { msg: 'Você não tem acesso a essa área' }
-        ];
-        res.render('index', { validacao: errors, aviso: {} });
-        return;
-    }
-    var connection = application.config.dbConection;
-    var JogoDAO = new application.app.models.JogoDAO(connection);
-    JogoDAO.buscarUsuario(res, req, req.session.casa);
-}
-
 module.exports.sair = function (application, req, res) {
     req.session.destroy(function (erro) {
         res.render('index', { validacao: {}, aviso: {} });
@@ -43,7 +30,12 @@ module.exports.gerarSuditos = function (application, req, res) {
         res.render('index', { validacao: errors, aviso: {} });
         return;
     }
-    res.render('aldeoes');
+
+    var connection = application.config.dbConection;
+    var UsuarioDAO = new application.app.models.UsuariosDAO(connection);
+    UsuarioDAO.buscarUsuarioGerarAldeoes(res, req, req.session.casa);
+
+
 }
 
 module.exports.gerarPergaminhos = function (application, req, res) {
@@ -78,10 +70,26 @@ module.exports.gerarOrdemSuditos = function (application, req, res) {
         res.redirect('jogo?msg=erro');
         return;
     }
+
+    dadosForm.jogo = JSON.parse(dadosForm.jogo);
+
+
+    if (isNaN(Number(dadosForm.quantidade).valueOf())) {
+        res.redirect('jogo?msg=quantidadeDeveSerNumerica');
+        return;
+    }
+
+
+    if (dadosForm.quantidade > (dadosForm.jogo.suditos - dadosForm.jogo.suditosTrabalhando)) {
+        res.redirect('jogo?msg=todoSutidosOcupados');
+        return;
+    }
+
+
     var connection = application.config.dbConection;
     var JogoDAO = new application.app.models.JogoDAO(connection);
     dadosForm.usuario = req.session.usuario;
-    JogoDAO.acao(dadosForm);
+    JogoDAO.gerarOrdemSuditos(dadosForm);
     res.redirect('jogo?msg=acerto');
 }
 

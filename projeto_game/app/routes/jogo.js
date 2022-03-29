@@ -7,21 +7,16 @@ module.exports = function(application){
 		application.app.controllers.jogo.sair(application,req, res );		
 	});
 
-	application.get('/suditos', function(req, res){
+	application.get('/gerarSuditos', function(req, res){
 		application.app.controllers.jogo.gerarSuditos(application,req, res );		
 	});
 
-	application.get('/pergaminhos', function(req, res){
+	application.get('/gerarPergaminhos', function(req, res){
 		application.app.controllers.jogo.gerarPergaminhos(application,req, res );		
 	});
 
-	application.post('/ordenar_acao_sudito', function(req, res){
+	application.post('/gerarOrdemSuditos', function(req, res){
 		application.app.controllers.jogo.gerarOrdemSuditos(application,req, res );		
-	});
-
-	application.get('/buscarUsuario', function(req, res){
-		console.log('buscarUsuario   ');
-		application.app.controllers.jogo.buscarUsuario(application,req, res );		
 	});
 
 	application.get('/revogar_acao', function(req, res){

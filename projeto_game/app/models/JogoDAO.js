@@ -4,14 +4,16 @@ function JogoDAO(connection) {
     this._connection = connection();
 }
 
-JogoDAO.prototype.gerarParametros = function (usuario) {
+JogoDAO.prototype.gerarParametrosJogo = function (usuario) {
     this._connection.open(function (err, mongoclient) {
         mongoclient.collection("jogo",
             function (erro, collection) {
                 collection.insert({
                     usuario: usuario,
+                    idUsuario: usuario,
                     moeda: 15,
                     suditos: 10,
+                    suditosTrabalhando: 0,
                     temor: Math.floor(Math.random() * 1000),
                     sabedoria: Math.floor(Math.random() * 1000),
                     comercio: Math.floor(Math.random() * 1000),
@@ -19,25 +21,6 @@ JogoDAO.prototype.gerarParametros = function (usuario) {
                 });
                 mongoclient.close();
             });
-    });
-}
-
-JogoDAO.prototype.buscarUsuario = function (res, req, casa, msg) {
-    const usuarioId = req.session._id;
-    let usuario2;
-    this._connection.open(function (err, mongoclient) {
-        mongoclient.collection("jogo", function (erro, collection) {
-            // collection.find({usuario:{$eq:usuario.usuario}, senha:{$eq: usuario.senha}});
-            //collection.find({usuario:usuario.usuario, senha: usuario.senha});
-            collection.find({ usuario: ObjectID(usuarioId) })
-                .toArray(function (err, result) {
-                    console.log(' result ', result);
-                    result[0].nome = req.session.nome;
-                    usuario2 = { img_casa: casa, jogo: result[0], msg: msg };
-                    res.send(usuario2);
-                });
-            mongoclient.close();
-        });
     });
 }
 
@@ -58,7 +41,12 @@ JogoDAO.prototype.iniciaJogo = function (res, req, casa, msg) {
     });
 }
 
-JogoDAO.prototype.acao = function (acao) {
+JogoDAO.prototype.gerarOrdemSuditos = function (acao) {
+
+
+
+    console.log('   gerarOrdemSuditos::  ', acao);
+
     this._connection.open(function (err, mongoclient) {
         mongoclient.collection("acao", function (erro, collection) {
             let tempoParaTermino = new Date().getTime();
@@ -79,25 +67,27 @@ JogoDAO.prototype.acao = function (acao) {
         });
 
         mongoclient.collection("jogo", function (erro, collection) {
-
             let moedas = null;
-
             switch (parseInt(acao.acao)) {
-                case 1: moedas = moedas - 2 * acao.quantidade;
+                case 1: moedas = acao.jogo.moeda - (2 * acao.quantidade);
                     break;
-                case 2: moedas = moedas - 3 * acao.quantidade;
+                case 2: moedas = acao.jogo.moeda - (3 * acao.quantidade);
                     break;
-                case 3: moedas = moedas - 1 * acao.quantidade;
+                case 3: moedas = acao.jogo.moeda - (1 * acao.quantidade);
                     break;
-                case 4: moedas = moedas - 1 * acao.quantidade;
+                case 4: moedas = acao.jogo.moeda - (1 * acao.quantidade);
                     break;
                 default: console.log("error");
                     break;
             }
 
-            collection.update({ usuario: acao.usuario },
+            console.log('   gerarOrdemSuditos::  ', acao.jogo.moeda, acao.quantidade);
+
+
+
+            collection.update({ "_id": ObjectID(acao.jogo._id) },
                 // { $set:{moeda:moedas} },
-                { $set: { moeda: moedas } },
+                { $set: { moeda: moedas, suditosTrabalhando: parseInt(acao.jogo.suditosTrabalhando) + parseInt(acao.quantidade) } },
                 // {} como é apenas uma conexao esse permanece falso
             );
             mongoclient.close();

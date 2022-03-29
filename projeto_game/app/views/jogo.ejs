@@ -15,37 +15,106 @@
 
 	<!-- incluindo css -->
 	<link href="css/style.css" rel="stylesheet">
-
 	<script>
-		$(document).ready(function () {
+		document.addEventListener("DOMContentLoaded", function () {
+			let usuario = {};
+
+			const parametros = new URLSearchParams(window.location.search);
+
+
+
+
+			const divMensagens = document.getElementById('mensagens');
+
+			switch (parametros.get('msg')) {
+				case 'erro':
+					divMensagens.innerHTML = ` <div class="alert alert-danger" id='msg'>
+													<ul>
+														<li> <strong> Operação Invalida, verifique se todos os campos foram informados! </strong></li>
+													</ul>
+												</div>`
+					break;
+				case 'acerto':
+					divMensagens.innerHTML = ` <div class="alert alert-info" id='msg'>
+													<ul>
+														<li> <strong> Operação realizada com sucesso! </strong> </li>
+													</ul>
+												</div>`
+					break;
+				case 'todoSutidosOcupados':
+					divMensagens.innerHTML = `   <div class="alert alert-info" id='msg'>
+												<ul>
+													<li> <strong> Todos suditos estão ocupado! </strong> </li>
+												</ul>
+											</div>`
+					break;
+				case 'C':
+					divMensagens.innerHTML = `<div class="alert alert-info" id='msg'>
+													<ul>
+														<li> <strong> Senhor, ação ordenada foi finalizada! </strong> </li>
+													</ul>
+												</div>`
+					break;
+				case 'Deleted':
+					divMensagens.innerHTML = ` <div class="alert alert-info" id='msg'>
+													<ul>
+														<li> <strong> Senhor, sua ordem foi revogada com sucesso! </strong> </li>
+													</ul>
+												</div>`
+					break;
+
+				case 'quantidadeDeveSerNumerica':
+					divMensagens.innerHTML = ` <div class="alert alert-info" id='msg'>
+													<ul>
+														<li> <strong> Quantidade deve ser numerica! </strong> </li>
+													</ul>
+												</div>`
+					break;
+
+
+
+				default:
+					break;
+			}
+
+			setTimeout(() => {
+				divMensagens.innerHTML = '';
+			}, 6000);
+
 			$('#btn-suditos').click(function () {
 				$('#msg').hide();
 				$.ajax({
-					url: "/suditos",
+					url: "/gerarSuditos",
 					method: "get",
 					success: function (htmlRequisicao) {
 						$('#acoes').html(htmlRequisicao);
+						const numeroSuditosLivre = document.getElementById('numero-de-suditos-livres');
+						if (numeroSuditosLivre) {
+							numeroSuditosLivre.innerHTML = usuario.jogo.suditos - usuario.jogo.suditosTrabalhando;
+						}
+
+						const numeroSuditosTrab = document.getElementById('numero-de-suditos-trab');
+						if (numeroSuditosTrab) {
+							numeroSuditosTrab.innerHTML = usuario.jogo.suditosTrabalhando;
+						}
 					}
 				});
 			});
-
-			const buscarUsuario = function () {			 
+			const buscaJogoUsuario = function () {
 				$.ajax({
-					url: '/buscarUsuario',
+					url: '/buscaJogoUsuario',
 					method: 'get',
-					success: function (htmlRequisicao) {
-					   console.log('  buscarUsuario ' , htmlRequisicao);
+					success: function (respBuscarUsuario) {
+						console.log('  buscaJogoUsuario ', respBuscarUsuario);
+						usuario = respBuscarUsuario;
 					}
 				});
 			}
-
-			buscarUsuario();
-
-
+			buscaJogoUsuario();
 			const lerPergaminhhos = function () {
 				$('#msg').hide();
 				$.ajax({
-					url: '/pergaminhos',
+					url: '/gerarPergaminhos',
 					method: 'get',
 					success: function (htmlRequisicao) {
 						$('#acoes').html(htmlRequisicao);
@@ -54,11 +123,8 @@
 					}
 				});
 			}
-
 			$('#btn-pergaminhos').click(lerPergaminhhos);
-
 			let timerId = null;
-
 			function cronometro() {
 				$('.tempo_restante').each(function () {
 					let segundos = $(this).html();
@@ -87,44 +153,10 @@
 			</div>
 		</div>
 	</nav>
-	<div class="container">
-		<div>
-			<%if(msg==='erro' ){%>
-				<div class="alert alert-danger" id='msg'>
-					<ul>
-						<li> <strong> Operação Invalida, verifique se todos os campos foram informados! </strong></li>
-					</ul>
-				</div>
-				<%}%>
-		</div>
-		<div>
-			<% if(msg==='acerto' ){ %>
+	<div id="mensagens">
 
-				<div class="alert alert-info" id='msg'>
-					<ul>
-						<li> <strong> Operação realizada com sucesso! </strong> </li>
-					</ul>
-				</div>
-				<% } %>
-		</div>
-		<div>
-			<%if(msg==='C' ){%>
-				<div class="alert alert-info" id='msg'>
-					<ul>
-						<li> <strong> Senhor, ação ordenada foi finalizada! </strong> </li>
-					</ul>
-				</div>
-				<%}%>
-		</div>
-		<div>
-			<% if(msg==='Deleted' ){ %>
-				<div class="alert alert-info" id='msg'>
-					<ul>
-						<li> <strong> Senhor, sua ordem foi revogada com sucesso! </strong> </li>
-					</ul>
-				</div>
-				<% } %>
-		</div>
+	</div>
+	<div class="container">
 		<div class="row">
 			<div class="col-sm-3 casa">
 				<img src="images/casa_<%=img_casa%>.jpg" />
@@ -173,7 +205,7 @@
 			<div class="col-sm-3"></div>
 			<div class="col-sm-9">
 				<div class="acoes" id="acoes">
-					Senhor o que deseja fazer hoje?
+					Senhor o que deseja fazer hoje?s
 				</div>
 			</div>
 		</div>
@@ -181,17 +213,29 @@
 	<div class="barra-inferior">
 		<div class="container">
 			<div class="row">
-				<div class="col-sm-1">
-					<img src="images/outros/suditos.jpg" title="Aldeões" alt="Aldeões" id="btn-suditos" />
+				<div class="col-sm-2">
+					<img src="images/outros/suditos.jpg" title="suditos" alt="suditos" id="btn-suditos" />
+					<div>
+						Total Suditos
+					</div>
 					<span>
 						<%=jogo.suditos%>
+					</span>
+				</div>
+				<div class="col-sm-2">
+					<img src="images/outros/suditos.jpg" title="suditos" alt="suditos" id="btn-suditos" />
+					<div>
+						Suditos Trabalhando
+					</div>
+					<span>
+						<%=jogo.suditosTrabalhando%>
 					</span>
 				</div>
 				<div class="col-sm-1">
 					<img src="images/outros/pergaminho.jpg" title="Pergaminhos" alt="Pergaminhos"
 						id="btn-pergaminhos" />
 				</div>
-				<div class="col-sm-8"></div>
+				<div class="col-sm-5"></div>
 				<div class="col-sm-2">
 					<img src="images/outros/moeda.jpg" title="Moeda" alt="Moeda" />
 					<span>
