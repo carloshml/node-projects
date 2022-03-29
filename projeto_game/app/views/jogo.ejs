@@ -1,178 +1,206 @@
 <!DOCTYPE HTML>
 <html lang="pt-br">
-	<head>
-		<meta charset="UTF-8">
 
-		<title>MMORPG - Game of Thrones</title>
-		
-		<!-- JQuery -->
-		<script src="js/jquery-2.2.1.js"></script>
+<head>
+	<meta charset="UTF-8">
 
-		<!-- bootstrap - link cdn -->
-		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
-	
-		<!-- incluindo css -->
-		<link href="css/style.css" rel="stylesheet">
+	<title>MMORPG - Game of Thrones</title>
 
-		<script>
-			$(document).ready(function(){				
-				$('#btn-suditos').click(function(){
-					$('#msg').hide();
-					$.ajax({
-						url:"/suditos",
-						method:"get",
-						success:function(htmlRequisicao){
-							$('#acoes').html(htmlRequisicao);
-						}
-					});
-				});
-				$('#btn-pergaminhos').click(function(){
-					$('#msg').hide();
-					$.ajax({
-						url:'/pergaminhos',
-						method:'get',
-						success:function(htmlRequisicao){
-							$('#acoes').html(htmlRequisicao);
-							clearTimeout(timerId);
-							cronometro();
-						}
-					});
-				});
+	<!-- JQuery -->
+	<script src="js/jquery-2.2.1.js"></script>
 
-				let timerId = null
+	<!-- bootstrap - link cdn -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
+		integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
 
-				function cronometro(){	
-				    $('.tempo_restante').each(function(){
-					let segundos = $(this).html()
-					let segundo_atuais = parseInt(segundos)-1;
-					if(segundo_atuais<0){
-						window.location.href ="/jogo?msg=C";
-					}else{
-						$(this).html(segundo_atuais)	
+	<!-- incluindo css -->
+	<link href="css/style.css" rel="stylesheet">
+
+	<script>
+		$(document).ready(function () {
+			$('#btn-suditos').click(function () {
+				$('#msg').hide();
+				$.ajax({
+					url: "/suditos",
+					method: "get",
+					success: function (htmlRequisicao) {
+						$('#acoes').html(htmlRequisicao);
 					}
-
-										
-					});
-					timerId = setTimeout(function(){ cronometro(); }, 1000);
-				}
+				});
 			});
-		</script>
 
-	</head>
+			const buscarUsuario = function () {			 
+				$.ajax({
+					url: '/buscarUsuario',
+					method: 'get',
+					success: function (htmlRequisicao) {
+					   console.log('  buscarUsuario ' , htmlRequisicao);
+					}
+				});
+			}
 
-	<body class="body-jogo">
+			buscarUsuario();
 
-		<nav class="navbar navbar-default navbar-static-top">
-			<a class="navbar-brand" href="/home">
-				<img src="images/casa_<%=img_casa%>.jpg" width="30" height="30" class="display-logo align-top" alt="">    
-				Este é seu jogo, <%=jogo.nome%>! 
-			</a>
-			<div class="container">
-				<div class="form-group sair">
-					<a   href="/sair"  id="btn-sair" class="btn btn-info pull-right">Sair</a>
-				</div>
+
+			const lerPergaminhhos = function () {
+				$('#msg').hide();
+				$.ajax({
+					url: '/pergaminhos',
+					method: 'get',
+					success: function (htmlRequisicao) {
+						$('#acoes').html(htmlRequisicao);
+						clearTimeout(timerId);
+						cronometro();
+					}
+				});
+			}
+
+			$('#btn-pergaminhos').click(lerPergaminhhos);
+
+			let timerId = null;
+
+			function cronometro() {
+				$('.tempo_restante').each(function () {
+					let segundos = $(this).html();
+					let segundo_atuais = parseInt(segundos) - 1;
+					if (segundo_atuais < 0) {
+						window.location.href = "/jogo?msg=C";
+					} else {
+						$(this).html(segundo_atuais)
+					}
+				});
+				timerId = setTimeout(function () { cronometro(); }, 1000);
+			}
+		});
+	</script>
+</head>
+
+<body class="body-jogo">
+	<nav class="navbar navbar-default navbar-static-top">
+		<a class="navbar-brand" href="/home">
+			<img src="images/casa_<%=img_casa%>.jpg" width="30" height="30" class="display-logo align-top" alt="">
+			Este é seu jogo, <%=jogo.nome%>!
+		</a>
+		<div class="container">
+			<div class="form-group sair">
+				<a href="/sair" id="btn-sair" class="btn btn-info pull-right">Sair</a>
 			</div>
-		</nav>
-
-	    <div class="container">
-
-			<%if(msg === 'erro'){%>
-				<div class="alert alert-danger" id='msg'>					
+		</div>
+	</nav>
+	<div class="container">
+		<div>
+			<%if(msg==='erro' ){%>
+				<div class="alert alert-danger" id='msg'>
 					<ul>
-						<li> <strong> Operação Invalida, verifique se todos os campos foram informados! </strong></li>							
+						<li> <strong> Operação Invalida, verifique se todos os campos foram informados! </strong></li>
 					</ul>
 				</div>
-			<%}%>
+				<%}%>
+		</div>
+		<div>
+			<% if(msg==='acerto' ){ %>
 
-			<%if(msg === 'acerto'){%>
-				<div class="alert alert-info" id='msg'>					
+				<div class="alert alert-info" id='msg'>
 					<ul>
-						<li> <strong> Operação realizada com sucesso! </strong> </li>							
+						<li> <strong> Operação realizada com sucesso! </strong> </li>
 					</ul>
 				</div>
-			<%}%>
-
-			<%if(msg === 'C'){%>
-				<div class="alert alert-info" id='msg'>					
+				<% } %>
+		</div>
+		<div>
+			<%if(msg==='C' ){%>
+				<div class="alert alert-info" id='msg'>
 					<ul>
-						<li> <strong> Senhor, ação ordenada foi finalizada! </strong> </li>							
+						<li> <strong> Senhor, ação ordenada foi finalizada! </strong> </li>
 					</ul>
 				</div>
-			<%}%>
-
-			<%if(msg === 'Deleted'){%>
-				<div class="alert alert-info" id='msg'>					
+				<%}%>
+		</div>
+		<div>
+			<% if(msg==='Deleted' ){ %>
+				<div class="alert alert-info" id='msg'>
 					<ul>
-						<li> <strong> Senhor, sua ordem foi revogada com sucesso! </strong> </li>							
+						<li> <strong> Senhor, sua ordem foi revogada com sucesso! </strong> </li>
 					</ul>
 				</div>
-			<%}%>
-
-			
-	    	
-			<div class="row">
-	    		<div class="col-sm-3 casa">
-					<img src="images/casa_<%=img_casa%>.jpg" />
-				</div>
-
-	    		<div class="col-sm-9">
-					<div class="row barra-superior">
-						<div class="col-sm-2"> 
-							<img src="images/habilidades/temor.jpg" title="Temor" alt="Temor" />
-							<span><%=jogo.temor%></span>
-						</div>
-						
-						<div class="col-sm-2"> 
-							<img src="images/habilidades/sabedoria.jpg" title="Sabedoria" alt="Sabedoria"/>
-							<span><%=jogo.sabedoria%></span>
-						</div>
-						
-						<div class="col-sm-2"> 
-							<img src="images/habilidades/comercio.jpg" title="Comércio" alt="Comércio"/>
-							<span><%=jogo.comercio%></span>
-						</div>
-						
-						<div class="col-sm-2"> 
-							<img src="images/habilidades/magia.jpg" title="Magia" alt="Magia"/>
-							<span><%=jogo.magia%></span>
-						</div>
-					</div>
-				</div>
-	    	</div>
-			
-			<div class="row">
-				<div class="col-sm-3"></div>
-				<div class="col-sm-9">
-					<div class="acoes" id="acoes" >
-						Senhor o que deseja fazer hoje?
-					</div>					
-				</div>
+				<% } %>
+		</div>
+		<div class="row">
+			<div class="col-sm-3 casa">
+				<img src="images/casa_<%=img_casa%>.jpg" />
 			</div>
-			
-		</div>	
-		
-		<div class="barra-inferior">
-			<div class="container">
-			
-				<div class="row">
-					<div class="col-sm-1">
-						<img src="images/outros/suditos.jpg" title="Aldeões" alt="Aldeões" id="btn-suditos"/>
-						<span><%=jogo.suditos%></span>
-					</div>
-					
-					<div class="col-sm-1">
-						<img src="images/outros/pergaminho.jpg" title="Pergaminhos" alt="Pergaminhos" id="btn-pergaminhos"/>
-					</div>
-					
-					<div class="col-sm-8"></div>
-					
+
+			<div class="col-sm-9">
+				<div class="row barra-superior">
 					<div class="col-sm-2">
-						<img src="images/outros/moeda.jpg" title="Moeda" alt="Moeda"/>
-						<span><%=jogo.moeda%></span>
+						<img src="images/habilidades/temor.jpg" title="Temor" alt="Temor" />
+						<div>Temor</div>
+						<span>
+							<%=jogo.temor%>
+						</span>
 					</div>
-					
+
+					<div class="col-sm-2">
+						<img src="images/habilidades/sabedoria.jpg" title="Sabedoria" alt="Sabedoria" />
+						<div>Sabedoria</div>
+						<span>
+							<%=jogo.sabedoria%>
+						</span>
+					</div>
+
+					<div class="col-sm-2">
+						<img src="images/habilidades/comercio.jpg" title="Comércio" alt="Comércio" />
+
+						<div>
+							comércio
+						</div>
+						<span>
+							<%=jogo.comercio%>
+						</span>
+					</div>
+
+					<div class="col-sm-2">
+						<img src="images/habilidades/magia.jpg" title="Magia" alt="Magia" />
+						<div>magia</div>
+						<span>
+							<%=jogo.magia%>
+						</span>
+					</div>
 				</div>
 			</div>
 		</div>
-	</body>
+		<div class="row">
+			<div class="col-sm-3"></div>
+			<div class="col-sm-9">
+				<div class="acoes" id="acoes">
+					Senhor o que deseja fazer hoje?
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="barra-inferior">
+		<div class="container">
+			<div class="row">
+				<div class="col-sm-1">
+					<img src="images/outros/suditos.jpg" title="Aldeões" alt="Aldeões" id="btn-suditos" />
+					<span>
+						<%=jogo.suditos%>
+					</span>
+				</div>
+				<div class="col-sm-1">
+					<img src="images/outros/pergaminho.jpg" title="Pergaminhos" alt="Pergaminhos"
+						id="btn-pergaminhos" />
+				</div>
+				<div class="col-sm-8"></div>
+				<div class="col-sm-2">
+					<img src="images/outros/moeda.jpg" title="Moeda" alt="Moeda" />
+					<span>
+						<%=jogo.moeda%>
+					</span>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+
 </html>

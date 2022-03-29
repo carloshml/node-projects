@@ -1,7 +1,6 @@
 module.exports = function(application){
 	application.get('/jogo', function(req, res){
-		application.app.controllers.jogo.render(application,req, res );
-		
+		application.app.controllers.jogo.render(application,req, res );		
 	});
 
 	application.get('/sair', function(req, res){
@@ -18,6 +17,11 @@ module.exports = function(application){
 
 	application.post('/ordenar_acao_sudito', function(req, res){
 		application.app.controllers.jogo.gerarOrdemSuditos(application,req, res );		
+	});
+
+	application.get('/buscarUsuario', function(req, res){
+		console.log('buscarUsuario   ');
+		application.app.controllers.jogo.buscarUsuario(application,req, res );		
 	});
 
 	application.get('/revogar_acao', function(req, res){

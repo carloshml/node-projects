@@ -1,36 +1,40 @@
-<div id="pergaminhos">					
+<div id="pergaminhos">
 	<h3>Pergaminhos</h3>
 
 	<ul>
-	<% for(let i=0 ; i < acoes.length ; i++ ) { %>
+		<% for(let i=0 ; i < acoes.length ; i++ ) { %>
 
-		<%
+			<% let txt_acao='' ; 
+			  switch (acoes[i].acao){ 
+				  case '1' : txt_acao='aldeão(ões) coletando recursos' ; break;
+			  	  case '2' : txt_acao='enforcamento(s) programado' ; break;
+			  	  case '3' : txt_acao='aldeão(ões) em treinamento de história' ; break; 
+			  	  case '4' : txt_acao='aldeão(ões) em treinamento de magia' ; break; 
+			  	  default: console.log("error"); break; 
+				} 
+			  const momentoAtual = new Date().getTime(); 
+			  const segundosRestantes = Math.round((acoes[i].acao_termina_em - momentoAtual) / 1000); 
+			  %>
 
-		let txt_acao ='';
+				<li>
+					<%=acoes[i].quantidade%>
+						<%= txt_acao %>
+							- <small>restam
 
-		switch (acoes[i].acao) {
-			case '1': txt_acao= 'aldeão(ões) coletando recursos';                  
-				break;
-			case '2': txt_acao= 'enforcamento(s) programado'   ;                
-				break;
-			case '3': txt_acao=  'aldeão(ões) em treinamento de história' ;                    
-				break;
-			case '4': txt_acao = 'aldeão(ões) em treinamento de magia'  ;                  
-				break;            
-			default: console.log("error");
-				break;
-		}	
-		var momentoAtual = new Date().getTime();
-		var segundosRestantes =  Math.round((acoes[i].acao_termina_em -momentoAtual) / 1000);	 
-		%> 
+								  
 
-		<li>
-			<%=acoes[i].quantidade%> <%= txt_acao %> 	
-			- <small>restam   <span class="tempo_restante"> <%=segundosRestantes %></span> 	
-			 segundos - <a href="/revogar_acao?id_acao=<%=acoes[i]._id%>">revogar ordem</a></small>
-		</li>
+								<% if( parseInt(segundosRestantes ) >  60){  %>
+									<%= Math.round(segundosRestantes  / 60) -1  %>  minutos
+								<%  } %>
+							
+								<span class="tempo_restante">
+									<%= segundosRestantes % 60 %> 
+								</span> segundos	 							 
+								<a href="/revogar_acao?id_acao=<%=acoes[i]._id%>">revogar ordem</a>
+							</small>
+				</li>
 
-	<% } %>
+				<% } %>
 	</ul>
 
 	<!--
@@ -42,6 +46,5 @@
 	</ul>
 	-->
 
-	
-</div>
 
+</div>
