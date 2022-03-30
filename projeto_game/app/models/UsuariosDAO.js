@@ -90,8 +90,7 @@ UsuarioDAO.prototype.buscaJogoUsuario = function (res, req, casa, msg) {
             // collection.find({usuario:{$eq:usuario.usuario}, senha:{$eq: usuario.senha}});
             //collection.find({usuario:usuario.usuario, senha: usuario.senha});
             collection.find({ usuario: ObjectID(usuarioId) })
-                .toArray(function (err, result) {
-                    console.log(' result ', result);
+                .toArray(function (err, result) {                    
                     result[0].nome = req.session.nome;
                     usuario2 = { img_casa: casa, jogo: result[0], msg: msg };
                     res.send(usuario2);
@@ -109,8 +108,7 @@ UsuarioDAO.prototype.buscarUsuarioGerarAldeoes = function (res, req, casa, msg) 
             // collection.find({usuario:{$eq:usuario.usuario}, senha:{$eq: usuario.senha}});
             //collection.find({usuario:usuario.usuario, senha: usuario.senha});
             collection.find({ usuario: ObjectID(usuarioId) })
-                .toArray(function (err, result) {
-                    console.log(' result ', result);
+                .toArray(function (err, result) {                     
                     result[0].nome = req.session.nome;
                     usuario2 = { img_casa: casa, jogo: result[0], msg: msg };
                     res.render('aldeoes', usuario2);

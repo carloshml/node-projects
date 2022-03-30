@@ -18,14 +18,8 @@
 	<script>
 		document.addEventListener("DOMContentLoaded", function () {
 			let usuario = {};
-
 			const parametros = new URLSearchParams(window.location.search);
-
-
-
-
 			const divMensagens = document.getElementById('mensagens');
-
 			switch (parametros.get('msg')) {
 				case 'erro':
 					divMensagens.innerHTML = ` <div class="alert alert-danger" id='msg'>
@@ -44,7 +38,7 @@
 				case 'todoSutidosOcupados':
 					divMensagens.innerHTML = `   <div class="alert alert-info" id='msg'>
 												<ul>
-													<li> <strong> Todos suditos estão ocupado! </strong> </li>
+													<li> <strong> Todos os suditos estão ocupados! </strong> </li>
 												</ul>
 											</div>`
 					break;
@@ -76,11 +70,9 @@
 				default:
 					break;
 			}
-
 			setTimeout(() => {
 				divMensagens.innerHTML = '';
 			}, 6000);
-
 			$('#btn-suditos').click(function () {
 				$('#msg').hide();
 				$.ajax({
@@ -88,38 +80,48 @@
 					method: "get",
 					success: function (htmlRequisicao) {
 						$('#acoes').html(htmlRequisicao);
-						const numeroSuditosLivre = document.getElementById('numero-de-suditos-livres');
-						if (numeroSuditosLivre) {
-							numeroSuditosLivre.innerHTML = usuario.jogo.suditos - usuario.jogo.suditosTrabalhando;
-						}
-
-						const numeroSuditosTrab = document.getElementById('numero-de-suditos-trab');
-						if (numeroSuditosTrab) {
-							numeroSuditosTrab.innerHTML = usuario.jogo.suditosTrabalhando;
-						}
+						buscaJogoUsuario();
 					}
 				});
 			});
-			const buscaJogoUsuario = function () {
+			function atualizarSuditos() {
+				const numeroSuditosLivre = document.getElementById('numero-de-suditos-livres');
+				// do compomente pergaminho
+				if (numeroSuditosLivre) {
+					numeroSuditosLivre.innerHTML = usuario.jogo.suditos - usuario.jogo.suditosTrabalhando;
+				}
+				// do compomente pergaminho
+				const numeroSuditosTrab = document.getElementById('numero-de-suditos-trab');
+				if (numeroSuditosTrab) {
+					numeroSuditosTrab.innerHTML = usuario.jogo.suditosTrabalhando;
+				}
+				// corpo principal
+				const suditosTrabalhando = document.getElementById('suditosTrabalhando');
+				if (suditosTrabalhando) {
+					suditosTrabalhando.innerHTML = usuario.jogo.suditosTrabalhando;
+				}
+			}
+			function buscaJogoUsuario() {
 				$.ajax({
 					url: '/buscaJogoUsuario',
 					method: 'get',
 					success: function (respBuscarUsuario) {
-						console.log('  buscaJogoUsuario ', respBuscarUsuario);
 						usuario = respBuscarUsuario;
+						atualizarSuditos();
 					}
 				});
 			}
-			buscaJogoUsuario();
+
 			const lerPergaminhhos = function () {
 				$('#msg').hide();
 				$.ajax({
-					url: '/gerarPergaminhos',
+					url: `/gerarPergaminhos?jogoid=${usuario.jogo._id}`,
 					method: 'get',
 					success: function (htmlRequisicao) {
 						$('#acoes').html(htmlRequisicao);
 						clearTimeout(timerId);
 						cronometro();
+						buscaJogoUsuario();
 					}
 				});
 			}
@@ -137,6 +139,8 @@
 				});
 				timerId = setTimeout(function () { cronometro(); }, 1000);
 			}
+
+			buscaJogoUsuario();
 		});
 	</script>
 </head>
@@ -227,7 +231,7 @@
 					<div>
 						Suditos Trabalhando
 					</div>
-					<span>
+					<span id="suditosTrabalhando">
 						<%=jogo.suditosTrabalhando%>
 					</span>
 				</div>

@@ -48,7 +48,7 @@ module.exports.gerarPergaminhos = function (application, req, res) {
     }
     var connection = application.config.dbConection;
     var JogoDAO = new application.app.models.JogoDAO(connection);
-    JogoDAO.gerarPergaminhos(req.session.usuario, res);
+    JogoDAO.gerarPergaminhos(req, res);
 
 }
 

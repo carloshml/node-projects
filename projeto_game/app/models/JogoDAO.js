@@ -41,12 +41,7 @@ JogoDAO.prototype.iniciaJogo = function (res, req, casa, msg) {
     });
 }
 
-JogoDAO.prototype.gerarOrdemSuditos = function (acao) {
-
-
-
-    console.log('   gerarOrdemSuditos::  ', acao);
-
+JogoDAO.prototype.gerarOrdemSuditos = function (acao) {  
     this._connection.open(function (err, mongoclient) {
         mongoclient.collection("acao", function (erro, collection) {
             let tempoParaTermino = new Date().getTime();
@@ -65,7 +60,6 @@ JogoDAO.prototype.gerarOrdemSuditos = function (acao) {
             acao.acao_termina_em = tempoParaTermino;
             collection.insert(acao);
         });
-
         mongoclient.collection("jogo", function (erro, collection) {
             let moedas = null;
             switch (parseInt(acao.acao)) {
@@ -81,7 +75,7 @@ JogoDAO.prototype.gerarOrdemSuditos = function (acao) {
                     break;
             }
 
-            console.log('   gerarOrdemSuditos::  ', acao.jogo.moeda, acao.quantidade);
+            
 
 
 
@@ -95,15 +89,29 @@ JogoDAO.prototype.gerarOrdemSuditos = function (acao) {
     });
 }
 
-JogoDAO.prototype.gerarPergaminhos = function (usuario, res) {
+JogoDAO.prototype.gerarPergaminhos = function (req, res) {
+
+
+    const jogoid = req.query.jogoid;
+    const usuario=  req.session.usuario;
+
     this._connection.open(function (err, mongoclient) {
         mongoclient.collection("acao", function (erro, collection) {
             const momento_atual = new Date().getTime();
             collection.find({ usuario: usuario, acao_termina_em: { $gt: momento_atual } })
-                .toArray(function (err, result) {
+                .toArray(function (err, result) {                   
+                    if (result.length === 0) {
+                        mongoclient.collection("jogo", function (erro, collection) {
+                            collection.update({ "_id": ObjectID(jogoid) },                                
+                                { $set: { suditosTrabalhando: 0 } }                                
+                            );
+                            mongoclient.close();
+                        });
+                    } else {
+                        mongoclient.close();
+                    }
                     res.render('pergaminhos', { acoes: result });
                 });
-            mongoclient.close();
         });
     });
 }

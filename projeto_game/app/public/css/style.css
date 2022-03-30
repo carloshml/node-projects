@@ -1,14 +1,14 @@
 .body-index {
-  background: #010101;
+  background: #e6e6e6;
 }
 
-.titulo{
-	background: rgb(88, 88, 88);
-	color: white;	
+.titulo {
+  background: rgb(88, 88, 88);
+  color: white;
 }
 
-.conteudo-pagina{
-	margin: 2px 15px;
+.conteudo-pagina {
+  margin: 2px 15px;
 }
 
 .elemento:nth-child(odd) {
@@ -97,11 +97,14 @@
 }
 
 /* feitas por @carloshml*/
-
 img {
-  border-radius: 15px;
-  box-shadow: 5px 5px 8px gray;
+  border-radius: 4px;
 }
+.imagem-home {
+  border-radius: 15px;
+  margin: 10% 0;
+}
+
 .barra-superior,
 #acoes {
   border-radius: 8px;
@@ -115,5 +118,34 @@ img {
 .display-logo {
   display: inline !important;
   border-radius: 8px !important;
-  box-shadow: 2px 2px 8px gray;
 }
+
+.acoes-pergaminho{
+  border-radius: 4px;
+  background-color:  rgba(128, 39, 39, 0.3);
+  margin: 2px 0;
+}
+
+.btn-home {
+  width: 400px;
+  padding: 5%;
+  margin: 2px 0;
+  display: inline-block;
+  text-transform: uppercase;
+  vertical-align: middle;
+}
+
+.imagem-acao{
+  height: 30px;
+}
+
+.btn-acao{
+  height: 30px;
+  text-decoration: none !important;
+  background: rgb(46, 94, 46);
+  color: white !important;
+  display: block;
+  border-radius: 4px;
+  text-align: center;
+}
+

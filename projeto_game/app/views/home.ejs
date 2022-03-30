@@ -18,9 +18,7 @@
 
 	<script type="text/javascript">
 		document.addEventListener("DOMContentLoaded", function () {
-			$('#btn-jogar').click(function () {
-				window.location.href = '/jogo';
-			});
+ 
 
 			$('#btn-sair').click(function () {
 				window.location.href = '/sair';
@@ -44,22 +42,28 @@
 	<div class="container">
 		<div class="row">
 			<div class="col-md-6 text-center">
-				<button id="btn-jogar" class="btn btn-success "> jogar </button>
+				<a  href="/jogo" id="btn-jogar" class="btn btn-success btn-home">
+					<span>
+						jogar
+					</span>
+				</a>
 			</div>
 
 			<div class="col-md-6 text-center">
-				<a href="/buscarUsuarios?img_casa=<%=img_casa%>&jogo=<%=JSON.stringify(jogo)%>&msg=" id="btn-ver-usuario"
-					class="btn btn-success ">
-					ver usuário
+				<a href="/buscarUsuarios?img_casa=<%=img_casa%>&jogo=<%=JSON.stringify(jogo)%>&msg="
+					id="btn-ver-usuario" class="btn btn-success  btn-home">
+					<span>
+						ver usuário
+					</span>					
 				</a>
 			</div>
 		</div>
 		<div class="container">
 			<div class="row">
-				<div class="col-md-2"></div>	
-				<div class="col-md-8">
-					<img src="images/game_of_thrones_logo.jpg" />
-				</div>	
+				<div class="col-md-2"></div>
+				<div class="col-md-8 text-center">
+					<img class="imagem-home" src="images/game_of_thrones_logo.jpg" />
+				</div>
 				<div class="col-md-2"></div>
 			</div>
 		</div>
