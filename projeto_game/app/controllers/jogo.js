@@ -49,6 +49,19 @@ module.exports.gerarPergaminhos = function (application, req, res) {
     var connection = application.config.dbConection;
     var JogoDAO = new application.app.models.JogoDAO(connection);
     JogoDAO.gerarPergaminhos(req, res);
+}
+
+module.exports.atualizarAcoesDeJogo = function (application, req, res) {
+    if (!req.session.autorizado) {
+        var errors = [
+            { msg: 'Você não tem acesso a essa área' }
+        ];
+        res.render('index', { validacao: errors, aviso: {} });
+        return;
+    }
+    var connection = application.config.dbConection;
+    var JogoDAO = new application.app.models.JogoDAO(connection);
+    JogoDAO.atualizarAcoesDeJogo(req, res);
 
 }
 
@@ -61,31 +74,22 @@ module.exports.gerarOrdemSuditos = function (application, req, res) {
         return;
     }
     var dadosForm = req.body;
-
     req.assert('acao', 'acao deve ser informada').notEmpty();
     req.assert('quantidade', 'acao deve ser informada').notEmpty();
     var erros = req.validationErrors();
-
     if (erros) {
         res.redirect('jogo?msg=erro');
         return;
     }
-
     dadosForm.jogo = JSON.parse(dadosForm.jogo);
-
-
     if (isNaN(Number(dadosForm.quantidade).valueOf())) {
         res.redirect('jogo?msg=quantidadeDeveSerNumerica');
         return;
     }
-
-
     if (dadosForm.quantidade > (dadosForm.jogo.suditos - dadosForm.jogo.suditosTrabalhando)) {
         res.redirect('jogo?msg=todoSutidosOcupados');
         return;
     }
-
-
     var connection = application.config.dbConection;
     var JogoDAO = new application.app.models.JogoDAO(connection);
     dadosForm.usuario = req.session.usuario;
@@ -93,9 +97,8 @@ module.exports.gerarOrdemSuditos = function (application, req, res) {
     res.redirect('jogo?msg=acerto');
 }
 
-module.exports.revogarAcao = function (application, req, res) {
-    let url_query = req.query;
+module.exports.revogarAcao = function (application, req, res) {   
     var connection = application.config.dbConection;
     var JogoDAO = new application.app.models.JogoDAO(connection);
-    JogoDAO.revogarAcao(url_query.id_acao, res);
+    JogoDAO.revogarAcao(req , res); 
 }

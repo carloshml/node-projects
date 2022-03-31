@@ -140,12 +140,12 @@ img {
 }
 
 .btn-acao{
-  height: 30px;
   text-decoration: none !important;
-  background: rgb(46, 94, 46);
+  background: rgb(195, 96, 8);
   color: white !important;
   display: block;
   border-radius: 4px;
   text-align: center;
+  padding: 5px;
 }
 

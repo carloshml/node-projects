@@ -8,6 +8,7 @@
 
 	<!-- JQuery -->
 	<script src="js/jquery-2.2.1.js"></script>
+	<script src="js/jogoView.js"></script>
 
 	<!-- bootstrap - link cdn -->
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
@@ -15,134 +16,7 @@
 
 	<!-- incluindo css -->
 	<link href="css/style.css" rel="stylesheet">
-	<script>
-		document.addEventListener("DOMContentLoaded", function () {
-			let usuario = {};
-			const parametros = new URLSearchParams(window.location.search);
-			const divMensagens = document.getElementById('mensagens');
-			switch (parametros.get('msg')) {
-				case 'erro':
-					divMensagens.innerHTML = ` <div class="alert alert-danger" id='msg'>
-													<ul>
-														<li> <strong> Operação Invalida, verifique se todos os campos foram informados! </strong></li>
-													</ul>
-												</div>`
-					break;
-				case 'acerto':
-					divMensagens.innerHTML = ` <div class="alert alert-info" id='msg'>
-													<ul>
-														<li> <strong> Operação realizada com sucesso! </strong> </li>
-													</ul>
-												</div>`
-					break;
-				case 'todoSutidosOcupados':
-					divMensagens.innerHTML = `   <div class="alert alert-info" id='msg'>
-												<ul>
-													<li> <strong> Todos os suditos estão ocupados! </strong> </li>
-												</ul>
-											</div>`
-					break;
-				case 'C':
-					divMensagens.innerHTML = `<div class="alert alert-info" id='msg'>
-													<ul>
-														<li> <strong> Senhor, ação ordenada foi finalizada! </strong> </li>
-													</ul>
-												</div>`
-					break;
-				case 'Deleted':
-					divMensagens.innerHTML = ` <div class="alert alert-info" id='msg'>
-													<ul>
-														<li> <strong> Senhor, sua ordem foi revogada com sucesso! </strong> </li>
-													</ul>
-												</div>`
-					break;
 
-				case 'quantidadeDeveSerNumerica':
-					divMensagens.innerHTML = ` <div class="alert alert-info" id='msg'>
-													<ul>
-														<li> <strong> Quantidade deve ser numerica! </strong> </li>
-													</ul>
-												</div>`
-					break;
-
-
-
-				default:
-					break;
-			}
-			setTimeout(() => {
-				divMensagens.innerHTML = '';
-			}, 6000);
-			$('#btn-suditos').click(function () {
-				$('#msg').hide();
-				$.ajax({
-					url: "/gerarSuditos",
-					method: "get",
-					success: function (htmlRequisicao) {
-						$('#acoes').html(htmlRequisicao);
-						buscaJogoUsuario();
-					}
-				});
-			});
-			function atualizarSuditos() {
-				const numeroSuditosLivre = document.getElementById('numero-de-suditos-livres');
-				// do compomente pergaminho
-				if (numeroSuditosLivre) {
-					numeroSuditosLivre.innerHTML = usuario.jogo.suditos - usuario.jogo.suditosTrabalhando;
-				}
-				// do compomente pergaminho
-				const numeroSuditosTrab = document.getElementById('numero-de-suditos-trab');
-				if (numeroSuditosTrab) {
-					numeroSuditosTrab.innerHTML = usuario.jogo.suditosTrabalhando;
-				}
-				// corpo principal
-				const suditosTrabalhando = document.getElementById('suditosTrabalhando');
-				if (suditosTrabalhando) {
-					suditosTrabalhando.innerHTML = usuario.jogo.suditosTrabalhando;
-				}
-			}
-			function buscaJogoUsuario() {
-				$.ajax({
-					url: '/buscaJogoUsuario',
-					method: 'get',
-					success: function (respBuscarUsuario) {
-						usuario = respBuscarUsuario;
-						atualizarSuditos();
-					}
-				});
-			}
-
-			const lerPergaminhhos = function () {
-				$('#msg').hide();
-				$.ajax({
-					url: `/gerarPergaminhos?jogoid=${usuario.jogo._id}`,
-					method: 'get',
-					success: function (htmlRequisicao) {
-						$('#acoes').html(htmlRequisicao);
-						clearTimeout(timerId);
-						cronometro();
-						buscaJogoUsuario();
-					}
-				});
-			}
-			$('#btn-pergaminhos').click(lerPergaminhhos);
-			let timerId = null;
-			function cronometro() {
-				$('.tempo_restante').each(function () {
-					let segundos = $(this).html();
-					let segundo_atuais = parseInt(segundos) - 1;
-					if (segundo_atuais < 0) {
-						window.location.href = "/jogo?msg=C";
-					} else {
-						$(this).html(segundo_atuais)
-					}
-				});
-				timerId = setTimeout(function () { cronometro(); }, 1000);
-			}
-
-			buscaJogoUsuario();
-		});
-	</script>
 </head>
 
 <body class="body-jogo">
@@ -209,7 +83,7 @@
 			<div class="col-sm-3"></div>
 			<div class="col-sm-9">
 				<div class="acoes" id="acoes">
-					Senhor o que deseja fazer hoje?s
+					Senhor o que deseja fazer hoje?
 				</div>
 			</div>
 		</div>
@@ -218,7 +92,8 @@
 		<div class="container">
 			<div class="row">
 				<div class="col-sm-2">
-					<img src="images/outros/suditos.jpg" title="suditos" alt="suditos" id="btn-suditos" />
+					<img src="images/outros/suditos.jpg" title="suditos" alt="suditos" id="btn-suditos"
+						onclick="verSudutos()" />
 					<div>
 						Total Suditos
 					</div>
@@ -227,7 +102,8 @@
 					</span>
 				</div>
 				<div class="col-sm-2">
-					<img src="images/outros/suditos.jpg" title="suditos" alt="suditos" id="btn-suditos" />
+					<img src="images/outros/suditos.jpg" title="suditos" alt="suditos" id="btn-suditos"
+						onclick="verSudutos()" />
 					<div>
 						Suditos Trabalhando
 					</div>
@@ -236,8 +112,8 @@
 					</span>
 				</div>
 				<div class="col-sm-1">
-					<img src="images/outros/pergaminho.jpg" title="Pergaminhos" alt="Pergaminhos"
-						id="btn-pergaminhos" />
+					<img src="images/outros/pergaminho.jpg" title="Pergaminhos" alt="Pergaminhos" id="btn-pergaminhos"
+						onclick="verPergaminhos()" />
 				</div>
 				<div class="col-sm-5"></div>
 				<div class="col-sm-2">
