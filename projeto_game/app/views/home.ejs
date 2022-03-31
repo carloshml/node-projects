@@ -14,17 +14,7 @@
 		integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
 
 	<!-- incluindo css -->
-	<link href="css/style.css" rel="stylesheet">
-
-	<script type="text/javascript">
-		document.addEventListener("DOMContentLoaded", function () {
- 
-
-			$('#btn-sair').click(function () {
-				window.location.href = '/sair';
-			});
-		});	
-	</script>
+	<link href="css/style.css" rel="stylesheet">	 
 </head>
 
 <body class="body-index">
@@ -35,7 +25,9 @@
 		</a>
 		<div class="container">
 			<div class="form-group sair">
-				<button type="button" id="btn-sair" class="btn btn-info pull-right">Sair</button>
+				<a href="/sair" type="button" id="btn-sair" class="btn btn-info pull-right">
+					Sair
+				</a>
 			</div>
 		</div>
 	</nav>

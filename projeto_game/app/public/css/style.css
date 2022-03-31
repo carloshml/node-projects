@@ -83,7 +83,7 @@
 }
 
 #pergaminhos {
-  max-height: 180px;
+  height: 40vh;
   overflow: auto;
 }
 
@@ -137,6 +137,7 @@ img {
 
 .imagem-acao{
   height: 30px;
+  width: 45px;
 }
 
 .btn-acao{

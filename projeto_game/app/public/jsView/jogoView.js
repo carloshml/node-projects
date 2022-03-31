@@ -3,13 +3,19 @@ let timerId = null;
 function cronometro() {
     if (document.getElementById('pergaminhos') !== null) {
         gerarPergaminhos();
+        const tempo_restante = document.getElementById('tempo_restante'); 
+        if (tempo_restante && (tempo_restante.innerText === '0')) {           
+            atualizarAcoesDeJogo()
+                .then(() => buscaJogoUsuario());
+        }
     }
-
-    atualizarAcoesDeJogo()
-        .then(() => {      
-            buscaJogoUsuario();
-        });
     timerId = setTimeout(function () { cronometro(); }, 1000);
+}
+
+function cronometro10seg() {
+    atualizarAcoesDeJogo()
+        .then(() => buscaJogoUsuario());
+    timerId = setTimeout(function () { cronometro10seg(); }, 10000);
 }
 
 const verPergaminhos = function () {
@@ -178,21 +184,27 @@ function gerarPergaminhos(usarClearTimeOut) {
                 .text()
                 .then(function (response) {
                     response = JSON.parse(response);
-                    if (response) {
-                        console.log('gerarPergaminhos', response);
+                    if (response) {                        
                         // apenas se pergaminhos estiver na tela
                         const acoes = response.acoes;
                         let conteudo = ` <div id="pergaminhos">
                                                       <h3>Pergaminhos</h3>`;
                         for (let i = 0; i < acoes.length; i++) {
-
                             let txt_acao = '';
                             let imagem = '';
                             switch (acoes[i].acao) {
-                                case '1': txt_acao = 'aldeão(ões) coletando recursos'; break;
-                                case '2': txt_acao = 'enforcamento(s) programado'; break;
-                                case '3': txt_acao = 'aldeão(ões) em treinamento de história'; imagem = 'book.gif'; break;
-                                case '4': txt_acao = 'aldeão(ões) em treinamento de magia'; imagem = 'fire.gif'; break;
+                                case '1': txt_acao = 'aldeão(ões) coletando recursos';
+                                    imagem = 'walk.gif';
+                                    break;
+                                case '2': txt_acao = 'enforcamento(s) programado';
+                                    imagem = 'dead.gif';
+                                    break;
+                                case '3': txt_acao = 'aldeão(ões) em treinamento de história';
+                                    imagem = 'book.gif';
+                                    break;
+                                case '4': txt_acao = 'aldeão(ões) em treinamento de magia';
+                                    imagem = 'fire.gif';
+                                    break;
                                 default: console.log("error");
                                     break;
                             }
@@ -204,10 +216,10 @@ function gerarPergaminhos(usarClearTimeOut) {
                                 conteudo += `	<img class="imagem-acao" src="images/${imagem}" loading=lazy>`
                             }
                             conteudo += `${acoes[i].quantidade} ${txt_acao} - <small>restam`;
-                            if (parseInt(segundosRestantes) > 60) {
-                                conteudo += `	${Math.round(segundosRestantes / 60) - 1}   minutos`;
+                            if (parseInt(segundosRestantes) > 59) {
+                                conteudo += `	${Math.round(segundosRestantes / 60)}   minutos`;
                             }
-                            conteudo += `<span class="tempo_restante"> ${segundosRestantes % 60}	  </span> segundos
+                            conteudo += `<span class="tempo_restante" id="tempo_restante">${segundosRestantes % 60}</span> segundos
 
                                                 </small>
                                                 </div>
@@ -232,8 +244,10 @@ document.addEventListener("DOMContentLoaded", function () {
     // inicar atualizando a tela  
     buscaJogoUsuario()
         .then(() => {
-            atualizarAcoesDeJogo();
+            atualizarAcoesDeJogo()
+                .then(() => buscaJogoUsuario())
             cronometro();
+            cronometro10seg();
         });
     lerNotificacoes();
 
