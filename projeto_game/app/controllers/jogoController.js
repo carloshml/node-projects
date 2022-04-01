@@ -1,15 +1,11 @@
-module.exports.render = function (application, req, res) {
+module.exports.iniciaJogo = function (application, req, res) {
     if (req.session.autorizado) {
-        var connection = application.config.dbConection;
-        var JogoDAO = new application.app.models.JogoDAO(connection);
-        var comandoInvalido = false;
-        var msg = '';
-        if (req.query.msg !== '') {
-            msg = req.query.msg;
-        }
+        const connection = application.config.dbConection;
+        const JogoDAO = new application.app.models.JogoDAO(connection);
+        const comandoInvalido = false;      
         JogoDAO.iniciaJogo(res, req, req.session.casa);
     } else {
-        var errors = [
+        const errors = [
             { msg: 'Você não tem acesso a essa área' }
         ]
         res.render('index', { validacao: errors, aviso: {} });
@@ -24,15 +20,15 @@ module.exports.sair = function (application, req, res) {
 
 module.exports.gerarSuditos = function (application, req, res) {
     if (!req.session.autorizado) {
-        var errors = [
+        const errors = [
             { msg: 'Você não tem acesso a essa área' }
         ];
         res.render('index', { validacao: errors, aviso: {} });
         return;
     }
 
-    var connection = application.config.dbConection;
-    var UsuarioDAO = new application.app.models.UsuariosDAO(connection);
+    const connection = application.config.dbConection;
+    const UsuarioDAO = new application.app.models.UsuariosDAO(connection);
     UsuarioDAO.buscarUsuarioGerarAldeoes(res, req, req.session.casa);
 
 
@@ -40,47 +36,46 @@ module.exports.gerarSuditos = function (application, req, res) {
 
 module.exports.gerarPergaminhos = function (application, req, res) {
     if (!req.session.autorizado) {
-        var errors = [
+        const errors = [
             { msg: 'Você não tem acesso a essa área' }
         ];
         res.render('index', { validacao: errors, aviso: {} });
         return;
     }
-    var connection = application.config.dbConection;
-    var JogoDAO = new application.app.models.JogoDAO(connection);
+    const connection = application.config.dbConection;
+    const JogoDAO = new application.app.models.JogoDAO(connection);
     JogoDAO.gerarPergaminhos(req, res);
 }
 
 module.exports.atualizarAcoesDeJogo = function (application, req, res) {
     if (!req.session.autorizado) {
-        var errors = [
+        const errors = [
             { msg: 'Você não tem acesso a essa área' }
         ];
         res.render('index', { validacao: errors, aviso: {} });
         return;
     }
-    var connection = application.config.dbConection;
-    var JogoDAO = new application.app.models.JogoDAO(connection);
+    const connection = application.config.dbConection;
+    const JogoDAO = new application.app.models.JogoDAO(connection);
     JogoDAO.atualizarAcoesDeJogo(req, res);
 
 }
 
-module.exports.gerarOrdemSuditos = function (application, req, res) {
+module.exports.gerarOrdemSuditos = function (application, req, res , validationResult) {
     if (!req.session.autorizado) {
-        var errors = [
+        const errors = [
             { msg: 'Você não tem acesso a essa área' }
         ];
         res.render('index', { validacao: errors, aviso: {} });
         return;
     }
-    var dadosForm = req.body;
-    req.assert('acao', 'acao deve ser informada').notEmpty();
-    req.assert('quantidade', 'acao deve ser informada').notEmpty();
-    var erros = req.validationErrors();
-    if (erros) {
+  
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
         res.redirect('jogo?msg=erro');
         return;
     }
+    const dadosForm = req.body;
     dadosForm.jogo = JSON.parse(dadosForm.jogo);
     if (isNaN(Number(dadosForm.quantidade).valueOf())) {
         res.redirect('jogo?msg=quantidadeDeveSerNumerica');
@@ -90,15 +85,15 @@ module.exports.gerarOrdemSuditos = function (application, req, res) {
         res.redirect('jogo?msg=todoSutidosOcupados');
         return;
     }
-    var connection = application.config.dbConection;
-    var JogoDAO = new application.app.models.JogoDAO(connection);
+    const connection = application.config.dbConection;
+    const JogoDAO = new application.app.models.JogoDAO(connection);
     dadosForm.usuario = req.session.usuario;
     JogoDAO.gerarOrdemSuditos(dadosForm);
     res.redirect('jogo?msg=acerto');
 }
 
-module.exports.revogarAcao = function (application, req, res) {   
-    var connection = application.config.dbConection;
-    var JogoDAO = new application.app.models.JogoDAO(connection);
-    JogoDAO.revogarAcao(req , res); 
+module.exports.revogarAcao = function (application, req, res) {
+    const connection = application.config.dbConection;
+    const JogoDAO = new application.app.models.JogoDAO(connection);
+    JogoDAO.revogarAcao(req, res);
 }
