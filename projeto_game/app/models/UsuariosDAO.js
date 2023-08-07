@@ -17,7 +17,7 @@ UsuarioDAO.prototype.inserirUsuario = async function (usuario, application, res)
                     //req.query.resultados =  result;                              
                     //res.render('usuarios',req.query, ); 
 
-                    console.log(' result  ::   ', result);
+                    
                     if (result.length > 0) {
                         var erros = [
                             { msg: 'Usuario já existe!!' }
@@ -36,18 +36,18 @@ UsuarioDAO.prototype.inserirUsuario = async function (usuario, application, res)
     await this._connection
         .getDB()
         .then(async db => {
-            await db.db.insert(usuario, function (err, result) {
-                if (err) throw err;
-
-                // geração dos parametros
-                var connection = application.config.dbConection;
-                var JogoDAO = new application.app.models.JogoDAO(connection);
-                JogoDAO.gerarParametrosJogo(result.ops[0]._id);
-                var avisos = [
-                    { msg: 'Você Foi Cadastrado com Sucesso!!' }
-                ]
-                res.render('index', { validacao: {}, aviso: avisos });
-            });
+            await db.db.collection("usuarios")
+                .insertOne(usuario, function (err, result) {
+                    if (err) throw err;    
+                    // geração dos parametros
+                    var connection = application.config.dbConection;
+                    var JogoDAO = new application.app.models.JogoDAO(connection);
+                    JogoDAO.gerarParametrosJogo(result.insertedId);
+                    var avisos = [
+                        { msg: 'Você Foi Cadastrado com Sucesso!!' }
+                    ]
+                    res.render('index', { validacao: {}, aviso: avisos });
+                });
         })
         .catch(error => {
             console.log('  algum erro foi encontrado  ', error);

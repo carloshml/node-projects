@@ -1,31 +1,40 @@
 let usuario = {};
 let timerId = null;
-function cronometro() {
-    if (document.getElementById('pergaminhos') !== null) {
-        gerarPergaminhos();
-        const tempo_restante = document.getElementById('tempo_restante'); 
-        if (tempo_restante && (tempo_restante.innerText === '0')) {           
-            atualizarAcoesDeJogo()
-                .then(() => buscaJogoUsuario());
+async function cronometro() {
+    try {
+        if (document.getElementById('pergaminhos') !== null) {
+            await  gerarPergaminhos();
+            const tempo_restante = document.getElementById('tempo_restante');
+            if (tempo_restante && (tempo_restante.innerText === '0')) {
+                await  atualizarAcoesDeJogo()
+                    .then(() => buscaJogoUsuario());
+            }
         }
+    } catch (error) {
+        throw (error);
     }
-    timerId = setTimeout(function () { cronometro(); }, 1000);
+    timerCronometro= setTimeout(function () { cronometro(); }, 1000);
 }
 
-function cronometro10seg() {
-    atualizarAcoesDeJogo()
-        .then(() => buscaJogoUsuario());
-    timerId = setTimeout(function () { cronometro10seg(); }, 10000);
+async function cronometro10seg() {
+    try {
+       await atualizarAcoesDeJogo()
+            .then(() => buscaJogoUsuario());
+    } catch (error) {
+        throw (error);
+    }
+    timerCronometro10seg = setTimeout(function () { cronometro10seg(); }, 10000);
 }
 
-const verPergaminhos = function () {
-    clearTimeout(timerId);
-    gerarPergaminhos();
-    cronometro();
+const verPergaminhos = async function () {
+    clearTimeout(timerCronometro);
+    clearTimeout(timerCronometro10seg);
+    await gerarPergaminhos();
+    await cronometro();
 }
 
 
-const verSudutos = function () {
+const verSuditos = function () {
     $('#msg').hide();
     $.ajax({
         url: "/gerarSuditos",
@@ -58,12 +67,12 @@ function atualizarAcoesDeJogo() {
                     });
             } else {
                 alert(' Deu erro ');
-                console.log("Oops, we haven't got JSON!");
+                throw ("Oops, we haven't got JSON!");
             }
         })
         .catch(e => {
             alert(' Deu erro 500');
-            console.log("Oops, we haven't got JSON!");
+            throw ("Oops, we haven't got JSON!");
         });
 }
 
@@ -87,12 +96,12 @@ function buscaJogoUsuario() {
                     });
             } else {
                 alert(' Deu erro ');
-                console.log("Oops, we haven't got JSON!");
+                throw ("Oops, we haven't got JSON!");
             }
         })
         .catch(e => {
             alert(' Deu erro 500');
-            console.log("Oops, we haven't got JSON!");
+            throw ("Oops, we haven't got JSON!");
         });
 }
 
@@ -184,7 +193,7 @@ function gerarPergaminhos(usarClearTimeOut) {
                 .text()
                 .then(function (response) {
                     response = JSON.parse(response);
-                    if (response) {                        
+                    if (response) {
                         // apenas se pergaminhos estiver na tela
                         const acoes = response.acoes;
                         let conteudo = ` <div id="pergaminhos">
@@ -236,7 +245,7 @@ function gerarPergaminhos(usarClearTimeOut) {
         })
         .catch(e => {
             alert(' Deu erro 500');
-            console.log("Oops, we haven't got JSON!");
+           throw("Oops, we haven't got JSON!");
         });
 }
 

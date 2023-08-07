@@ -2,7 +2,7 @@ var MongoClient = require('mongodb').MongoClient;
 const config = {
   user: '',
   password: '',
-  url: 'localhost:27017',
+  url: '127.0.0.1:27017',
   database: 'got'
 }
 // const mongodbUri = `mongodb://${config.user}:${config.password}@${config.url}/${config.database}`;
@@ -32,8 +32,9 @@ module.exports = new MongoDBConnection();
 // transforms into a promise Mongo's client.connect
 function mConnect() {
   return new Promise((resolve, reject) => {
+   
     MongoClient
-      .connect('mongodb://localhost',
+      .connect(mongodbUri,
         options,
         function (err, clientResponse) {
           if (err) {
@@ -41,9 +42,9 @@ function mConnect() {
           }
 
           if (clientResponse && clientResponse.db) {
-            const db = clientResponse.db(config.database);
-            const clienteAberto = clientResponse;
-            resolve({ db, client: clienteAberto });
+          const db = clientResponse.db(config.database);
+          const clienteAberto = clientResponse;
+          resolve({ db, client: clienteAberto });
           } else {
             reject('Sem conexão com o banco');
           }

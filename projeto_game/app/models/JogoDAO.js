@@ -6,20 +6,17 @@ function JogoDAO(connection) {
 JogoDAO.prototype.gerarParametrosJogo = function (usuario) {
     this._connection.getDB()
         .then(db => {
-            db.collection("jogo",
-                function (erro, collection) {
-                    collection.insertOne({
-                        usuario: usuario,
-                        idUsuario: usuario,
-                        moeda: 15,
-                        suditos: 10,
-                        suditosTrabalhando: 0,
-                        temor: Math.floor(Math.random() * 1000),
-                        sabedoria: Math.floor(Math.random() * 1000),
-                        comercio: Math.floor(Math.random() * 1000),
-                        magia: Math.floor(Math.random() * 1000),
-                    });
-
+            db.db.collection("jogo")
+                .insertOne({
+                    usuario: usuario,
+                    idUsuario: usuario,
+                    moeda: 15,
+                    suditos: 10,
+                    suditosTrabalhando: 0,
+                    temor: Math.floor(Math.random() * 1000),
+                    sabedoria: Math.floor(Math.random() * 1000),
+                    comercio: Math.floor(Math.random() * 1000),
+                    magia: Math.floor(Math.random() * 1000),
                 });
         })
         .catch(error => {
@@ -119,7 +116,7 @@ JogoDAO.prototype.gerarPergaminhos = function (req, res) {
 }
 
 JogoDAO.prototype.atualizarAcoesDeJogo = async function (req, res, connection) {
-    
+
     const jogoid = req.query.jogoid;
     const usuario = req.session.usuario;
     let totalSuditosAcoesTerminadas = 0;
@@ -141,7 +138,7 @@ JogoDAO.prototype.atualizarAcoesDeJogo = async function (req, res, connection) {
                     acoesTerminadas.forEach(acoesDeJogo => {
                         totalSuditosAcoesTerminadas = totalSuditosAcoesTerminadas + parseInt(acoesDeJogo.quantidade);
                     });
-                   
+
                     db.client.close();
                 });
 
@@ -157,7 +154,7 @@ JogoDAO.prototype.atualizarAcoesDeJogo = async function (req, res, connection) {
                 .collection("jogo")
                 .find({ "_id": ObjectID(jogoid) })
                 .toArray(async function (err, jogo) {
-                  
+
                     await db.db.collection("jogo")
                         .updateOne({ "_id": ObjectID(jogoid) },
                             { $set: { suditosTrabalhando: jogo[0].suditosTrabalhando - totalSuditosAcoesTerminadas } }
@@ -200,7 +197,7 @@ JogoDAO.prototype.revogarAcao = async function (req, res) {
 
     const idAcao = req.query.id_acao;
     const jogoid = req.query.jogoid;
-    
+
     let acaoParaDeletar = null;
     await this._connection
         .getDB()
@@ -208,10 +205,10 @@ JogoDAO.prototype.revogarAcao = async function (req, res) {
             await db.db.collection("acao")
                 .find({ _id: ObjectID(idAcao) })
                 .toArray(function (err, acaoParaDeletarResp) {
-                    acaoParaDeletar = acaoParaDeletarResp;                     
+                    acaoParaDeletar = acaoParaDeletarResp;
                     db.client.close();
                 });
-          
+
         })
         .catch(error => {
             console.log('  algum erro foi encontrado  ', error);
@@ -220,11 +217,11 @@ JogoDAO.prototype.revogarAcao = async function (req, res) {
     await this._connection
         .getDB()
         .then(async db => {
-           
+
             await db.db.collection("jogo")
                 .find({ "_id": ObjectID(jogoid) })
                 .toArray(async function (err, jogo) {
-                  
+
                     await db.db
                         .collection("jogo")
                         .updateOne({ "_id": ObjectID(jogoid) },
@@ -248,7 +245,7 @@ JogoDAO.prototype.revogarAcao = async function (req, res) {
                         db.client.close();
                     }
                 );
-          
+
         })
         .catch(error => {
             console.log('  algum erro foi encontrado  ', error);
