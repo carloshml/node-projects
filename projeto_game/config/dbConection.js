@@ -19,7 +19,11 @@ class MongoDBConnection {
 
   // return a promise to the existing connection or the connection function
   getDB() {
-    return  mConnect();
+    try {
+      return mConnect();
+    } catch (error) {
+      throw (error);
+    }
   }
 }
 
@@ -27,7 +31,7 @@ module.exports = new MongoDBConnection();
 
 // transforms into a promise Mongo's client.connect
 function mConnect() {
-  return new Promise((resolve, reject) => {     
+  return new Promise((resolve, reject) => {
     MongoClient
       .connect('mongodb://localhost',
         options,
@@ -35,9 +39,14 @@ function mConnect() {
           if (err) {
             reject(err);
           }
-          const db = clientResponse.db(config.database);
-          const clienteAberto = clientResponse;         
-          resolve({ db, client: clienteAberto });
+
+          if (clientResponse && clientResponse.db) {
+            const db = clientResponse.db(config.database);
+            const clienteAberto = clientResponse;
+            resolve({ db, client: clienteAberto });
+          } else {
+            reject('Sem conexão com o banco');
+          }
         });
   });
 }
