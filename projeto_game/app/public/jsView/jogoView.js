@@ -1,24 +1,25 @@
 let usuario = {};
 let timerId = null;
+let divMensagens;
 async function cronometro() {
     try {
         if (document.getElementById('pergaminhos') !== null) {
-            await  gerarPergaminhos();
+            await gerarPergaminhos();
             const tempo_restante = document.getElementById('tempo_restante');
             if (tempo_restante && (tempo_restante.innerText === '0')) {
-                await  atualizarAcoesDeJogo()
+                await atualizarAcoesDeJogo()
                     .then(() => buscaJogoUsuario());
             }
         }
     } catch (error) {
         throw (error);
     }
-    timerCronometro= setTimeout(function () { cronometro(); }, 1000);
+    timerCronometro = setTimeout(function () { cronometro(); }, 1000);
 }
 
 async function cronometro10seg() {
     try {
-       await atualizarAcoesDeJogo()
+        await atualizarAcoesDeJogo()
             .then(() => buscaJogoUsuario());
     } catch (error) {
         throw (error);
@@ -35,7 +36,7 @@ const verPergaminhos = async function () {
 
 
 const verSuditos = function () {
-    $('#msg').hide();
+
     $.ajax({
         url: "/gerarSuditos",
         method: "get",
@@ -125,7 +126,7 @@ function atualizarSuditos() {
 
 function lerNotificacoes() {
     const parametros = new URLSearchParams(window.location.search);
-    const divMensagens = document.getElementById('mensagens');
+    console.log('parametros :::', parametros.get('msg'));
     switch (parametros.get('msg')) {
         case 'erro':
             divMensagens.innerHTML = ` <div class="alert alert-danger" id='msg'>
@@ -177,13 +178,20 @@ function lerNotificacoes() {
             break;
     }
 
+
     setTimeout(() => {
         divMensagens.innerHTML = '';
-    }, 6000);
+    }, 8000);
+
+
+}
+
+function apagaMensagem() {
+    divMensagens.innerHTML = '';
 }
 
 function gerarPergaminhos(usarClearTimeOut) {
-    $('#msg').hide();
+
     return fetch(`/gerarPergaminhos?jogoid=${usuario.jogo._id}`,
         {
             method: "GET",
@@ -197,7 +205,7 @@ function gerarPergaminhos(usarClearTimeOut) {
                         // apenas se pergaminhos estiver na tela
                         const acoes = response.acoes;
                         let conteudo = ` <div id="pergaminhos">
-                                                      <h3>Pergaminhos</h3>`;
+                                                      <h3>Atividades:</h3>`;
                         for (let i = 0; i < acoes.length; i++) {
                             let txt_acao = '';
                             let imagem = '';
@@ -239,13 +247,13 @@ function gerarPergaminhos(usarClearTimeOut) {
 
                         }
                         conteudo += `</div>`;
-                        $('#acoes').html(conteudo);
+                        $('#pergaminhos').html(conteudo);
                     }
                 });
         })
         .catch(e => {
             alert(' Deu erro 500');
-           throw("Oops, we haven't got JSON!");
+            throw ("Oops, we haven't got JSON!");
         });
 }
 
@@ -258,6 +266,8 @@ document.addEventListener("DOMContentLoaded", function () {
             cronometro();
             cronometro10seg();
         });
-    lerNotificacoes();
 
+
+    divMensagens = document.getElementById('mensagens');
+    lerNotificacoes();
 });
