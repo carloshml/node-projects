@@ -12,12 +12,6 @@
 	<!-- incluindo css -->
 	<link rel="stylesheet" href="css/style.css">
 	<script src="js/bootstrap.min.js"></script>
-
-	<script>
-
-	</script>
-
-
 </head>
 
 <body class="body-index" style="background: white">
@@ -43,20 +37,18 @@
 				<div class="col-md-3 text-center">
 					usuario
 				</div>
-			
-				
 			</div>
 			<% for( var i=0; i< usuarios.length; i++ ){%>
 				<div class="row elemento">
 					<div class="col-md-2 text-center">
 						<%= usuarios[i].jogo.moeda%>
-					</div>	
+					</div>
 					<div class="col-md-2 text-center">
 						<img class="ranking-img-casas" src="images/casa_<%=usuarios[i].img_casa%>.jpg" />
 					</div>
 					<div class="col-md-3 text-center">
 						<%= usuarios[i].nome%>
-					</div>												
+					</div>
 				</div>
 				<%}%>
 		</div>
@@ -64,72 +56,3 @@
 </body>
 
 </html>
-
-
-<!-- Modal  Update-->
-<div class="modal fade" id="modal_update" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-	aria-hidden="true">
-	<div class="modal-dialog" role="document">
-		<div class="modal-content">
-			<div class="modal-header">
-				<h5 class="modal-title" id="exampleModalLabel"> Atualizar</h5>
-				<button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
-					<span aria-hidden="true">&times;</span>
-				</button>
-			</div>
-			<div class="modal-body">
-				<form id="form_contato_update" class="form-horizontal" action="" method="post">
-					<div class="container">
-						<div clas="span10 offset1">
-							<div class="card">
-								<div class="card-body">
-									<div class="form-row">
-										<div class="col col-md-2">
-											<div class="control-group">
-												<label class="control-label">Cód</label>
-												<div class="controls">
-													<input disabled name="_id_1" id="input_id_contato_1" size="50"
-														class="form-control" name="id" type="text" placeholder="Cód"
-														value="">
-													<input name="_id" type="hidden" id="input_id_contato" size="50"
-														class="form-control" name="id" type="text" placeholder="Cód"
-														value="">
-													<input name="id_jogo" type="hidden" id="id_jogo" size="50"
-														class="form-control" name="id" type="text" placeholder="Cód"
-														value="">
-												</div>
-											</div>
-										</div>
-										<div class="col">
-											<div class="control-group">
-												<label class="control-label">Nome</label>
-												<div class="controls">
-													<input size="50" id="input_nome_contato" class="form-control"
-														name="nome" type="text" placeholder="Nome" required="">
-													<span id="erro_nomeup" class="help-inline text-warning"></span>
-												</div>
-											</div>
-										</div>
-										<div class="control-group ">
-											<label class="control-label">usuario</label>
-											<div class="controls">
-												<input size="80" id="input_usuario" class="form-control" name="usuario"
-													type="text" placeholder="usuário" required="">
-												<span id="erro_enderecoup" class="help-inline text-warning"></span>
-											</div>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-					<div class="modal-footer">
-						<button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
-						<button id="btn_concluir_update_contato" type="submit"
-							class="btn btn-success">Atualizar</button>
-					</div>
-				</form>
-			</div>
-		</div>
-	</div>
-</div>
