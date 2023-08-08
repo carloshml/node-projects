@@ -1,6 +1,6 @@
 module.exports.iniciaChat = function (application, req, res, metodo) {
   var dadosForm = req.body;
-  console.log('req.body::::', req.body);
+
   if (!req.body.apelido) {
     res.render('index', { erros: [{ msg: 'Apelido deve ser inserido' }] });
     return;
