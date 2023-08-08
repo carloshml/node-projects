@@ -1,8 +1,5 @@
 module.exports = function(appication){
-    appication.get('/', function(req,res){
-      /*manda informação
-           res.send('test')
-      */
+    appication.get('/', function(req,res){   
       appication.app.controllers.index.home(appication,req,res);
     });
 }
