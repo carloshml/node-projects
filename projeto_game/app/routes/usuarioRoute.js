@@ -42,4 +42,9 @@ module.exports = function (application) {
 		.get('/buscaJogoUsuario', function (req, res) {
 			application.app.controllers.usuarioController.buscaJogoUsuario(application, req, res);
 		});
+
+	application
+		.get('/verRanking', function (req, res) {
+			application.app.controllers.usuarioController.verRanking(application, req, res);
+		});
 }

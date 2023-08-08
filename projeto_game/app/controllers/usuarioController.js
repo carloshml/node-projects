@@ -1,6 +1,6 @@
 module.exports.buscarUsuarios = function (application, req, res) {
     if (req.session.autorizado) {
-        var connection  = application.config.dbConection;
+        var connection = application.config.dbConection;
         var UsuarioDAO = new application.app.models.UsuariosDAO(connection);
 
         var comandoInvalido = false;
@@ -8,7 +8,7 @@ module.exports.buscarUsuarios = function (application, req, res) {
         if (req.query.msg !== '') {
             msg = req.query.msg;
         }
-        UsuarioDAO.buscarUsuarios(res, req, req.session.casa, msg);
+        UsuarioDAO.irParaTelaUsuarios(res, req, req.session.casa, msg);
     } else {
         var errors = [
             { msg: 'Você não tem acesso a essa área' }
@@ -36,7 +36,7 @@ module.exports.buscaJogoUsuario = function (application, req, res) {
 
 module.exports.autenticar = function (application, req, res, validationResult) {
     var dadosForm = req.body;
-    var errors = validationResult(req);    
+    var errors = validationResult(req);
     if (!errors.isEmpty()) {
         res.render('index', { validacao: errors.array(), aviso: {} });
         return;
@@ -48,8 +48,8 @@ module.exports.autenticar = function (application, req, res, validationResult) {
 }
 
 module.exports.atualizarUsuario = function (application, req, res, validationResult) {
-    var dadosForm = req.body;  
-    var errors = validationResult (req) ;
+    var dadosForm = req.body;
+    var errors = validationResult(req);
     if (!errors.isEmpty()) {
         // res.redirect('usuarios-sistema',{validacao:errors, dadosForm: dadosForm});   
         res.redirect('usuarios-sistema');
@@ -70,7 +70,7 @@ module.exports.atualizarUsuario = function (application, req, res, validationRes
 module.exports.inserirUsuario = function (application, req, res, validationResult) {
     var dadosForm = req.body;
     var errors = validationResult(req);
-    if (!errors.isEmpty()) {       
+    if (!errors.isEmpty()) {
         res.render('cadastro', { validacao: errors.array(), dadosForm: dadosForm });
         return;
     }
@@ -78,4 +78,24 @@ module.exports.inserirUsuario = function (application, req, res, validationResul
     var UsuariosDAO = new application.app.models.UsuariosDAO(connection);
     UsuariosDAO.inserirUsuario(dadosForm, application, res);
 
+}
+
+module.exports.verRanking = async function (application, req, res) {
+    if (req.session.autorizado) {
+        var connection = application.config.dbConection;
+        var UsuarioDAO = new application.app.models.UsuariosDAO(connection);
+
+        var comandoInvalido = false;
+        var msg = '';
+        if (req.query.msg !== '') {
+            msg = req.query.msg;
+        }
+        await UsuarioDAO.verRanking(res, req, req.session.casa, msg, application);
+       
+    } else {
+        var errors = [
+            { msg: 'Você não tem acesso a essa área' }
+        ];
+        res.render('index', { validacao: errors, aviso: {} });
+    }
 }

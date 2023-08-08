@@ -14,7 +14,7 @@
 		integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
 
 	<!-- incluindo css -->
-	<link href="css/style.css" rel="stylesheet">	 
+	<link href="css/style.css" rel="stylesheet">
 </head>
 
 <body class="body-index">
@@ -34,7 +34,7 @@
 	<div class="container">
 		<div class="row">
 			<div class="col-md-6 text-center">
-				<a  href="/jogo" id="btn-jogar" class="btn btn-success btn-home">
+				<a href="/jogo" id="btn-jogar" class="btn btn-success btn-home">
 					<span>
 						jogar
 					</span>
@@ -46,7 +46,16 @@
 					id="btn-ver-usuario" class="btn btn-success  btn-home">
 					<span>
 						ver usuário
-					</span>					
+					</span>
+				</a>
+			</div>
+
+			<div class="col-md-6 text-center">
+				<a href="/verRanking?img_casa=<%=img_casa%>&jogo=<%=JSON.stringify(jogo)%>&msg="
+					id="btn-ver-usuario" class="btn btn-success  btn-home">
+					<span>
+						Ranking
+					</span>
 				</a>
 			</div>
 		</div>

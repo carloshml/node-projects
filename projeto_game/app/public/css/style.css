@@ -160,3 +160,8 @@ img {
   text-align: center;
   padding: 5px;
 }
+
+.ranking-img-casas{
+  border-radius: 49%;
+  height: 77px;
+}
