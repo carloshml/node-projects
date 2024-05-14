@@ -3,13 +3,13 @@ function JogoDAO(connection) {
     this._connection = connection;
 }
 
-JogoDAO.prototype.gerarParametrosJogo = function (usuario) {
+JogoDAO.prototype.gerarParametrosJogo = function (id, usuario) {
     this._connection.getDB()
         .then(db => {
             db.db.collection("jogo")
                 .insertOne({
                     usuario: usuario,
-                    idUsuario: usuario,
+                    idUsuario: id,
                     moeda: 15,
                     suditos: 10,
                     suditosTrabalhando: 0,
@@ -29,7 +29,7 @@ JogoDAO.prototype.iniciaJogo = function (res, req, casa, msg) {
     this._connection.getDB()
         .then(db => {
             db.db.collection("jogo")
-                .find({ usuario: ObjectID(usuarioId) })
+                .find({ idUsuario: ObjectID(usuarioId) })
                 .toArray(function (err, result) {
                     result[0].nome = req.session.nome;
                     res.render('jogo', { img_casa: casa, jogo: result[0], msg: msg });
@@ -246,6 +246,26 @@ JogoDAO.prototype.revogarAcao = async function (req, res) {
                     }
                 );
 
+        })
+        .catch(error => {
+            console.log('  algum erro foi encontrado  ', error);
+        });
+}
+
+JogoDAO.prototype.buscaJogoUsuario = async function (res, req, casa, msg) {
+    const usuarioId = req.session._id;
+    const teste = await this._connection.getDB()
+        .then(async db => {
+            return await db.db
+                .collection("jogo")
+                .find({ idUsuario: ObjectID(usuarioId) })
+                .toArray(async function (err, result) {
+                    result[0].nome = req.session.nome;
+                    const usuario2 = { img_casa: casa, jogo: result[0], msg: msg };
+                    res.send(usuario2);
+                    db.client.close();
+                    return usuario2;
+                });
         })
         .catch(error => {
             console.log('  algum erro foi encontrado  ', error);

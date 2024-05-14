@@ -23,18 +23,7 @@ module.exports.render = function (application, req, res) {
     res.render('cadastro', { validacao: {}, dadosForm: {} });
 }
 
-module.exports.buscaJogoUsuario = function (application, req, res) {
-    if (!req.session.autorizado) {
-        var errors = [
-            { msg: 'Você não tem acesso a essa área' }
-        ];
-        res.render('index', { validacao: errors, aviso: {} });
-        return;
-    }
-    var connection = application.config.dbConection;
-    var UsuarioDAO = new application.app.models.UsuariosDAO(connection);
-    UsuarioDAO.buscaJogoUsuario(res, req, req.session.casa);
-}
+
 
 module.exports.autenticar = function (application, req, res, validationResult) {
     var dadosForm = req.body;

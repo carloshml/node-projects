@@ -6,25 +6,17 @@ function UsuarioDAO(connection) {
     this._connection = connection;
 }
 
-UsuarioDAO.prototype.inserirUsuario = async function (usuario, application, res) {
+UsuarioDAO.prototype.inserirUsuario = async function (usuario, application) {
     usuario.senha = crypto.createHash('md5').update(usuario.senha).digest('hex');
-
-    console.log('usuario  ::: ', usuario);
-
-
     return await this._connection
         .getDB()
         .then(async db => {
             const existeUsuario = await db.db.collection("usuarios")
                 .find({ usuario: usuario.usuario })
                 .toArray()
-                .then((result) => {
-                    //req.query.resultados =  result;                              
-                    //res.render('usuarios',req.query, ); 
-                    console.log(' result 0001 ', result);
+                .then((result) => {                    
                     db.client.close();
-                    if (result.length > 0) {
-                        console.log('Usuario já existe 001!!');
+                    if (result.length > 0) {                       
                         return true;
                     } else {
                         return false;
@@ -32,17 +24,11 @@ UsuarioDAO.prototype.inserirUsuario = async function (usuario, application, res)
                 })
                 .catch(error => {
                     console.log('  algum erro foi encontrado  ', error);
-                });
-
-
-            console.log('Usuario  result  existeUsuario ', existeUsuario);
-            if (existeUsuario) {
-                console.log('Usuario já existe 002 !!');
+                });            
+            if (existeUsuario) {                 
                 return 'usuarioexiste';
             }
-
             delete usuario._id;
-
             return await this._connection
                 .getDB()
                 .then(async db2 => {
@@ -52,8 +38,7 @@ UsuarioDAO.prototype.inserirUsuario = async function (usuario, application, res)
                             // geração dos parametros
                             var connection = application.config.dbConection;
                             var JogoDAO = new application.app.models.JogoDAO(connection);
-                            JogoDAO.gerarParametrosJogo(result.insertedId);
-                            console.log('0003 ', result);
+                            JogoDAO.gerarParametrosJogo(result.insertedId,  usuario.usuario);                         
                             return 'sucesso';
                         })
                         .catch(error => {
@@ -87,35 +72,12 @@ UsuarioDAO.prototype.atualizarUsuario = async function (usuario, req, res) {
         });
 }
 
-
-
-
-UsuarioDAO.prototype.buscaJogoUsuario = async function (res, req, casa, msg) {
-    const usuarioId = req.session._id;
-    const teste = await this._connection.getDB()
-        .then(async db => {
-            return await db.db
-                .collection("jogo")
-                .find({ usuario: ObjectID(usuarioId) })
-                .toArray(async function (err, result) {
-                    result[0].nome = req.session.nome;
-                    const usuario2 = { img_casa: casa, jogo: result[0], msg: msg };
-                    res.send(usuario2);
-                    db.client.close();
-                    return usuario2;
-                });
-        })
-        .catch(error => {
-            console.log('  algum erro foi encontrado  ', error);
-        });
-}
-
 UsuarioDAO.prototype.buscarUsuarioGerarAldeoes = function (res, req, casa, msg) {
     const usuarioId = req.session._id;
     this._connection.getDB()
         .then(db => {
             db.db.collection("jogo")
-                .find({ usuario: ObjectID(usuarioId) })
+                .find({ idUsuario: ObjectID(usuarioId) })
                 .toArray(function (err, result) {
                     result[0].nome = req.session.nome;
                     let usuario2 = { img_casa: casa, jogo: result[0], msg: msg };
@@ -192,7 +154,7 @@ UsuarioDAO.prototype.irParaHome = function (res, usuario, casa, msg, req) {
         .then(db => {
             db.db
                 .collection("jogo")
-                .find({ usuario: ObjectID(req.session._id) })
+                .find({ idUsuario: ObjectID(req.session._id) })
                 .toArray(function (err, result) {
                     result[0].nome = req.session.nome;
                     result[0]._id = req.session._id;
@@ -216,8 +178,8 @@ UsuarioDAO.prototype.buscarUsuarios = async function (res, req, casa, msg, jogos
     await this._connection.getDB()
         .then(async db => {
             let dbCollection = db.db.collection("usuarios");
-            for await (const jogo of jogos) {
-                let usuario = await dbCollection.findOne({ _id: ObjectID(jogo.idUsuario) });
+            for await (const jogo of jogos) {                
+                let usuario = await dbCollection.findOne({ "_id": ObjectID(jogo.idUsuario) }).then( usuario=> usuario );            
                 usuario.jogo = jogo;
                 usuario.img_casa = usuario.casa;
                 usuarios.push(usuario);

@@ -97,3 +97,16 @@ module.exports.revogarAcao = function (application, req, res) {
     const JogoDAO = new application.app.models.JogoDAO(connection);
     JogoDAO.revogarAcao(req, res);
 }
+
+module.exports.buscaJogoUsuario = function (application, req, res) {
+    if (!req.session.autorizado) {
+        var errors = [
+            { msg: 'Você não tem acesso a essa área' }
+        ];
+        res.render('index', { validacao: errors, aviso: {} });
+        return;
+    }
+    var connection = application.config.dbConection;
+    var JogoDAO = new application.app.models.JogoDAO(connection);
+    JogoDAO.buscaJogoUsuario(res, req, req.session.casa);
+}

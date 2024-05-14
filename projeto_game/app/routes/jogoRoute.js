@@ -30,4 +30,9 @@ module.exports = function (application) {
 	application.get('/revogar_acao', function (req, res) {
 		application.app.controllers.jogoController.revogarAcao(application, req, res);
 	});
+
+	application
+		.get('/buscaJogoUsuario', function (req, res) {
+			application.app.controllers.jogoController.buscaJogoUsuario(application, req, res);
+		});
 }

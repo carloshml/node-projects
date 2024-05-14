@@ -50,10 +50,7 @@ module.exports = function (application) {
 			application.app.controllers.usuarioController.buscarUsuarios(application, req, res);
 		});
 
-	application
-		.get('/buscaJogoUsuario', function (req, res) {
-			application.app.controllers.usuarioController.buscaJogoUsuario(application, req, res);
-		});
+
 
 	application
 		.get('/verRanking', function (req, res) {
