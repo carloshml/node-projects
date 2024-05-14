@@ -79,7 +79,11 @@
 		<a class="navbar-brand" href="/home">
 			<img src="images/casa_<%=img_casa%>.jpg" width="30" height="30" class="display-logo align-top" alt="">
 			Veja os usuários, <%=jogo.nome%>!
-		</a>
+		</a>	
+	 
+		<button id="btn-create-usuario" 
+			class="btn btn-success btn-up-usuario" data-toggle="modal" data-target="#modal_create"> Cadastro
+		</button>	 
 		<a href="/sair" id="btn-sair" class="btn btn-info pull-right">Sair</a>
 	</nav>
 	<section class="conteudo-pagina">
@@ -174,6 +178,163 @@
 										</div>
 									</div>
 								</div>
+							</div>
+						</div>
+					</div>
+					<div class="form-group row center">
+
+						<div class="col-xs-2">
+							<img src="images/casa_arryn.jpg"  class="img-responsive img-radio tam-img-crud">
+							<div class="center">
+								<input type="radio" id="left-item" name="casa" value="arryn"> Casa Arryn
+							</div>
+						</div>
+
+						<div class="col-xs-2">
+							<img src="images/casa_baratheon.jpg"  class="img-responsive img-radio tam-img-crud">
+							<div class="center">
+								<input type="radio" id="left-item" name="casa" value="baratheon"> Casa Baratheon
+							</div>
+						</div>
+
+						<div class="col-xs-2">
+							<img src="images/casa_greyjoy.jpg"  class="img-responsive img-radio tam-img-crud">
+							<div class="center">
+								<input type="radio" id="left-item" name="casa" value="greyjoy"> Casa Greyjoy
+							</div>
+						</div>
+
+						<div class="col-xs-2">
+							<img src="images/casa_lannister.jpg"  class="img-responsive img-radio tam-img-crud">
+							<div class="center">
+								<input type="radio" id="left-item" name="casa" value="lannister"> Casa Lannister
+							</div>
+						</div>
+
+						<div class="col-xs-2">
+							<img src="images/casa_martell.jpg"  class="img-responsive img-radio tam-img-crud">
+							<div class="center">
+								<input type="radio" id="left-item" name="casa" value="martell"> Casa Martell
+							</div>
+						</div>
+
+						<div class="col-xs-2">
+							<img src="images/casa_stark.jpg"  class="img-responsive img-radio tam-img-crud">
+							<div class="center">
+								<input type="radio" id="left-item" name="casa" value="stark"> Casa Stark
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+						<button id="btn_concluir_update_contato" type="submit"
+							class="btn btn-success">Atualizar</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>]
+
+
+<!-- Modal  create-->
+<div class="modal fade" id="modal_create" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+	aria-hidden="true">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="exampleModalLabel"> Novo Usuário</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<form id="form_contato_update" class="form-horizontal" action="" method="post">
+					<div class="container">
+						<div clas="span10 offset1">
+							<div class="card">
+								<div class="card-body">
+									<div class="form-row">
+										<div class="col col-md-2">
+											<div class="control-group">
+												<label class="control-label">Cód</label>
+												<div class="controls">
+													<input disabled name="_id_1" id="input_id_contato_1" size="50"
+														class="form-control" name="id" type="text" placeholder="Cód"
+														value="">
+													<input name="_id" type="hidden" id="input_id_contato" size="50"
+														class="form-control" name="id" type="text" placeholder="Cód"
+														value="">
+													<input name="id_jogo" type="hidden" id="id_jogo" size="50"
+														class="form-control" name="id" type="text" placeholder="Cód"
+														value="">
+												</div>
+											</div>
+										</div>
+										<div class="col">
+											<div class="control-group">
+												<label class="control-label">Nome</label>
+												<div class="controls">
+													<input size="50" id="input_nome_contato" class="form-control"
+														name="nome" type="text" placeholder="Nome" required="">
+													<span id="erro_nomeup" class="help-inline text-warning"></span>
+												</div>
+											</div>
+										</div>
+										<div class="control-group ">
+											<label class="control-label">usuario</label>
+											<div class="controls">
+												<input size="80" id="input_usuario" class="form-control" name="usuario"
+													type="text" placeholder="usuário" required="">
+												<span id="erro_enderecoup" class="help-inline text-warning"></span>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="form-group row center">
+
+						<div class="col-xs-2">
+							<img src="images/casa_arryn.jpg"  class="img-responsive img-radio tam-img-crud">
+							<div class="center">
+								<input type="radio" id="left-item" name="casa" value="arryn"> Casa Arryn
+							</div>
+						</div>
+
+						<div class="col-xs-2">
+							<img src="images/casa_baratheon.jpg"  class="img-responsive img-radio tam-img-crud">
+							<div class="center">
+								<input type="radio" id="left-item" name="casa" value="baratheon"> Casa Baratheon
+							</div>
+						</div>
+
+						<div class="col-xs-2">
+							<img src="images/casa_greyjoy.jpg"  class="img-responsive img-radio tam-img-crud">
+							<div class="center">
+								<input type="radio" id="left-item" name="casa" value="greyjoy"> Casa Greyjoy
+							</div>
+						</div>
+
+						<div class="col-xs-2">
+							<img src="images/casa_lannister.jpg"  class="img-responsive img-radio tam-img-crud">
+							<div class="center">
+								<input type="radio" id="left-item" name="casa" value="lannister"> Casa Lannister
+							</div>
+						</div>
+
+						<div class="col-xs-2">
+							<img src="images/casa_martell.jpg"  class="img-responsive img-radio tam-img-crud">
+							<div class="center">
+								<input type="radio" id="left-item" name="casa" value="martell"> Casa Martell
+							</div>
+						</div>
+
+						<div class="col-xs-2">
+							<img src="images/casa_stark.jpg"  class="img-responsive img-radio tam-img-crud">
+							<div class="center">
+								<input type="radio" id="left-item" name="casa" value="stark"> Casa Stark
 							</div>
 						</div>
 					</div>

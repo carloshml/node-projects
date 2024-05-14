@@ -57,17 +57,12 @@ module.exports.atualizarUsuario = function (application, req, res, validationRes
     }
     var connection = application.config.dbConection;
     var UsuariosDAO = new application.app.models.UsuariosDAO(connection);
-    UsuariosDAO.atualizarUsuario(dadosForm, req, res);
-
-    var avisos = [
-        { msg: 'Você Foi Cadastrado com Sucesso!!' }
-    ]
-    // res.render('usuarios-sistema',{validacao:{},aviso:avisos});
-    // res.redirect('usuarios-sistema');    
-
+    if (UsuariosDAO.atualizarUsuario(dadosForm, req)) {
+        res.redirect('buscarUsuarios?' + dadosForm.id_jogo);
+    }
 }
 
-module.exports.inserirUsuario = function (application, req, res, validationResult) {
+module.exports.inserirUsuario = async function (application, req, res, validationResult) {
     var dadosForm = req.body;
     var errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -76,8 +71,19 @@ module.exports.inserirUsuario = function (application, req, res, validationResul
     }
     var connection = application.config.dbConection;
     var UsuariosDAO = new application.app.models.UsuariosDAO(connection);
-    UsuariosDAO.inserirUsuario(dadosForm, application, res);
-
+    let retorno = await UsuariosDAO.inserirUsuario(dadosForm, application);  
+    if (retorno === 'sucesso') {
+        const aviso = [
+            { msg: 'Você Foi Cadastrado com Sucesso!!' }
+        ]
+        res.render('index', { validacao: {}, aviso });
+    } else if (retorno === 'usuarioexiste') {
+        var erros = [
+            { msg: 'Usuario já existe!!' }
+        ];
+        dadosForm.senha = undefined;
+        res.render('cadastro', { validacao: erros, dadosForm: dadosForm });
+    }
 }
 
 module.exports.verRanking = async function (application, req, res) {
@@ -91,7 +97,7 @@ module.exports.verRanking = async function (application, req, res) {
             msg = req.query.msg;
         }
         await UsuarioDAO.verRanking(res, req, req.session.casa, msg, application);
-       
+
     } else {
         var errors = [
             { msg: 'Você não tem acesso a essa área' }

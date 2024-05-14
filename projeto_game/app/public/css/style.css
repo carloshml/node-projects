@@ -124,6 +124,10 @@ img {
 }
 
 
+.center{
+   text-align: center;
+}
+
 
 
 .display-logo {
@@ -164,4 +168,14 @@ img {
 .ranking-img-casas{
   border-radius: 49%;
   height: 77px;
+}
+
+.tam-img-crud{
+  height: 170px;
+}
+
+@media (min-width: 576px) {
+  .modal-dialog {
+      max-width: 576px !important;     
+  }
 }
