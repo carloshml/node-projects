@@ -18,6 +18,18 @@ module.exports = function (application) {
 			});
 
 	application
+		.post('/inserirUsuarioCrud',
+			[
+				check('nome', 'nome não pode ser vazio').notEmpty(),
+				check('usuario', 'usuário não pode ser vazio').notEmpty(),
+				check('senha', 'senha não pode ser vazio').notEmpty(),
+				check('casa', 'casa não pode ser vazio').notEmpty(),
+			],
+			function (req, res) {
+				application.app.controllers.usuarioController.inserirUsuarioCrud(application, req, res, validationResult);
+			});
+
+	application
 		.post('/autenticar', [
 			check('usuario', 'Usuário deve ser fornecido!').notEmpty(),
 			check('senha', 'Senha deve ser fornecida!').notEmpty()

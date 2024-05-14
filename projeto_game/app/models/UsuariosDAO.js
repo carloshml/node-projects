@@ -8,6 +8,10 @@ function UsuarioDAO(connection) {
 
 UsuarioDAO.prototype.inserirUsuario = async function (usuario, application, res) {
     usuario.senha = crypto.createHash('md5').update(usuario.senha).digest('hex');
+
+    console.log('usuario  ::: ', usuario);
+
+
     return await this._connection
         .getDB()
         .then(async db => {
@@ -23,7 +27,6 @@ UsuarioDAO.prototype.inserirUsuario = async function (usuario, application, res)
                         console.log('Usuario já existe 001!!');
                         return true;
                     } else {
-                        // ... other code ...
                         return false;
                     }
                 })
@@ -37,6 +40,8 @@ UsuarioDAO.prototype.inserirUsuario = async function (usuario, application, res)
                 console.log('Usuario já existe 002 !!');
                 return 'usuarioexiste';
             }
+
+            delete usuario._id;
 
             return await this._connection
                 .getDB()
@@ -63,7 +68,7 @@ UsuarioDAO.prototype.inserirUsuario = async function (usuario, application, res)
 
 UsuarioDAO.prototype.atualizarUsuario = async function (usuario, req, res) {
     req.query.jogo = JSON.parse(req.query.jogo);
-    await this._connection
+    return await this._connection
         .getDB()
         .then(async db => {
             const result = await db.db
@@ -75,23 +80,7 @@ UsuarioDAO.prototype.atualizarUsuario = async function (usuario, req, res) {
                     // {} como é apenas uma conexao esse permanece falso
                 );
             db.client.close();
-
-        })
-        .catch(error => {
-            console.log('  algum erro foi encontrado  ', error);
-        });
-    await this._connection
-        .getDB()
-        .then(async dbConfig => {
-            await dbConfig.db
-                .collection("usuarios")
-                .find({ _id: ObjectID(usuario._id) })
-                .toArray(function (err, result) {
-                    //req.query.resultados =  result;                              
-                    //res.render('usuarios',req.query, );    
-                    res.redirect('buscarUsuarios?' + usuario.id_jogo);
-                });
-            dbConfig.client.close();
+            return true;
         })
         .catch(error => {
             console.log('  algum erro foi encontrado  ', error);
@@ -139,24 +128,20 @@ UsuarioDAO.prototype.buscarUsuarioGerarAldeoes = function (res, req, casa, msg) 
         });
 }
 
-UsuarioDAO.prototype.irParaTelaUsuarios = function (res, req, casa, msg) {
-    const usuario = req.session.usuario;
-    req.query.jogo = JSON.parse(req.query.jogo);
-
-
-    this._connection.getDB()
-        .then(db => {
-            db.db.collection("usuarios")
+UsuarioDAO.prototype.listarUsuarios = async function () {
+    return await this._connection.getDB()
+        .then(async db => {
+            return await db.db.collection("usuarios")
                 .find()
-                .toArray(function (err, result) {
-                    req.query.resultados = result;
-                    const opcoes = req.query;
-                    res.render('usuariosSistema', opcoes,);
+                .toArray()
+                .then(result => {
                     db.client.close();
-                });
+                    return result;
+                })
         })
         .catch(error => {
             console.log('  algum erro foi encontrado  ', error);
+            return error;
         });
 }
 
@@ -225,25 +210,20 @@ UsuarioDAO.prototype.irParaHome = function (res, usuario, casa, msg, req) {
 }
 
 
-UsuarioDAO.prototype.buscarUsuarios = async function (res, req, casa, msg, jogos) {
-    const usuario = req.session.usuario;
+UsuarioDAO.prototype.buscarUsuarios = async function (res, req, casa, msg, jogos) {    
     req.query.jogo = JSON.parse(req.query.jogo);
     let usuarios = [];
     await this._connection.getDB()
         .then(async db => {
-            let dbCollection = db.db.collection("usuarios")
+            let dbCollection = db.db.collection("usuarios");
             for await (const jogo of jogos) {
                 let usuario = await dbCollection.findOne({ _id: ObjectID(jogo.idUsuario) });
                 usuario.jogo = jogo;
                 usuario.img_casa = usuario.casa;
                 usuarios.push(usuario);
             }
-
             db.client.close();
-            res.render('ranking', { img_casa: casa, nome: req.session.nome, usuarios });
-            db.client.close();
-
-
+            res.render('ranking', { img_casa: casa, nome: req.session.nome, usuarios });  
         })
         .catch(error => {
             console.log('  algum erro foi encontrado  ', error);

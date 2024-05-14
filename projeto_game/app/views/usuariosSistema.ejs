@@ -70,25 +70,49 @@
 				document.getElementById('form_contato_update').action = "atualizarUsuario?" + urlParams;
 			};
 			mudarParametro();
-		});	
+
+
+			let temValicao = document.getElementById('tem-validacao').value;
+			if (temValicao === 'S') {
+				document.getElementById('btn-create-usuario').click();
+			}
+		});
+
+		function verSuditos() {
+			$.ajax({
+				url: "/gerarSuditos",
+				method: "get",
+				success: function (htmlRequisicao) {
+
+					console.log('htmlRequisicao ', htmlRequisicao);
+
+				}
+			});
+		}
 	</script>
 </head>
 
 <body class="body-index" style="background: white">
+
+
+	<input type="checkbox" name="" id="tem-validacao" hidden="true" value="<%=validacao.length>0?'S':'F'%>">
 	<nav class="navbar navbar-light bg-light">
 		<a class="navbar-brand" href="/home">
 			<img src="images/casa_<%=img_casa%>.jpg" width="30" height="30" class="display-logo align-top" alt="">
 			Veja os usuários, <%=jogo.nome%>!
-		</a>	
-	 
-		<button id="btn-create-usuario" 
-			class="btn btn-success btn-up-usuario" data-toggle="modal" data-target="#modal_create"> Cadastro
-		</button>	 
-		<a href="/sair" id="btn-sair" class="btn btn-info pull-right">Sair</a>
+		</a>
+		<div>
+			<button id="btn-create-usuario" class="btn btn-info btn-up-usuario" data-toggle="modal"
+				data-target="#modal_create">
+				<i class="bi bi-file-plus-fill"></i>
+				Cadastro
+			</button>
+			<a href="/sair" id="btn-sair" class="btn btn-info pull-right">Sair</a>
+		</div>
 	</nav>
 	<section class="conteudo-pagina">
 		<h1>
-			veja os usuários
+			Veja os usuários
 		</h1>
 		<div class="container">
 			<div class="row titulo">
@@ -184,44 +208,44 @@
 					<div class="form-group row center">
 
 						<div class="col-xs-2">
-							<img src="images/casa_arryn.jpg"  class="img-responsive img-radio tam-img-crud">
+							<img src="images/casa_arryn.jpg" class="img-responsive img-radio tam-img-crud">
 							<div class="center">
-								<input type="radio" id="left-item" name="casa" value="arryn"> Casa Arryn
+								<input type="radio" id="left-item1" name="casa" value="arryn"> Casa Arryn
 							</div>
 						</div>
 
 						<div class="col-xs-2">
-							<img src="images/casa_baratheon.jpg"  class="img-responsive img-radio tam-img-crud">
+							<img src="images/casa_baratheon.jpg" class="img-responsive img-radio tam-img-crud">
 							<div class="center">
-								<input type="radio" id="left-item" name="casa" value="baratheon"> Casa Baratheon
+								<input type="radio" id="left-item2" name="casa" value="baratheon"> Casa Baratheon
 							</div>
 						</div>
 
 						<div class="col-xs-2">
-							<img src="images/casa_greyjoy.jpg"  class="img-responsive img-radio tam-img-crud">
+							<img src="images/casa_greyjoy.jpg" class="img-responsive img-radio tam-img-crud">
 							<div class="center">
-								<input type="radio" id="left-item" name="casa" value="greyjoy"> Casa Greyjoy
+								<input type="radio" id="left-item3" name="casa" value="greyjoy"> Casa Greyjoy
 							</div>
 						</div>
 
 						<div class="col-xs-2">
-							<img src="images/casa_lannister.jpg"  class="img-responsive img-radio tam-img-crud">
+							<img src="images/casa_lannister.jpg" class="img-responsive img-radio tam-img-crud">
 							<div class="center">
-								<input type="radio" id="left-item" name="casa" value="lannister"> Casa Lannister
+								<input type="radio" id="left-item4" name="casa" value="lannister"> Casa Lannister
 							</div>
 						</div>
 
 						<div class="col-xs-2">
-							<img src="images/casa_martell.jpg"  class="img-responsive img-radio tam-img-crud">
+							<img src="images/casa_martell.jpg" class="img-responsive img-radio tam-img-crud">
 							<div class="center">
-								<input type="radio" id="left-item" name="casa" value="martell"> Casa Martell
+								<input type="radio" id="left-item5" name="casa" value="martell"> Casa Martell
 							</div>
 						</div>
 
 						<div class="col-xs-2">
-							<img src="images/casa_stark.jpg"  class="img-responsive img-radio tam-img-crud">
+							<img src="images/casa_stark.jpg" class="img-responsive img-radio tam-img-crud">
 							<div class="center">
-								<input type="radio" id="left-item" name="casa" value="stark"> Casa Stark
+								<input type="radio" id="left-item6" name="casa" value="stark"> Casa Stark
 							</div>
 						</div>
 					</div>
@@ -234,7 +258,7 @@
 			</div>
 		</div>
 	</div>
-</div>]
+</div>
 
 
 <!-- Modal  create-->
@@ -249,101 +273,129 @@
 				</button>
 			</div>
 			<div class="modal-body">
-				<form id="form_contato_update" class="form-horizontal" action="" method="post">
-					<div class="container">
-						<div clas="span10 offset1">
-							<div class="card">
-								<div class="card-body">
-									<div class="form-row">
-										<div class="col col-md-2">
-											<div class="control-group">
-												<label class="control-label">Cód</label>
-												<div class="controls">
-													<input disabled name="_id_1" id="input_id_contato_1" size="50"
-														class="form-control" name="id" type="text" placeholder="Cód"
-														value="">
-													<input name="_id" type="hidden" id="input_id_contato" size="50"
-														class="form-control" name="id" type="text" placeholder="Cód"
-														value="">
-													<input name="id_jogo" type="hidden" id="id_jogo" size="50"
-														class="form-control" name="id" type="text" placeholder="Cód"
-														value="">
+				<% if(validacao.length>0){%>
+					<div class="alert alert-danger">
+						<strong>Atenção</strong>
+						<ul>
+							<% for ( var i=0; i < validacao.length; i++ ){%>
+								<li>
+									<%= validacao[i].msg%>
+								</li>
+								<%}%>
+						</ul>
+					</div>
+					<%}%>
+						<form class="form-cadastro"
+							action="inserirUsuarioCrud?img_casa=<%=img_casa%>&jogo=<%=JSON.stringify(jogo)%>&msg="
+							method="POST">
+							<div class="container">
+								<div clas="span10 offset1">
+									<div class="card">
+										<div class="card-body">
+											<div class="form-row">
+												<div class="col col-md-2">
+													<div class="control-group">
+														<label class="control-label">Cód</label>
+														<div class="controls">
+															<input disabled name="_id_1" id="input_id_contato_1"
+																size="50" class="form-control" name="id" type="text"
+																placeholder="Cód" value="">
+															<input name="_id" type="hidden" id="input_id_contato"
+																size="50" class="form-control" name="id" type="text"
+																placeholder="Cód" value="">
+															<input name="id_jogo" type="hidden" id="id_jogo" size="50"
+																class="form-control" name="id" type="text"
+																placeholder="Cód" value="">
+														</div>
+													</div>
 												</div>
-											</div>
-										</div>
-										<div class="col">
-											<div class="control-group">
-												<label class="control-label">Nome</label>
-												<div class="controls">
-													<input size="50" id="input_nome_contato" class="form-control"
-														name="nome" type="text" placeholder="Nome" required="">
-													<span id="erro_nomeup" class="help-inline text-warning"></span>
+												<div class="col">
+													<div class="control-group">
+														<label class="control-label">Nome</label>
+														<div class="controls">
+															<input size="50" id="input_nome_contato"
+																class="form-control" name="nome" type="text"
+																placeholder="Nome" required="">
+															<span id="erro_nomeup"
+																class="help-inline text-warning"></span>
+														</div>
+													</div>
 												</div>
-											</div>
-										</div>
-										<div class="control-group ">
-											<label class="control-label">usuario</label>
-											<div class="controls">
-												<input size="80" id="input_usuario" class="form-control" name="usuario"
-													type="text" placeholder="usuário" required="">
-												<span id="erro_enderecoup" class="help-inline text-warning"></span>
+												<div class="control-group ">
+													<label class="control-label">Usuário</label>
+													<div class="controls">
+														<input size="80" id="input_usuario" class="form-control"
+															name="usuario" type="text" placeholder="usuário"
+															required="">
+														<span id="erro_enderecoup"
+															class="help-inline text-warning"></span>
+													</div>
+												</div>
+												<div class="control-group ">
+													<label class="control-label">senha</label>
+													<div class="controls">
+														<input type="password" class="form-control" id="senha"
+															name="senha" placeholder="Password">
+													</div>
+
+												</div>
 											</div>
 										</div>
 									</div>
 								</div>
 							</div>
-						</div>
-					</div>
-					<div class="form-group row center">
+							<div class="form-group row center">
 
-						<div class="col-xs-2">
-							<img src="images/casa_arryn.jpg"  class="img-responsive img-radio tam-img-crud">
-							<div class="center">
-								<input type="radio" id="left-item" name="casa" value="arryn"> Casa Arryn
-							</div>
-						</div>
+								<div class="col-xs-2">
+									<img src="images/casa_arryn.jpg" class="img-responsive img-radio tam-img-crud">
+									<div class="center">
+										<input type="radio" id="left-item7" name="casa" value="arryn"> Casa Arryn
+									</div>
+								</div>
 
-						<div class="col-xs-2">
-							<img src="images/casa_baratheon.jpg"  class="img-responsive img-radio tam-img-crud">
-							<div class="center">
-								<input type="radio" id="left-item" name="casa" value="baratheon"> Casa Baratheon
-							</div>
-						</div>
+								<div class="col-xs-2">
+									<img src="images/casa_baratheon.jpg" class="img-responsive img-radio tam-img-crud">
+									<div class="center">
+										<input type="radio" id="left-item8" name="casa" value="baratheon"> Casa
+										Baratheon
+									</div>
+								</div>
 
-						<div class="col-xs-2">
-							<img src="images/casa_greyjoy.jpg"  class="img-responsive img-radio tam-img-crud">
-							<div class="center">
-								<input type="radio" id="left-item" name="casa" value="greyjoy"> Casa Greyjoy
-							</div>
-						</div>
+								<div class="col-xs-2">
+									<img src="images/casa_greyjoy.jpg" class="img-responsive img-radio tam-img-crud">
+									<div class="center">
+										<input type="radio" id="left-item9" name="casa" value="greyjoy"> Casa Greyjoy
+									</div>
+								</div>
 
-						<div class="col-xs-2">
-							<img src="images/casa_lannister.jpg"  class="img-responsive img-radio tam-img-crud">
-							<div class="center">
-								<input type="radio" id="left-item" name="casa" value="lannister"> Casa Lannister
-							</div>
-						</div>
+								<div class="col-xs-2">
+									<img src="images/casa_lannister.jpg" class="img-responsive img-radio tam-img-crud">
+									<div class="center">
+										<input type="radio" id="left-item10" name="casa" value="lannister"> Casa
+										Lannister
+									</div>
+								</div>
 
-						<div class="col-xs-2">
-							<img src="images/casa_martell.jpg"  class="img-responsive img-radio tam-img-crud">
-							<div class="center">
-								<input type="radio" id="left-item" name="casa" value="martell"> Casa Martell
-							</div>
-						</div>
+								<div class="col-xs-2">
+									<img src="images/casa_martell.jpg" class="img-responsive img-radio tam-img-crud">
+									<div class="center">
+										<input type="radio" id="left-item11" name="casa" value="martell"> Casa Martell
+									</div>
+								</div>
 
-						<div class="col-xs-2">
-							<img src="images/casa_stark.jpg"  class="img-responsive img-radio tam-img-crud">
-							<div class="center">
-								<input type="radio" id="left-item" name="casa" value="stark"> Casa Stark
+								<div class="col-xs-2">
+									<img src="images/casa_stark.jpg" class="img-responsive img-radio tam-img-crud">
+									<div class="center">
+										<input type="radio" id="left-item12" name="casa" value="stark"> Casa Stark
+									</div>
+								</div>
 							</div>
-						</div>
-					</div>
-					<div class="modal-footer">
-						<button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
-						<button id="btn_concluir_update_contato" type="submit"
-							class="btn btn-success">Atualizar</button>
-					</div>
-				</form>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+								<button id="btn_concluir_update_contato" type="submit"
+									class="btn btn-success">salvar</button>
+							</div>
+						</form>
 			</div>
 		</div>
 	</div>

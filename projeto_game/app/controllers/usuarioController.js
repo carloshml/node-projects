@@ -1,14 +1,16 @@
 module.exports.buscarUsuarios = function (application, req, res) {
+    listaUsuarios(application, req, res, []);
+}
+
+async function listaUsuarios(application, req, res, errors) {
     if (req.session.autorizado) {
         var connection = application.config.dbConection;
         var UsuarioDAO = new application.app.models.UsuariosDAO(connection);
-
-        var comandoInvalido = false;
-        var msg = '';
-        if (req.query.msg !== '') {
-            msg = req.query.msg;
-        }
-        UsuarioDAO.irParaTelaUsuarios(res, req, req.session.casa, msg);
+        const result = await UsuarioDAO.listarUsuarios();
+        req.query.resultados = result;
+        const opcoes = req.query;
+        opcoes.validacao = errors;
+        res.render('usuariosSistema', opcoes);
     } else {
         var errors = [
             { msg: 'Você não tem acesso a essa área' }
@@ -17,7 +19,7 @@ module.exports.buscarUsuarios = function (application, req, res) {
     }
 }
 
-module.exports.render = function (application, req, res) {
+module.exports.render = function (application, req, res) { 
     res.render('cadastro', { validacao: {}, dadosForm: {} });
 }
 
@@ -62,6 +64,14 @@ module.exports.atualizarUsuario = function (application, req, res, validationRes
     }
 }
 
+async function inserirUsuario(application, req, res) {
+    var dadosForm = req.body;
+    var connection = application.config.dbConection;
+    var UsuariosDAO = new application.app.models.UsuariosDAO(connection);   
+    return await UsuariosDAO.inserirUsuario(dadosForm, application);
+
+}
+
 module.exports.inserirUsuario = async function (application, req, res, validationResult) {
     var dadosForm = req.body;
     var errors = validationResult(req);
@@ -69,9 +79,7 @@ module.exports.inserirUsuario = async function (application, req, res, validatio
         res.render('cadastro', { validacao: errors.array(), dadosForm: dadosForm });
         return;
     }
-    var connection = application.config.dbConection;
-    var UsuariosDAO = new application.app.models.UsuariosDAO(connection);
-    let retorno = await UsuariosDAO.inserirUsuario(dadosForm, application);  
+    const retorno = await inserirUsuario(application, req, res);
     if (retorno === 'sucesso') {
         const aviso = [
             { msg: 'Você Foi Cadastrado com Sucesso!!' }
@@ -83,6 +91,27 @@ module.exports.inserirUsuario = async function (application, req, res, validatio
         ];
         dadosForm.senha = undefined;
         res.render('cadastro', { validacao: erros, dadosForm: dadosForm });
+    }
+}
+
+module.exports.inserirUsuarioCrud = async function (application, req, res, validationResult) {
+    var errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        console.log('errors  ::: ', errors);
+        listaUsuarios(application, req, res, errors.array());
+        return;
+    }
+    const retorno = await inserirUsuario(application, req, res);
+    if (retorno === 'sucesso') {
+        const aviso = [
+            { msg: 'Você Foi Cadastrado com Sucesso!!' }
+        ]       
+        listaUsuarios(application, req, res, []);
+    } else if (retorno === 'usuarioexiste') {
+        var erros = [
+            { msg: 'Usuario já existe!!' }
+        ];        
+        listaUsuarios(application, req, res, erros);
     }
 }
 
