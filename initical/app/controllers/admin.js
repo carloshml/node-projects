@@ -1,20 +1,25 @@
-module.exports.formulario = function(application,req,res){
-   res.render("admin/form_add_noticia",{validacao:{},noticia:{}});
+module.exports.formulario = function (application, req, res) {
+  res.render("admin/form_add_noticia", { validacao: {}, noticia: {} });
 }
-module.exports.noticias_salvar = function(app,req,res){
-  var noticia = req.body ;
 
-  req.assert('titulo','Título é obrigatório').notEmpty();
-  req.assert('resumo','Resumo é obrigatório').notEmpty();
-  req.assert('autor','Resumo é obrigatório').notEmpty();
-  req.assert('noticia','Notícia é obrigatória').notEmpty();
-  req.assert('data_noticia','data é obrigatório').notEmpty();
-  req.assert('resumo','Resumo [10,100]').len(10,100);
-  var errors = req.validationErrors();
-     if(errors){
-       res.render("admin/form_add_noticia",{validacao:errors, noticia:noticia});
-       return ;
-     }
+module.exports.noticias_salvar = function (app, req, res) {
+  var noticia = req.body;
+
+  console.log(' noticia :::: ', noticia);
+
+  const memsagens = [];
+
+  !noticia.titulo ? memsagens.push({ msg: 'Título é obrigatório' }) : '';
+  !noticia.resumo ? memsagens.push({ msg: 'Resumo é obrigatório' }) : '';
+  !noticia.autor ? memsagens.push({ msg: 'Resumo é obrigatório' }) : '';
+  !noticia.noticia ? memsagens.push({ msg: 'Notícia é obrigatória' }) : '';
+  !noticia.data_noticia ? memsagens.push({ msg: 'Data é obrigatória' }) : '';
+  noticia.resumo && noticia.resumo.legth < 100 ? memsagens.push({ msg: 'Resumo é obrigatória' }) : '';
+  if (memsagens.length > 0) {
+    console.log(' memsagens :::: ', memsagens);
+    res.render("admin/form_add_noticia", { validacao: memsagens, noticia: noticia });
+    return;
+  }
 
   // conexao
 
@@ -22,11 +27,14 @@ module.exports.noticias_salvar = function(app,req,res){
   //model
   var noticiasModel = new app.app.models.NoticiasDao(connection);
   // enviar em uma função de salvar
-  noticiasModel.salvarNoticia(noticia, function(error, resultado){
-
-       res.redirect("/noticias");
-
-    });
+  noticiasModel.salvarNoticia(noticia, function (error, resultado) {
+    if(!error){
+      res.redirect("/noticias");
+    }else{
+      console.error('error salvarNoticia',error);
+      res.render("admin/form_add_noticia", { validacao: memsagens, noticia: noticia });
+    }
+  });
 
   // implentar uma função de calback para inserir as noticias
 
