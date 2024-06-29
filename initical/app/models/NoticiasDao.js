@@ -1,6 +1,5 @@
 function NoticiasDao(connection){
   this._connection = connection;
-
 }
 
 NoticiasDao.prototype.getNoticias = function(callback){
@@ -17,13 +16,17 @@ NoticiasDao.prototype.salvarNoticia = function(noticia, callback){
   var dataNoticia = new Date(noticia.data_noticia);
   noticia.data_noticia = dataNoticia;
   dataNoticia = new Date();
-
   noticia.data_noticia.setHours(dataNoticia.getHours());
   noticia.data_noticia.setMinutes(dataNoticia.getMinutes());
-
-
-  this._connection.query('insert into noticias set ? ',noticia,callback);
+  console.log(' save noticia:' , noticia);
+  try {
+    this._connection.query('insert into noticias set ? ',noticia,callback);
+  } catch (error) {
+    console.error(error);
+    throw error; 
+  }  
 };
+
 NoticiasDao.prototype.get5ultimasNoticias = function( callback){
   // o modo instalado suporta o json ele faz essa traducao
   // recebe uma sql e uma callback
