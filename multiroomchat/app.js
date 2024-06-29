@@ -1,13 +1,14 @@
 /* importar as configurações do servidor */
 var app = require('./config/server');
 
+const port = 3000;
 /*parametrizar a porta de escuta*/
-var server = app.listen(3000, function () {
-  console.log('servidor está online use localhost:3000');
+var server = app.listen(port, function () {
+  console.log(`servidor está online use localhost:${port}`);
 });
 
 
-var io = require('socket.io').listen(server);
+var io = require('socket.io')(server);
 /* criar a conexão por websocket*/
 
 
