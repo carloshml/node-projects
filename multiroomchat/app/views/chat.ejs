@@ -51,7 +51,13 @@
 	<script src="/socket.io/socket.io.js">	</script>
 
 	<script type="text/javascript">
+
+
+
 		document.addEventListener("DOMContentLoaded", function () {
+
+			const apelido = $('#apelido').val();
+
 			$("#exibe_chat").click(function () {
 				$("#conversa").show();
 				$("#participantes").hide();
@@ -67,11 +73,16 @@
 
 			socket.on('msgParaCliente',
 				function (data) {
-
 					var html = '';
-					html += '<div class=dialogo >';
-					html += '<h4>' + data.apelido + '</h4>';
-					html += '<p>' + data.mensagem + '</p>';
+					if (apelido === data.apelido) {
+						html += "<div class='dialogo dialogo-pessoal ' >";					 
+					} else {
+
+						html += "<div class='dialogo  dialogo-do-outro' >"
+						html += '<span>' + data.apelido + '</span>';
+					}
+
+					html += '<p class="mensagem">' + data.mensagem + '</p>';
 					html += '</div  >';
 
 					$('#dialogos').append(html);
@@ -103,7 +114,7 @@
 				apelidoAtualizadosNosClientes: $('#apelido_atualizados_nos_clientes').val()
 			};
 
-		
+
 			socket.emit('msgParaServidor', corpoMensagem);
 			$('#mensagem').val('')
 			$('#apelido_atualizados_nos_clientes').val(1);
@@ -160,8 +171,7 @@
 	<nav class="navbar navbar-default navbar-fixed-bottom" role="navigation">
 		<div class="container">
 			<div class="panel-body campo-mensagem">
-
-				<div class="col-md-12">
+				<div class="col-md-12">					
 					<div class="input-group">
 						<input type="text" id="mensagem" class="form-control" placeholder="Mensagem"
 							onkeyup="enviarMsgEnter(event)">

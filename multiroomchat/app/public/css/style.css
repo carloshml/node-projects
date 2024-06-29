@@ -80,15 +80,27 @@ img {
     margin-top: -10px;
 }
 
-.dialogo {
-    width: 100%;
+.dialogo {   
     height: auto;
-    margin-bottom: 15px;
-    padding: 10px;
+    margin-bottom: 15px;    
     background: #D8F0FE;
+    border-radius: 8px;
+    box-shadow: gray 2px 2px 6px;
+}
+.dialogo-do-outro {
+    width: 100%;
 }
 
-.dialogo h4 {
+.dialogo-pessoal {   
+    width: 80%;
+    margin-left: 20%;
+    background: #B6DDF4;
+    border-radius: 8px  8px 0  8px;
+}
+
+.dialogo span {
+    border-radius: 8px  8px 0  0;
+    display: block;
     font-size: 15px;
     font-weight: bold;
     color: white;
@@ -96,8 +108,12 @@ img {
     padding: 0 16px;
 }
 
+.dialogo mensagem{
+    padding-left: 8px;
+}
+
 .dialogo p {
-    font-size: 12px;
+    font-size: 20px;
     padding-left: 15px;
     color: #8B7777;
 }
