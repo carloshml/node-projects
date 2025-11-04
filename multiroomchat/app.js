@@ -38,10 +38,16 @@ io.on('connection', function (socket) {
     );
 
     socket.emit('participantesParaCliente',
-      { apelidosParticipantes }
+      {
+        apelido: data.apelido,
+        apelidosParticipantes
+      }
     );
     socket.broadcast.emit('participantesParaCliente',
-      { apelidosParticipantes }
+      {
+        apelido: data.apelido,
+        apelidosParticipantes
+      }
     );
 
   });

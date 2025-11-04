@@ -85,6 +85,17 @@
 			/* azul Bootstrap */
 			margin-bottom: 5px;
 		}
+
+		.participante {
+			display: block;
+			padding: 5px 10px;
+			border-bottom: 1px solid #dee2e6;
+		}
+
+		.participante.font-weight-bold {
+			font-weight: bold;
+			color: #007bff;
+		}
 	</style>
 	<script src="/socket.io/socket.io.js">	</script>
 
@@ -94,7 +105,7 @@
 
 		document.addEventListener("DOMContentLoaded", function () {
 
-			const apelido = $('#apelido').val();
+			const apelido = $('#apelido_now_user').val();
 
 			$("#exibe_chat").click(function () {
 				$("#conversa").show();
@@ -129,20 +140,26 @@
 				});
 
 			socket.on('participantesParaCliente', function (data) {
-				console.log('data ::: ', data);
-
-				// Clear the container
 				$('#pessoas').html('');
 
-				// Build new HTML
+				const apelidoAtual = $('#apelido_now_user').val();
 				let html = '';
-				for (const element of data.apelidosParticipantes) {
-					html += '<span class="participante">' + element + '</span>';
+
+				// Primeiro, adiciona o apelido do usuário atual
+				if (data.apelidosParticipantes.includes(apelidoAtual)) {
+					html += '<span class="participante font-weight-bold text-primary">' + apelidoAtual + ' (você)</span>';
 				}
 
-				// Insert new content
+				// Depois, adiciona os demais participantes
+				for (const apelido of data.apelidosParticipantes) {
+					if (apelido !== apelidoAtual) {
+						html += '<span class="participante">' + apelido + '</span>';
+					}
+				}
+
 				$('#pessoas').append(html);
 			});
+
 
 		})
 		function ocultaNavbar() {
@@ -153,16 +170,20 @@
 		}
 		var socket = io('http://localhost:3000');
 		function enviarMensagem() {
+
+			if (!$('#mensagem').val()) {
+				return;
+			}
 			let corpoMensagem = {
-				apelido: $('#apelido').val(),
+				apelido: $('#apelido_now_user').val(),
 				mensagem: $('#mensagem').val(),
-				apelidoAtualizadosNosClientes: $('#apelido_atualizados_nos_clientes').val()
+				apelidoAtualizadosNosClientes: $('#apelido_now_user_atualizados_nos_clientes').val()
 			};
 
 
 			socket.emit('msgParaServidor', corpoMensagem);
 			$('#mensagem').val('')
-			$('#apelido_atualizados_nos_clientes').val(1);
+			$('#apelido_now_user_atualizados_nos_clientes').val(1);
 			document.getElementById('dialogos').scrollTo(0, document.getElementById('dialogos').scrollHeight);
 		}
 
@@ -221,7 +242,7 @@
 					<div class="input-group">
 						<input type="text" id="mensagem" style="flex: 1 1 auto;" placeholder="Digite sua mensagem..."
 							onkeyup="enviarMsgEnter(event)">
-						<input type="hidden" id="apelido" value="<%=dadosForm.apelido%>">
+						<input type="hidden" id="apelido_now_user" value="<%=dadosForm.apelido%>">
 						<input type="hidden" id="apelido_atualizados_nos_clientes" value="0">
 						<div class="input-group-append">
 							<button class="btn btn-primary" onclick="enviarMensagem()" type="button">
