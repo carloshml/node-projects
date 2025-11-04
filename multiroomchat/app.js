@@ -11,7 +11,7 @@ var server = app.listen(port, function () {
 var io = require('socket.io')(server);
 /* criar a conexão por websocket*/
 
-
+var apelidosParticipantes = [];
 //assim a variável fica global
 app.set('io', io);
 // aqui é o lado do servidor o que é mandado aqui é
@@ -24,19 +24,25 @@ io.on('connection', function (socket) {
   })
 
   socket.on('msgParaServidor', function (data) {
+
+    if (!apelidosParticipantes.includes(data.apelido)) {
+      apelidosParticipantes.push(data.apelido);
+    }
+
+
     socket.emit('msgParaCliente',
       { apelido: data.apelido, mensagem: data.mensagem }
     );
     socket.broadcast.emit('msgParaCliente',
       { apelido: data.apelido, mensagem: data.mensagem }
     );
-    if (parseInt(data.apelidoAtualizadosNosClientes) === 0) {
-      socket.emit('participantesParaCliente',
-        { apelido: data.apelido }
-      );
-      socket.broadcast.emit('participantesParaCliente',
-        { apelido: data.apelido }
-      );
-    }
+
+    socket.emit('participantesParaCliente',
+      { apelidosParticipantes }
+    );
+    socket.broadcast.emit('participantesParaCliente',
+      { apelidosParticipantes }
+    );
+
   });
 });
