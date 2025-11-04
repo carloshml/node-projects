@@ -80,35 +80,28 @@ img {
     margin-top: -10px;
 }
 
-.dialogo {   
+.dialogo {
     height: auto;
-    margin-bottom: 15px;    
+    margin-bottom: 15px;
     background: #D8F0FE;
     border-radius: 8px;
     box-shadow: gray 2px 2px 6px;
 }
+
 .dialogo-do-outro {
     width: 100%;
 }
 
-.dialogo-pessoal {   
+.dialogo-pessoal {
     width: 80%;
     margin-left: 20%;
     background: #B6DDF4;
-    border-radius: 8px  8px 0  8px;
+    border-radius: 8px 8px 0 8px;
 }
 
-.dialogo span {
-    border-radius: 8px  8px 0  0;
-    display: block;
-    font-size: 15px;
-    font-weight: bold;
-    color: white;
-    background: #89ccf5;
-    padding: 0 16px;
-}
 
-.dialogo mensagem{
+
+.dialogo mensagem {
     padding-left: 8px;
 }
 

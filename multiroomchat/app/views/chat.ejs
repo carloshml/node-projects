@@ -1,53 +1,91 @@
-<!DOCTYPE HTML>
+<!DOCTYPE html>
 <html lang="pt-br">
 
 <head>
 	<meta charset="UTF-8">
-
 	<title>Multiroom Chat</title>
 
-	<!-- icones -->
+	<!-- Bootstrap 4 -->
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+	<!-- Material Icons -->
 	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
-	<!-- JQUERY -->
-	<script src="js/jquery-2.2.1.js"></script>
-
-	<!-- bootstrap - link cdn -->
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
-		integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
-
-	<!-- estilo -->
 	<link href="css/style.css" rel="stylesheet">
-	<style media="screen">
-		.material-icons {
-			font-family: 'Material Icons';
-			font-weight: normal;
-			font-style: normal;
-			font-size: 15px;
-			/* Preferred icon size */
-			display: inline-block;
-			line-height: 1;
-			text-transform: none;
-			letter-spacing: normal;
-			word-wrap: normal;
-			white-space: nowrap;
-			direction: ltr;
+	<style>
+		body {
+			padding-top: 70px;
+			padding-bottom: 70px;
+			background-color: #f8f9fa;
+		}
 
-			/* Support for all WebKit browsers. */
-			-webkit-font-smoothing: antialiased;
-			/* Support for Safari and Chrome. */
-			text-rendering: optimizeLegibility;
+		.navbar-brand {
+			font-weight: bold;
+		}
 
-			/* Support for Firefox. */
-			-moz-osx-font-smoothing: grayscale;
+		#dialogos .dialogo {
+			margin-bottom: 15px;
+			padding: 10px 15px;
+			border-radius: 15px;
+			max-width: 70%;
+			word-wrap: break-word;
+		}
 
-			/* Support for IE. */
-			font-feature-settings: 'liga';
+		.dialogo-pessoal {
+			background-color: #d1ecf1;
+			align-self: flex-end;
+			margin-left: auto;
+		}
+
+		.dialogo-do-outro {
+			background-color: #fff3cd;
+			align-self: flex-start;
+			margin-right: auto;
+		}
+
+		.mensagem {
+			margin: 0;
+		}
+
+		#dialogos {
+			display: flex;
+			flex-direction: column;
+			height: 85vh;
+			overflow-y: auto;
+			padding: 10px;
+			background-color: #ffffff;
+			border: 1px solid #dee2e6;
+			border-radius: 5px;
+		}
+
+		#pessoas .participante {
+			display: block;
+			padding: 8px;
+			border-bottom: 1px solid #dee2e6;
+		}
+
+		.campo-mensagem {
+			background-color: #ffffff;
+			padding: 10px;
+			border-top: 1px solid #dee2e6;
+		}
+
+		.input-group .form-control {
+			border-radius: 20px;
+		}
+
+		.input-group-btn .btn {
+			border-radius: 20px;
+		}
+
+		.apelido-destacado {
+			display: block;
+			font-weight: bold;
+			font-size: 14px;
+			color: #007bff;
+			/* azul Bootstrap */
+			margin-bottom: 5px;
 		}
 	</style>
-	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"
-		integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS"
-		crossorigin="anonymous"></script>
 	<script src="/socket.io/socket.io.js">	</script>
 
 	<script type="text/javascript">
@@ -75,11 +113,12 @@
 				function (data) {
 					var html = '';
 					if (apelido === data.apelido) {
-						html += "<div class='dialogo dialogo-pessoal ' >";					 
+						html += "<div class='dialogo dialogo-pessoal ' >";
 					} else {
 
 						html += "<div class='dialogo  dialogo-do-outro' >"
-						html += '<span>' + data.apelido + '</span>';
+						html += '<span class="apelido-destacado">' + data.apelido + '</span>';
+
 					}
 
 					html += '<p class="mensagem">' + data.mensagem + '</p>';
@@ -129,36 +168,26 @@
 </head>
 
 <body>
-	<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+	<!-- Navbar -->
+	<nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
 		<div class="container">
-			<div class="navbar-header">
-				<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-collapse-1"
-					id="btn_navbar_toggle">
-					<span class="sr-only">Toggle navigation</span>
-					<span class="icon-bar"></span>
-					<span class="icon-bar"></span>
-					<span class="icon-bar"></span>
-				</button>
-				<a class="navbar-brand" href="#">Multiroom Chat</a>
-			</div>
-			<div class="collapse navbar-collapse" id="navbar-collapse-1">
-				<ul class="nav navbar-nav">
-					<li>
-						<a href="#" id="exibe_chat">Chat</a>
-					</li>
-					<li>
-						<a href="#" id="exibe_participantes">Participantes</a>
-					</li>
+			<a class="navbar-brand" href="#">Multiroom Chat</a>
+			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<div class="collapse navbar-collapse" id="navbarNav">
+				<ul class="navbar-nav ml-auto">
+					<li class="nav-item"><a class="nav-link" href="#" id="exibe_chat">Chat</a></li>
+					<li class="nav-item"><a class="nav-link" href="#" id="exibe_participantes">Participantes</a></li>
 				</ul>
 			</div>
 		</div>
 	</nav>
 
+	<!-- Conteúdo -->
 	<div class="container">
-		<div class="row conversa" id="conversa">
-			<div class="col-md-1"></div>
-			<div class="col-md-10" id="dialogos"> </div>
-			<div class="col-md-1"></div>
+		<div id="conversa">
+			<div id="dialogos"></div>
 		</div>
 		<div class="row participantes" id="participantes" style="display:none">
 			<div class="col-md-1"></div>
@@ -168,26 +197,28 @@
 		</div>
 	</div>
 
-	<nav class="navbar navbar-default navbar-fixed-bottom" role="navigation">
+	<!-- Campo de mensagem -->
+	<footer class="navbar fixed-bottom campo-mensagem">
 		<div class="container">
-			<div class="panel-body campo-mensagem">
-				<div class="col-md-12">					
-					<div class="input-group">
-						<input type="text" id="mensagem" class="form-control" placeholder="Mensagem"
-							onkeyup="enviarMsgEnter(event)">
-						<input type="hidden" name="" id="apelido" value="<%=dadosForm.apelido%>">
-						<input type="hidden" name="" id="apelido_atualizados_nos_clientes" value="0">
-						<span class="input-group-btn">
-							<button id="enviar_mensagem" class="btn btn-default" onclick="enviarMensagem()"
-								type="button">
-								<i class="material-icons">send</i>
-							</button>
-						</span>
-					</div>
+			<div class="input-group">
+				<input type="text" id="mensagem" class="form-control" placeholder="Digite sua mensagem..."
+					onkeyup="enviarMsgEnter(event)">
+				<input type="hidden" id="apelido" value="<%=dadosForm.apelido%>">
+				<input type="hidden" id="apelido_atualizados_nos_clientes" value="0">
+				<div class="input-group-append">
+					<button class="btn btn-primary" onclick="enviarMensagem()" type="button">
+						<i class="material-icons">send</i>
+					</button>
 				</div>
 			</div>
 		</div>
-	</nav>
+	</footer>
+
+	<!-- Scripts -->
+	<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+	<script src="/socket.io/socket.io.js"></script>
+	<!-- Seu script JS permanece igual -->
 </body>
 
 </html>
