@@ -125,19 +125,25 @@
 					html += '</div  >';
 
 					$('#dialogos').append(html);
-					window.scrollTo(0, document.body.scrollHeight)
+					document.getElementById('dialogos').scrollTo(0, document.getElementById('dialogos').scrollHeight);
 				});
 
-			socket.on('participantesParaCliente',
-				function (data) {
+			socket.on('participantesParaCliente', function (data) {
+				console.log('data ::: ', data);
 
-					var html = '';
-					html += '<span class="participante" >';
-					html += data.apelido;
-					html += '</span  >';
+				// Clear the container
+				$('#pessoas').html('');
 
-					$('#pessoas').append(html);
-				});
+				// Build new HTML
+				let html = '';
+				for (const element of data.apelidosParticipantes) {
+					html += '<span class="participante">' + element + '</span>';
+				}
+
+				// Insert new content
+				$('#pessoas').append(html);
+			});
+
 		})
 		function ocultaNavbar() {
 			$("#btn_navbar_toggle").attr("class", "navbar-toggle collapsed");
@@ -157,6 +163,7 @@
 			socket.emit('msgParaServidor', corpoMensagem);
 			$('#mensagem').val('')
 			$('#apelido_atualizados_nos_clientes').val(1);
+			document.getElementById('dialogos').scrollTo(0, document.getElementById('dialogos').scrollHeight);
 		}
 
 		function enviarMsgEnter(eventKey) {
@@ -186,11 +193,23 @@
 
 	<!-- Conteúdo -->
 	<div class="container">
-		<div id="conversa">
-			<div id="dialogos" class="dialogos"></div>
-		</div>
-		<div id="participantes" style="display:none">
-			<div id="pessoas" class="dialogos"> </div>
+		<div class="row">
+			<!-- Área de diálogo (mais larga) -->
+			<div class="col-md-9" id="conversa">
+				<div id="dialogos" class="dialogos"></div>
+			</div>
+
+			<!-- Área de participantes (mais estreita) -->
+			<div class="col-md-3">
+
+				<div class="dialogos">
+					<h5 class="text-center font-weight-bold">Participantes</h5>
+					<div id="participantes">
+						<div id="pessoas">
+						</div>
+					</div>
+				</div>
+			</div>
 		</div>
 	</div>
 
