@@ -15,7 +15,12 @@ module.exports.iniciaChat = function (application, req, res, metodo) {
 
 
   const apelidos = handler.apelidosParticipantes;
-  handler.adicionarApelido(dadosForm.apelido);
+  const apelidoLivre = handler.adicionarApelido(dadosForm.apelido);
+
+  if (!apelidoLivre) {
+    res.render('index', { erros: [{ msg: 'Apelido já está em uso na Sala!' }] });
+    return;
+  }
 
   setTimeout(() => {
     application.get('io').emit('msgParaCliente', {

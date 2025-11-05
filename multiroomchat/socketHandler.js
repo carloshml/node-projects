@@ -1,9 +1,11 @@
 const apelidosParticipantes = [];
 
 function adicionarApelido(apelido) {
-    if (!apelidosParticipantes.includes(apelido)) {
-        apelidosParticipantes.push(apelido);
+    if (apelidosParticipantes.includes(apelido)) {
+        return false;
     }
+    apelidosParticipantes.push(apelido);
+    return true;
 }
 
 
