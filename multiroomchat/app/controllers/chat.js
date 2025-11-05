@@ -1,3 +1,5 @@
+const handler = require('../../socketHandler');
+
 module.exports.iniciaChat = function (application, req, res, metodo) {
   var dadosForm = req.body;
 
@@ -11,13 +13,20 @@ module.exports.iniciaChat = function (application, req, res, metodo) {
     return;
   }
 
-  application
-    .get('io')
-    .emit('msgParaCliente',
-      {
-        apelido: dadosForm.apelido,
-        mensagem: 'acabou de entrar no chat'
-      }
-    );
+
+  const apelidos = handler.apelidosParticipantes;
+  handler.adicionarApelido(dadosForm.apelido);
+
+  application.get('io').emit('msgParaCliente', {
+    apelido: dadosForm.apelido,
+    mensagem: 'acabou de entrar no chat',
+    apelidosParticipantes: apelidos
+  });
+
+  application.get('io').emit('participantesParaCliente', {
+    apelido: dadosForm.apelido,
+    apelidosParticipantes: apelidos
+  });
+
   res.render('chat', { dadosForm: dadosForm });
 }

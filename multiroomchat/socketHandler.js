@@ -1,6 +1,13 @@
-module.exports = function (io) {
-    const apelidosParticipantes = [];
+const apelidosParticipantes = [];
 
+function adicionarApelido(apelido) {
+    if (!apelidosParticipantes.includes(apelido)) {
+        apelidosParticipantes.push(apelido);
+    }
+}
+
+
+module.exports = function (io) {
     io.on('connection', function (socket) {
         console.log('usuario conectou');
 
@@ -9,9 +16,12 @@ module.exports = function (io) {
         });
 
         socket.on('msgParaServidor', function (data) {
-            if (!apelidosParticipantes.includes(data.apelido)) {
-                apelidosParticipantes.push(data.apelido);
-            }
+            adicionarApelido(data.apelido);
+
+            io.emit('participantesParaCliente', {
+                apelido: data.apelido,
+                apelidosParticipantes
+            });
 
             socket.emit('msgParaCliente', {
                 apelido: data.apelido,
@@ -23,10 +33,11 @@ module.exports = function (io) {
                 mensagem: data.mensagem
             });
 
-            io.emit('participantesParaCliente', {
-                apelido: data.apelido,
-                apelidosParticipantes
-            });
+
         });
     });
 };
+
+module.exports.apelidosParticipantes = apelidosParticipantes;
+module.exports.adicionarApelido = adicionarApelido;
+
