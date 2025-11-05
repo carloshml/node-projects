@@ -107,6 +107,14 @@
 
 			const apelido = $('#apelido_now_user').val();
 
+
+
+			$("#btn_logout").click(function () {
+				socket.emit('logout', { apelido: apelido });
+				window.location.href = '/';
+			});
+
+
 			$("#exibe_chat").click(function () {
 				$("#conversa").show();
 				$("#participantes").hide();
@@ -209,6 +217,9 @@
 			</button>
 			<div class="collapse navbar-collapse" id="navbarNav">
 				<ul class="navbar-nav ml-auto">
+					<li class="nav-item">
+						<a class="nav-link" href="#" id="btn_logout">SAIR</a>
+					</li>
 
 				</ul>
 			</div>

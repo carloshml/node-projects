@@ -37,6 +37,27 @@ module.exports = function (io) {
 
 
         });
+
+
+        socket.on('logout', function (data) {
+            const index = apelidosParticipantes.indexOf(data.apelido);
+            if (index !== -1) {
+                apelidosParticipantes.splice(index, 1);
+                console.log(`${data.apelido} saiu do chat`);
+            }
+
+            io.emit('participantesParaCliente', {
+                apelido: data.apelido,
+                apelidosParticipantes
+            });
+
+            io.emit('msgParaCliente', {
+                apelido: data.apelido,
+                mensagem: 'saiu do chat',
+                apelidosParticipantes
+            });
+        });
+
     });
 };
 
