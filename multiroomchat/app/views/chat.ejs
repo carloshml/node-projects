@@ -126,13 +126,17 @@
 					if (apelido === data.apelido) {
 						html += "<div class='dialogo dialogo-pessoal ' >";
 					} else {
-
 						html += "<div class='dialogo  dialogo-do-outro' >"
 						html += '<span class="apelido-destacado">' + data.apelido + '</span>';
-
 					}
 
-					html += '<p class="mensagem">' + data.mensagem + '</p>';
+					if (apelido === data.apelido && data.mensagem === 'acabou de entrar no chat') {
+						html += '<p class="mensagem"> Bem Vindo ao chat</p>';
+					} else {
+						html += '<p class="mensagem">' + data.mensagem + '</p>';
+					}
+
+
 					html += '</div  >';
 
 					$('#dialogos').append(html);
@@ -205,7 +209,7 @@
 			</button>
 			<div class="collapse navbar-collapse" id="navbarNav">
 				<ul class="navbar-nav ml-auto">
-				 
+
 				</ul>
 			</div>
 		</div>
