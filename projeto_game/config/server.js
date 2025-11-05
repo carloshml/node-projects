@@ -26,7 +26,7 @@ app.use(bodyParser.urlencoded({extended: true}));
 /* configurar o middleware express-session */
 app.use(expressSession({
 	secret:'secretkey-00045',
-	resave: false, // pais não será regravada a cada sessão
+	resave: false, // pois não será regravada a cada sessão
 	saveUninitialized: false
 }));
 
