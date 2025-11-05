@@ -6,7 +6,7 @@ const server = app.listen(port, function () {
 });
 
 const io = require('socket.io')(server);
-const handler = require('./socketHandler')(io);
+const handler = require('./app/controllers/socketHandler')(io);
 app.set('io', io);
 app.set('handler', handler);
 

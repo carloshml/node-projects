@@ -1,4 +1,4 @@
-const handler = require('../../socketHandler');
+const handler = require('./socketHandler');
 
 module.exports.iniciaChat = function (application, req, res, metodo) {
   var dadosForm = req.body;
