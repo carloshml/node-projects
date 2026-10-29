@@ -4,9 +4,6 @@ var express = require('express');
 /* importar o módulo do consign */
 var consign = require('consign');
 
-/* importar o módulo do body-parser */
-var bodyParser = require('body-parser');
-
 /* importar o módulo do express-session */
 var expressSession = require('express-session');
 
@@ -20,9 +17,9 @@ app.set('views', './app/views');
 /* configurar o middleware express.static */
 app.use(express.static('./app/public')); 
 
-/* configurar o middleware body-parser */
-app.use(bodyParser.urlencoded({extended: true}));
-app.use(bodyParser.json());
+/* configurar os parsers nativos do Express 5 */
+app.use(express.urlencoded({extended: true}));
+app.use(express.json());
 
 /* configurar o middleware express-session */
 app.use(expressSession({

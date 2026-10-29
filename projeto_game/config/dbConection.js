@@ -1,13 +1,14 @@
-var MongoClient = require('mongodb').MongoClient;
+const { MongoClient } = require('mongodb');
+
 const config = {
   user: '',
   password: '',
   url: '127.0.0.1:27017',
   database: 'got'
-}
+};
+
 // const mongodbUri = `mongodb://${config.user}:${config.password}@${config.url}/${config.database}`;
 const mongodbUri = `mongodb://${config.url}/${config.database}`;
-
 
 const options = {
   connectTimeoutMS: 120000,
@@ -17,7 +18,7 @@ const options = {
 class MongoDBConnection {
   constructor() { }
 
-  // return a promise to the existing connection or the connection function
+  // devolve uma Promise com a conexão aberta
   getDB() {
     try {
       return mConnect();
@@ -29,25 +30,9 @@ class MongoDBConnection {
 
 module.exports = new MongoDBConnection();
 
-// transforms into a promise Mongo's client.connect
-function mConnect() {
-  return new Promise((resolve, reject) => {
-   
-    MongoClient
-      .connect(mongodbUri,
-        options,
-        function (err, clientResponse) {
-          if (err) {
-            reject(err);
-          }
-
-          if (clientResponse && clientResponse.db) {
-          const db = clientResponse.db(config.database);
-          const clienteAberto = clientResponse;
-          resolve({ db, client: clienteAberto });
-          } else {
-            reject('Sem conexão com o banco');
-          }
-        });
-  });
+// transforma a conexão do driver em uma Promise
+async function mConnect() {
+  const client = await MongoClient.connect(mongodbUri, options);
+  const db = client.db(config.database);
+  return { db, client };
 }

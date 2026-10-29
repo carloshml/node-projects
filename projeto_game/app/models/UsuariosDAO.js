@@ -1,209 +1,199 @@
 let crypto = require('crypto');
-let ObjectID = require('mongodb').ObjectID;
+let ObjectId = require('mongodb').ObjectId;
 
 function UsuarioDAO(connection) {
-    // underline converção para que a variável só funciona nessa função
     this._connection = connection;
 }
 
 UsuarioDAO.prototype.inserirUsuario = async function (usuario, application) {
     usuario.senha = crypto.createHash('md5').update(usuario.senha).digest('hex');
-    return await this._connection
-        .getDB()
-        .then(async db => {
-            const existeUsuario = await db.db.collection("usuarios")
-                .find({ usuario: usuario.usuario })
-                .toArray()
-                .then((result) => {                    
-                    db.client.close();
-                    if (result.length > 0) {                       
-                        return true;
-                    } else {
-                        return false;
-                    }
-                })
-                .catch(error => {
-                    console.log('  algum erro foi encontrado  ', error);
-                });            
-            if (existeUsuario) {                 
-                return 'usuarioexiste';
-            }
-            delete usuario._id;
-            return await this._connection
-                .getDB()
-                .then(async db2 => {
-                    return await db2.db.collection("usuarios")
-                        .insertOne(usuario)
-                        .then((result) => {
-                            // geração dos parametros
-                            var connection = application.config.dbConection;
-                            var JogoDAO = new application.app.models.JogoDAO(connection);
-                            JogoDAO.gerarParametrosJogo(result.insertedId,  usuario.usuario);                         
-                            return 'sucesso';
-                        })
-                        .catch(error => {
-                            console.log('  algum erro foi encontrado  ', error);
-                        });
-                })
-                .catch(error => {
-                    console.log('  algum erro foi encontrado  ', error);
-                });
-        })
+    const conexao = await this._connection.getDB();
+
+    try {
+        const existentes = await conexao.db.collection("usuarios")
+            .find({ usuario: usuario.usuario })
+            .toArray();
+
+        if (existentes.length > 0) {
+            return 'usuarioexiste';
+        }
+
+        delete usuario._id;
+        const resultado = await conexao.db.collection("usuarios").insertOne(usuario);
+
+        const JogoDAO = new application.app.models.JogoDAO(application.config.dbConection);
+        await JogoDAO.gerarParametrosJogo(resultado.insertedId, usuario.usuario);
+
+        return 'sucesso';
+    } catch (error) {
+        console.log('  algum erro foi encontrado  ', error);
+        return 'erro';
+    } finally {
+        await conexao.client.close();
+    }
 }
 
 UsuarioDAO.prototype.atualizarUsuario = async function (usuario, req, res) {
-    req.query.jogo = JSON.parse(req.query.jogo);
-    return await this._connection
-        .getDB()
-        .then(async db => {
-            const result = await db.db
-                .collection("usuarios")
-                .updateOne({ "_id": ObjectID(usuario._id) },
-                    { $set: { "nome": usuario.nome, "usuario": usuario.usuario } },
-                    { upsert: true }
-                    // { $inc: {moeda:moedas} },
-                    // {} como é apenas uma conexao esse permanece falso
-                );
-            db.client.close();
-            return true;
-        })
-        .catch(error => {
-            console.log('  algum erro foi encontrado  ', error);
-        });
+    const conexao = await this._connection.getDB();
+
+    try {
+        await conexao.db.collection("usuarios").updateOne(
+            { "_id": new ObjectId(usuario._id) },
+            { $set: { "nome": usuario.nome, "usuario": usuario.usuario } },
+            { upsert: true }
+        );
+        return true;
+    } catch (error) {
+        console.log('  algum erro foi encontrado  ', error);
+        return false;
+    } finally {
+        await conexao.client.close();
+    }
 }
 
-UsuarioDAO.prototype.buscarUsuarioGerarAldeoes = function (res, req, casa, msg) {
+UsuarioDAO.prototype.buscarUsuarioGerarAldeoes = async function (res, req, casa, msg) {
     const usuarioId = req.session._id;
-    this._connection.getDB()
-        .then(db => {
-            db.db.collection("jogo")
-                .find({ idUsuario: ObjectID(usuarioId) })
-                .toArray(function (err, result) {
-                    result[0].nome = req.session.nome;
-                    let usuario2 = { img_casa: casa, jogo: result[0], msg: msg };
-                    res.render('aldeoes', usuario2);
-                    db.client.close();
-                });
-        })
-        .catch(error => {
-            console.log('  algum erro foi encontrado  ', error);
+    const conexao = await this._connection.getDB();
+
+    try {
+        const result = await conexao.db.collection("jogo")
+            .find({ idUsuario: new ObjectId(usuarioId) })
+            .toArray();
+
+        if (!result || !result[0]) {
+            res.redirect('/home');
+            return;
+        }
+
+        result[0].nome = req.session.nome;
+        res.render('aldeoes', {
+            img_casa: casa,
+            jogo: result[0],
+            msg: msg,
+            feras: require('./feras').FERAS
         });
+    } catch (error) {
+        console.log('  algum erro foi encontrado  ', error);
+    } finally {
+        await conexao.client.close();
+    }
 }
 
 UsuarioDAO.prototype.listarUsuarios = async function () {
-    return await this._connection.getDB()
-        .then(async db => {
-            return await db.db.collection("usuarios")
-                .find()
-                .toArray()
-                .then(result => {
-                    db.client.close();
-                    return result;
-                })
-        })
-        .catch(error => {
-            console.log('  algum erro foi encontrado  ', error);
-            return error;
-        });
+    const conexao = await this._connection.getDB();
+
+    try {
+        return await conexao.db.collection("usuarios").find().toArray();
+    } catch (error) {
+        console.log('  algum erro foi encontrado  ', error);
+        return error;
+    } finally {
+        await conexao.client.close();
+    }
 }
 
-UsuarioDAO.prototype.autenticar = function (usuario, req, res) {
+UsuarioDAO.prototype.autenticar = async function (usuario, req, res) {
     usuario.senha = crypto.createHash('md5').update(usuario.senha).digest('hex');
-    this._connection
-        .getDB()
-        .then(config => {
-            config.db.collection('usuarios')
-                .find(usuario)
-                .toArray(function (err, result) {
+    const conexao = await this._connection.getDB();
 
-                    if (result[0] != undefined) {
-                        req.session.autorizado = true;
-                        req.session.usuario = result[0].usuario;
-                        req.session.casa = result[0].casa;
-                        req.session.nome = result[0].nome;
-                        req.session._id = result[0]._id;
-                    } else {
-                        req.session.autorizado = false;
-                    }
-                    if (req.session.autorizado) {
-                        res.redirect('home');
-                    } else {
-                        var errors = [
-                            { msg: 'Usuario ou senha Incorreto' }
-                        ]
-                        res.render('index', { validacao: errors, aviso: {} });
-                    }
-                    config.client.close();
-                });
+    try {
+        const result = await conexao.db.collection('usuarios').find(usuario).toArray();
 
-        })
-        .catch(error => {
-            console.log('  algum erro foi encontrado  ', error);
+        if (result[0] != undefined) {
+            req.session.autorizado = true;
+            req.session.usuario = result[0].usuario;
+            req.session.casa = result[0].casa;
+            req.session.nome = result[0].nome;
+            req.session._id = result[0]._id;
+        } else {
+            req.session.autorizado = false;
+        }
+
+        if (req.session.autorizado) {
+            res.redirect('/home');
+        } else {
             const errors = [
-                { msg: 'algum erro foi encontrado autenticar usuário' }
-            ]
+                { msg: 'Usuario ou senha Incorreto' }
+            ];
             res.render('index', { validacao: errors, aviso: {} });
-        });
-
-
+        }
+    } catch (error) {
+        console.log('  algum erro foi encontrado  ', error);
+        const errors = [
+            { msg: 'algum erro foi encontrado autenticar usuário' }
+        ];
+        res.render('index', { validacao: errors, aviso: {} });
+    } finally {
+        await conexao.client.close();
+    }
 }
 
-UsuarioDAO.prototype.irParaHome = function (res, usuario, casa, msg, req) {
-    this._connection
-        .getDB()
-        .then(db => {
-            db.db
-                .collection("jogo")
-                .find({ idUsuario: ObjectID(req.session._id) })
-                .toArray(function (err, result) {
-                    result[0].nome = req.session.nome;
-                    result[0]._id = req.session._id;
-                    res.render('home', { img_casa: casa, jogo: result[0], msg: msg });
-                    db.client.close();
-                });
-        })
-        .catch(error => {
-            console.log('  algum erro foi encontrado  ', error);
-            const errors = [
-                { msg: 'algum erro foi encontrado irParaHome' }
-            ]
-            res.render('index', { validacao: errors, aviso: {} });
-        });
+UsuarioDAO.prototype.irParaHome = async function (res, usuario, casa, msg, req) {
+    const conexao = await this._connection.getDB();
+
+    try {
+        const result = await conexao.db.collection("jogo")
+            .find({ idUsuario: new ObjectId(req.session._id) })
+            .toArray();
+
+        if (!result || !result[0]) {
+            res.redirect('/');
+            return;
+        }
+
+        result[0].nome = req.session.nome;
+        result[0]._id = req.session._id;
+        res.render('home', { img_casa: casa, jogo: result[0], msg: msg });
+    } catch (error) {
+        console.log('  algum erro foi encontrado  ', error);
+        const errors = [
+            { msg: 'algum erro foi encontrado irParaHome' }
+        ];
+        res.render('index', { validacao: errors, aviso: {} });
+    } finally {
+        await conexao.client.close();
+    }
 }
 
-
-UsuarioDAO.prototype.buscarUsuarios = async function (res, req, casa, msg, jogos) {    
-    req.query.jogo = JSON.parse(req.query.jogo);
+UsuarioDAO.prototype.buscarUsuarios = async function (res, req, casa, msg, jogos) {
     let usuarios = [];
-    await this._connection.getDB()
-        .then(async db => {
-            let dbCollection = db.db.collection("usuarios");
-            for await (const jogo of jogos) {                
-                let usuario = await dbCollection.findOne({ "_id": ObjectID(jogo.idUsuario) }).then( usuario=> usuario );            
-                usuario.jogo = jogo;
-                usuario.img_casa = usuario.casa;
-                usuarios.push(usuario);
+    const conexao = await this._connection.getDB();
+
+    try {
+        const dbCollection = conexao.db.collection("usuarios");
+
+        for (const jogo of jogos) {
+            const usuario = await dbCollection.findOne({ "_id": new ObjectId(jogo.idUsuario) });
+            if (!usuario) {
+                continue;
             }
-            db.client.close();
-            res.render('ranking', { img_casa: casa, nome: req.session.nome, usuarios });  
-        })
-        .catch(error => {
-            console.log('  algum erro foi encontrado  ', error);
-        });
+            usuario.jogo = jogo;
+            usuario.img_casa = usuario.casa;
+            usuarios.push(usuario);
+        }
+
+        res.render('ranking', { img_casa: casa, nome: req.session.nome, usuarios });
+    } catch (error) {
+        console.log('  algum erro foi encontrado  ', error);
+    } finally {
+        await conexao.client.close();
+    }
 }
 
 UsuarioDAO.prototype.verRanking = async function (res, req, casa, msg, application) {
-    const teste = await this._connection.getDB()
-        .then(async db => {
-            let dbCollection = db.db.collection("jogo")
-            let jogos = await dbCollection.find().sort({ moeda: -1 });
-            var connection = application.config.dbConection;
-            var UsuarioDAO = new application.app.models.UsuariosDAO(connection);
-            UsuarioDAO.buscarUsuarios(res, req, casa, msg, jogos);
-        })
-        .catch(error => {
-            console.log('  algum erro foi encontrado  ', error);
-        });
+    const conexao = await this._connection.getDB();
+    let jogos = [];
+
+    try {
+        jogos = await conexao.db.collection("jogo").find().sort({ moeda: -1 }).toArray();
+    } catch (error) {
+        console.log('  algum erro foi encontrado  ', error);
+    } finally {
+        await conexao.client.close();
+    }
+
+    const UsuarioDAO = new application.app.models.UsuariosDAO(application.config.dbConection);
+    await UsuarioDAO.buscarUsuarios(res, req, casa, msg, jogos);
 }
 
 module.exports = function () {

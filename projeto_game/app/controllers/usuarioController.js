@@ -7,8 +7,12 @@ async function listaUsuarios(application, req, res, errors) {
         var connection = application.config.dbConection;
         var UsuarioDAO = new application.app.models.UsuariosDAO(connection);
         const result = await UsuarioDAO.listarUsuarios();
-        req.query.resultados = result;
-        const opcoes = req.query;
+
+        const opcoes = Object.assign({}, req.query, {
+            resultados: result,
+            validacao: errors
+        });
+
         if (typeof opcoes.jogo === 'string') {
             try {
                 opcoes.jogo = JSON.parse(opcoes.jogo);
@@ -16,7 +20,7 @@ async function listaUsuarios(application, req, res, errors) {
                 /* mantém a string se não for um JSON válido */
             }
         }
-        opcoes.validacao = errors;
+
         res.render('usuariosSistema', opcoes);
     } else {
         var errors = [
@@ -49,13 +53,13 @@ module.exports.atualizarUsuario = async function (application, req, res, validat
     var dadosForm = req.body;
     var errors = validationResult(req);
     if (!errors.isEmpty()) {
-        res.redirect('buscarUsuarios?' + (dadosForm.id_jogo || ''));
+        res.redirect('/buscarUsuarios?' + (dadosForm.id_jogo || ''));
         return;
     }
     var connection = application.config.dbConection;
     var UsuariosDAO = new application.app.models.UsuariosDAO(connection);
     if (await UsuariosDAO.atualizarUsuario(dadosForm, req)) {
-        res.redirect('buscarUsuarios?' + dadosForm.id_jogo);
+        res.redirect('/buscarUsuarios?' + dadosForm.id_jogo);
     }
 }
 

@@ -1,4 +1,4 @@
-let ObjectID = require('mongodb').ObjectID;
+let ObjectId = require('mongodb').ObjectId;
 const { FERAS, PODER_ALDEAO, obterFera } = require('./feras');
 
 /* custo em moedas por aldeão, por tipo de ação */
@@ -90,52 +90,54 @@ function JogoDAO(connection) {
 
 JogoDAO.PRECOS = PRECOS;
 
-JogoDAO.prototype.gerarParametrosJogo = function (id, usuario) {
-    this._connection.getDB()
-        .then(db => {
-            db.db.collection("jogo")
-                .insertOne({
-                    usuario: usuario,
-                    idUsuario: id,
-                    moeda: 15,
-                    suditos: 10,
-                    suditosTrabalhando: 0,
-                    temor: Math.floor(Math.random() * 1000),
-                    sabedoria: Math.floor(Math.random() * 1000),
-                    comercio: Math.floor(Math.random() * 1000),
-                    magia: Math.floor(Math.random() * 1000),
-                    recursos: { madeira: 0, comida: 0, ferro: 0 }
-                });
-        })
-        .catch(error => {
-            console.log('  algum erro foi encontrado  ', error);
+JogoDAO.prototype.gerarParametrosJogo = async function (id, usuario) {
+    const conexao = await this._connection.getDB();
+
+    try {
+        await conexao.db.collection("jogo").insertOne({
+            usuario: usuario,
+            idUsuario: id,
+            moeda: 15,
+            suditos: 10,
+            suditosTrabalhando: 0,
+            temor: Math.floor(Math.random() * 1000),
+            sabedoria: Math.floor(Math.random() * 1000),
+            comercio: Math.floor(Math.random() * 1000),
+            magia: Math.floor(Math.random() * 1000),
+            recursos: { madeira: 0, comida: 0, ferro: 0 }
         });
+    } catch (error) {
+        console.log('  algum erro foi encontrado  ', error);
+    } finally {
+        await conexao.client.close();
+    }
 }
 
-JogoDAO.prototype.iniciaJogo = function (res, req, casa, msg) {
+JogoDAO.prototype.iniciaJogo = async function (res, req, casa, msg) {
     const usuarioId = req.session._id;
-    this._connection.getDB()
-        .then(db => {
-            db.db.collection("jogo")
-                .find({ idUsuario: ObjectID(usuarioId) })
-                .toArray(function (err, result) {
-                    if (err || !result || !result[0]) {
-                        res.redirect('/');
-                        db.client.close();
-                        return;
-                    }
-                    const jogo = result[0];
-                    jogo.nome = req.session.nome;
-                    jogo.recursos = jogo.recursos || {};
-                    jogo.precos = PRECOS;
-                    jogo.feras = FERAS;
-                    res.render('jogo', { img_casa: casa, jogo: jogo, msg: msg });
-                    db.client.close();
-                });
-        })
-        .catch(error => {
-            console.log('  algum erro foi encontrado  ', error);
-        });
+    const conexao = await this._connection.getDB();
+
+    try {
+        const result = await conexao.db.collection("jogo")
+            .find({ idUsuario: new ObjectId(usuarioId) })
+            .toArray();
+
+        if (!result || !result[0]) {
+            res.redirect('/');
+            return;
+        }
+
+        const jogo = result[0];
+        jogo.nome = req.session.nome;
+        jogo.recursos = jogo.recursos || {};
+        jogo.precos = PRECOS;
+        jogo.feras = FERAS;
+        res.render('jogo', { img_casa: casa, jogo: jogo, msg: msg });
+    } catch (error) {
+        console.log('  algum erro foi encontrado  ', error);
+    } finally {
+        await conexao.client.close();
+    }
 }
 
 JogoDAO.prototype.gerarOrdemSuditos = async function (acao) {
@@ -157,8 +159,8 @@ JogoDAO.prototype.gerarOrdemSuditos = async function (acao) {
         const custo = CUSTOS[tipo] * quantidade;
         /* usa o usuário da sessão, não o id vindo do formulário */
         const filtroJogo = acao.idUsuario
-            ? { idUsuario: ObjectID(acao.idUsuario) }
-            : { _id: ObjectID(acao.jogo._id) };
+            ? { idUsuario: new ObjectId(acao.idUsuario) }
+            : { _id: new ObjectId(acao.jogo._id) };
 
         /* debita moedas e ocupa os aldeões de forma atômica */
         const debito = await db.collection("jogo").findOneAndUpdate(
@@ -211,37 +213,29 @@ JogoDAO.prototype.gerarOrdemSuditos = async function (acao) {
 
         return { ok: true };
     } finally {
-        conexao.client.close();
+        await conexao.client.close();
     }
 }
 
-JogoDAO.prototype.gerarPergaminhos = function (req, res) {
+JogoDAO.prototype.gerarPergaminhos = async function (req, res) {
     const usuario = req.session.usuario;
-    let acoesNaoTerminadas;
-    this._connection.getDB()
-        .then(db => {
-            const momento_atual = new Date().getTime();
-            db.db.collection("acao")
-                .find(
-                    { usuario: usuario, acao_termina_em: { $gt: momento_atual }, terminado: { $ne: true } }
-                )
-                .toArray(function (err, acoesNaoTerminadasResp) {
-                    if (err) {
-                        responderJson(res, 500, { ok: false, msg: 'erro' });
-                        db.client.close();
-                        return;
-                    }
-                    acoesNaoTerminadas = acoesNaoTerminadasResp;
-                    const jsonContent = JSON.stringify({ acoes: acoesNaoTerminadas });
-                    res.setHeader("Content-Type", "application/json");
-                    res.end(jsonContent);
-                    db.client.close();
-                });
-        })
-        .catch(error => {
-            console.log('  algum erro foi encontrado  ', error);
-            responderJson(res, 500, { ok: false, msg: 'erro' });
-        });
+    const conexao = await this._connection.getDB();
+
+    try {
+        const momento_atual = new Date().getTime();
+        const acoesNaoTerminadas = await conexao.db.collection("acao")
+            .find({ usuario: usuario, acao_termina_em: { $gt: momento_atual }, terminado: { $ne: true } })
+            .toArray();
+
+        const jsonContent = JSON.stringify({ acoes: acoesNaoTerminadas });
+        res.setHeader("Content-Type", "application/json");
+        res.end(jsonContent);
+    } catch (error) {
+        console.log('  algum erro foi encontrado  ', error);
+        responderJson(res, 500, { ok: false, msg: 'erro' });
+    } finally {
+        await conexao.client.close();
+    }
 }
 
 JogoDAO.prototype.atualizarAcoesDeJogo = async function (req, res) {
@@ -253,7 +247,7 @@ JogoDAO.prototype.atualizarAcoesDeJogo = async function (req, res) {
         conexao = await this._connection.getDB();
         const db = conexao.db;
 
-        const jogo = await db.collection("jogo").findOne({ idUsuario: ObjectID(usuarioId) });
+        const jogo = await db.collection("jogo").findOne({ idUsuario: new ObjectId(usuarioId) });
         if (!jogo) {
             responderJson(res, 404, { ok: false, msg: 'jogoNaoEncontrado' });
             return;
@@ -337,7 +331,7 @@ JogoDAO.prototype.atualizarAcoesDeJogo = async function (req, res) {
         responderJson(res, 500, { ok: false, msg: 'erro' });
     } finally {
         if (conexao) {
-            conexao.client.close();
+            await conexao.client.close();
         }
     }
 }
@@ -352,23 +346,23 @@ JogoDAO.prototype.revogarAcao = async function (req, res) {
         const db = conexao.db;
 
         const acao = await db.collection("acao").findOne({
-            _id: ObjectID(idAcao),
+            _id: new ObjectId(idAcao),
             usuario: usuario
         });
 
         if (!acao) {
-            res.redirect('jogo?msg=erro');
+            res.redirect('/jogo?msg=erro');
             return;
         }
 
         /* a fera já foi revelada; revogar permitiria sortear outra */
         if (parseInt(acao.acao, 10) === 5) {
-            res.redirect('jogo?msg=batalhaEmCurso');
+            res.redirect('/jogo?msg=batalhaEmCurso');
             return;
         }
 
         if (acao.terminado || Number(acao.acao_termina_em) <= new Date().getTime()) {
-            res.redirect('jogo?msg=acaoJaConcluida');
+            res.redirect('/jogo?msg=acaoJaConcluida');
             return;
         }
 
@@ -378,7 +372,7 @@ JogoDAO.prototype.revogarAcao = async function (req, res) {
         if (removida.deletedCount > 0) {
             const quantidade = Number(acao.quantidade) || 0;
             const custo = Number(acao.custo) || (CUSTOS[parseInt(acao.acao, 10)] || 0) * quantidade;
-            const jogo = await db.collection("jogo").findOne({ idUsuario: ObjectID(req.session._id) });
+            const jogo = await db.collection("jogo").findOne({ idUsuario: new ObjectId(req.session._id) });
 
             if (jogo) {
                 await db.collection("jogo").updateOne(
@@ -392,13 +386,13 @@ JogoDAO.prototype.revogarAcao = async function (req, res) {
             }
         }
 
-        res.redirect('jogo?msg=Deleted');
+        res.redirect('/jogo?msg=Deleted');
     } catch (error) {
         console.log('  algum erro foi encontrado  ', error);
-        res.redirect('jogo?msg=erro');
+        res.redirect('/jogo?msg=erro');
     } finally {
         if (conexao) {
-            conexao.client.close();
+            await conexao.client.close();
         }
     }
 }
@@ -421,7 +415,7 @@ JogoDAO.prototype.venderRecurso = async function (req, res) {
         conexao = await this._connection.getDB();
         const db = conexao.db;
 
-        const jogo = await db.collection("jogo").findOne({ idUsuario: ObjectID(req.session._id) });
+        const jogo = await db.collection("jogo").findOne({ idUsuario: new ObjectId(req.session._id) });
         if (!jogo) {
             responderJson(res, 404, { ok: false, msg: 'Jogo não encontrado.' });
             return;
@@ -460,38 +454,39 @@ JogoDAO.prototype.venderRecurso = async function (req, res) {
         responderJson(res, 500, { ok: false, msg: 'Não foi possível vender o recurso.' });
     } finally {
         if (conexao) {
-            conexao.client.close();
+            await conexao.client.close();
         }
     }
 }
 
 JogoDAO.prototype.buscaJogoUsuario = async function (res, req, casa, msg) {
     const usuarioId = req.session._id;
-    const teste = await this._connection.getDB()
-        .then(async db => {
-            return await db.db
-                .collection("jogo")
-                .find({ idUsuario: ObjectID(usuarioId) })
-                .toArray(async function (err, result) {
-                    if (err || !result || !result[0]) {
-                        res.status(404).send({ ok: false, msg: 'jogoNaoEncontrado' });
-                        db.client.close();
-                        return;
-                    }
-                    const jogo = result[0];
-                    jogo.nome = req.session.nome;
-                    jogo.recursos = jogo.recursos || {};
-                    jogo.precos = PRECOS;
-                    jogo.feras = FERAS;
-                    const usuario2 = { img_casa: casa, jogo: jogo, msg: msg };
-                    res.send(usuario2);
-                    db.client.close();
-                    return usuario2;
-                });
-        })
-        .catch(error => {
-            console.log('  algum erro foi encontrado  ', error);
-        });
+    const conexao = await this._connection.getDB();
+
+    try {
+        const result = await conexao.db.collection("jogo")
+            .find({ idUsuario: new ObjectId(usuarioId) })
+            .toArray();
+
+        if (!result || !result[0]) {
+            res.status(404).send({ ok: false, msg: 'jogoNaoEncontrado' });
+            return;
+        }
+
+        const jogo = result[0];
+        jogo.nome = req.session.nome;
+        jogo.recursos = jogo.recursos || {};
+        jogo.precos = PRECOS;
+        jogo.feras = FERAS;
+        res.send({ img_casa: casa, jogo: jogo, msg: msg });
+    } catch (error) {
+        console.log('  algum erro foi encontrado  ', error);
+        if (!res.headersSent) {
+            res.status(500).send({ ok: false, msg: 'erro' });
+        }
+    } finally {
+        await conexao.client.close();
+    }
 }
 
 module.exports = function () {

@@ -72,7 +72,7 @@ module.exports.gerarOrdemSuditos = async function (application, req, res, valida
 
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        res.redirect('jogo?msg=erro');
+        res.redirect('/jogo?msg=erro');
         return;
     }
 
@@ -80,18 +80,18 @@ module.exports.gerarOrdemSuditos = async function (application, req, res, valida
     try {
         dadosForm.jogo = JSON.parse(dadosForm.jogo);
     } catch (erro) {
-        res.redirect('jogo?msg=erro');
+        res.redirect('/jogo?msg=erro');
         return;
     }
 
     const quantidade = parseInt(dadosForm.quantidade, 10);
     if (!Number.isInteger(quantidade) || quantidade <= 0) {
-        res.redirect('jogo?msg=quantidadeDeveSerNumerica');
+        res.redirect('/jogo?msg=quantidadeDeveSerNumerica');
         return;
     }
 
     if (quantidade > (Number(dadosForm.jogo.suditos) - Number(dadosForm.jogo.suditosTrabalhando))) {
-        res.redirect('jogo?msg=todoSutidosOcupados');
+        res.redirect('/jogo?msg=todoSutidosOcupados');
         return;
     }
 
@@ -105,13 +105,13 @@ module.exports.gerarOrdemSuditos = async function (application, req, res, valida
         /* o DAO revalida saldo e aldeões livres direto no banco */
         const resultado = await JogoDAO.gerarOrdemSuditos(dadosForm);
         if (!resultado.ok) {
-            res.redirect('jogo?msg=' + resultado.msg);
+            res.redirect('/jogo?msg=' + resultado.msg);
             return;
         }
-        res.redirect('jogo?msg=acerto');
+        res.redirect('/jogo?msg=acerto');
     } catch (erro) {
         console.log('  algum erro foi encontrado  ', erro);
-        res.redirect('jogo?msg=erro');
+        res.redirect('/jogo?msg=erro');
     }
 }
 
