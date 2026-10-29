@@ -29,7 +29,7 @@ Jogo web de estratégia ambientado em **Game of Thrones**, feito com Node.js, Ex
 | Banco | MongoDB 4.4+ (driver `mongodb` 4.x) |
 | Sessão | `express-session` (MemoryStore) |
 | Validação | `express-validator` |
-| Front-end | jQuery 2.2, Bootstrap 3 (CDN), CSS próprio |
+| Front-end | Bootstrap 5.3 local, CSS próprio e JavaScript puro (sem jQuery) |
 | Autoload | `consign` |
 
 ## Requisitos
@@ -37,7 +37,7 @@ Jogo web de estratégia ambientado em **Game of Thrones**, feito com Node.js, Ex
 - Node.js 18 ou superior.
 - npm.
 - MongoDB local em `127.0.0.1:27017` (ou ajuste a conexão).
-- Acesso à internet apenas para o Bootstrap via CDN.
+- Um navegador moderno (Chrome, Edge, Firefox ou Safari).
 
 ## Como rodar
 
@@ -165,7 +165,7 @@ projeto_game/
 │   ├── views/                # templates EJS
 │   └── public/
 │       ├── css/              # estilo do jogo
-│       ├── js/               # jQuery e Bootstrap locais
+│       ├── js/               # Bootstrap 5 bundle local
 │       ├── jsView/           # lógica de tela (jogoView.js)
 │       └── images/           # mapa, casas, ícones e imagens das feras
 ├── package.json
@@ -260,7 +260,7 @@ Banco `got`, coleções principais:
 - Sessões usam o `MemoryStore` padrão do `express-session`; reiniciar o servidor derruba os logins. Usar um store persistente.
 - Conexão com o MongoDB e segredo da sessão estão no código; mover para variáveis de ambiente.
 - Não há suíte de testes automatizados (`npm test` é apenas um placeholder).
-- O Bootstrap 3 é carregado por CDN; sem internet a aparência pode quebrar.
+- O layout usa Bootstrap 5 e não foi testado em navegadores antigos.
 - A liquidação das ordens é feita por requisições do cliente (`/atualizarAcoesDeJogo`) e por uma verificação periódica; para produção, considerar um job no servidor.
 - A administração de usuários não possui controle de perfil/role.
 
