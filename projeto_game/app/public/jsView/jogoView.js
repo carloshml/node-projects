@@ -1,273 +1,466 @@
 let usuario = {};
-let timerId = null;
-let divMensagens;
-async function cronometro() {
-    try {
-        if (document.getElementById('pergaminhos') !== null) {
-            await gerarPergaminhos();
-            const tempo_restante = document.getElementById('tempo_restante');
-            if (tempo_restante && (tempo_restante.innerText === '0')) {
-                await atualizarAcoesDeJogo()
-                    .then(() => buscaJogoUsuario());
-            }
-        }
-    } catch (error) {
-        throw (error);
+let acoes = [];
+let assinaturaAcoes = '';
+let sincronizando = false;
+let divMensagens = null;
+let temporizadorMensagem = null;
+let ultimosMaximos = {};
+
+const DURACAO_BASE = { '1': 10000, '2': 120000, '3': 180000, '4': 240000 };
+const IMAGENS_ACAO = { '1': 'walk.gif', '2': 'dead.gif', '3': 'book.gif', '4': 'fire.gif' };
+const TEXTOS_ACAO = {
+    '1': 'aldeão(ões) coletando recursos',
+    '2': 'enforcamento(s) programado',
+    '3': 'aldeão(ões) em treinamento de história',
+    '4': 'aldeão(ões) em treinamento de magia'
+};
+const LABEL_GANHO = {
+    madeira: 'madeira',
+    comida: 'comida',
+    ferro: 'ferro',
+    temor: 'temor',
+    sabedoria: 'sabedoria',
+    magia: 'magia'
+};
+const RECURSO_LABEL = { madeira: 'Madeira', comida: 'Comida', ferro: 'Ferro' };
+const PRECOS_PADRAO = { madeira: 1, comida: 2, ferro: 3 };
+
+function formatarDuracao(segundos) {
+    const total = Math.max(0, Math.ceil(segundos));
+    const minutos = Math.floor(total / 60);
+    const resto = total % 60;
+    if (minutos > 0) {
+        return minutos + 'min ' + String(resto).padStart(2, '0') + 's';
     }
-    timerCronometro = setTimeout(function () { cronometro(); }, 1000);
+    return resto + 's';
 }
 
-async function cronometro10seg() {
-    try {
-        await atualizarAcoesDeJogo()
-            .then(() => buscaJogoUsuario());
-    } catch (error) {
-        throw (error);
+function mostrarMensagem(tipo, html) {
+    if (!divMensagens) {
+        return;
     }
-    timerCronometro10seg = setTimeout(function () { cronometro10seg(); }, 10000);
+    const classes = { acerto: 'alert-info', sucesso: 'alert-success', erro: 'alert-danger' };
+    divMensagens.innerHTML = '<div class="alert ' + (classes[tipo] || 'alert-info') + '" id="msg"><ul><li>' + html + '</li></ul></div>';
+    clearTimeout(temporizadorMensagem);
+    temporizadorMensagem = setTimeout(function () {
+        divMensagens.innerHTML = '';
+    }, 8000);
 }
 
-const verPergaminhos = async function () {
-    clearTimeout(timerCronometro);
-    clearTimeout(timerCronometro10seg);
-    await gerarPergaminhos();
-    await cronometro();
+function descreverGanhos(ganhos) {
+    return Object.keys(ganhos || {}).map(function (campo) {
+        return '+' + ganhos[campo] + ' ' + (LABEL_GANHO[campo] || campo);
+    }).join(', ');
 }
 
-
-const verSuditos = function () {
-
-    $.ajax({
-        url: "/gerarSuditos",
-        method: "get",
-        success: function (htmlRequisicao) {
-            $('#acoes').html(htmlRequisicao);
-            buscaJogoUsuario();
-        }
-    });
-}
-
-function atualizarAcoesDeJogo() {
-
-    return fetch(`/atualizarAcoesDeJogo?jogoid=${usuario.jogo._id}`,
-        {
-            method: "GET",
-            headers: {
-                'Content-Type': 'application/json'
-            },
-        })
-        .then(function (response) {
-            const contentType = response.headers.get("content-type");
-            if (contentType && (contentType.indexOf("application/json") !== -1)) {
-                return response
-                    .json()
-                    .then(function (atualizarAcoesDeJogo) {
-                        // process your JSON further
-                        // onsole.log(" atualizarAcoesDeJogo :: ", atualizarAcoesDeJogo);
-
-                    });
-            } else {
-                alert(' Deu erro ');
-                throw ("Oops, we haven't got JSON!");
-            }
-        })
-        .catch(e => {
-            alert(' Deu erro 500');
-            throw ("Oops, we haven't got JSON!");
-        });
-}
-
-function buscaJogoUsuario() {
-    return fetch('http://localhost:8200/buscaJogoUsuario',
-        {
-            method: "GET",
-            headers: {
-                'Content-Type': 'application/json'
-            },
-        })
-        .then(function (response) {
-            const contentType = response.headers.get("content-type");
-            if (contentType && (contentType.indexOf("application/json") !== -1)) {
-                return response
-                    .json()
-                    .then(function (respBuscarUsuario) {
-                        // process your JSON further                      
-                        usuario = respBuscarUsuario;
-                        atualizarSuditos();
-                    });
-            } else {
-                alert(' Deu erro ');
-                throw ("Oops, we haven't got JSON!");
-            }
-        })
-        .catch(e => {
-            alert(' Deu erro 500');
-            throw ("Oops, we haven't got JSON!");
-        });
-}
-
-function atualizarSuditos() {
-    const numeroSuditosLivre = document.getElementById('numero-de-suditos-livres');
-    // do compomente pergaminho
-    if (numeroSuditosLivre) {
-        numeroSuditosLivre.innerHTML = usuario.jogo.suditos - usuario.jogo.suditosTrabalhando;
-    }
-    // do compomente pergaminho
-    const numeroSuditosTrab = document.getElementById('numero-de-suditos-trab');
-    if (numeroSuditosTrab) {
-        numeroSuditosTrab.innerHTML = usuario.jogo.suditosTrabalhando;
-    }
-    // corpo principal
-    const suditosTrabalhando = document.getElementById('suditosTrabalhando');
-    if (suditosTrabalhando) {
-        suditosTrabalhando.innerHTML = usuario.jogo.suditosTrabalhando;
+function descreverConcluida(concluida) {
+    const quantidade = concluida.quantidade;
+    const ganhos = descreverGanhos(concluida.ganhos);
+    switch (String(concluida.acao)) {
+        case '1':
+            return 'Seus ' + quantidade + ' aldeão(ões) voltaram da coleta com ' + ganhos + '.';
+        case '2':
+            return 'Seus ' + quantidade + ' enforcamento(s) foram concluídos: ' + ganhos + '.';
+        case '3':
+            return 'Seus ' + quantidade + ' aldeão(ões) concluíram o treinamento de história: ' + ganhos + '.';
+        case '4':
+            return 'Seus ' + quantidade + ' aldeão(ões) concluíram o treinamento de magia: ' + ganhos + '.';
+        default:
+            return 'Ordem concluída: ' + ganhos + '.';
     }
 }
 
 function lerNotificacoes() {
     const parametros = new URLSearchParams(window.location.search);
-    console.log('parametros :::', parametros.get('msg'));
     switch (parametros.get('msg')) {
         case 'erro':
-            divMensagens.innerHTML = ` <div class="alert alert-danger" id='msg'>
-                                                    <ul>
-                                                        <li> <strong> Operação Invalida, verifique se todos os campos foram informados! </strong></li>
-                                                    </ul>
-                                                </div>`
+            mostrarMensagem('erro', 'Operação inválida, verifique se todos os campos foram informados!');
             break;
         case 'acerto':
-            divMensagens.innerHTML = ` <div class="alert alert-info" id='msg'>
-                                                    <ul>
-                                                        <li> <strong> Operação realizada com sucesso! </strong> </li>
-                                                    </ul>
-                                                </div>`
+            mostrarMensagem('acerto', 'Operação realizada com sucesso!');
             break;
         case 'todoSutidosOcupados':
-            divMensagens.innerHTML = `   <div class="alert alert-info" id='msg'>
-                                                <ul>
-                                                    <li> <strong> Todos os suditos estão ocupados! </strong> </li>
-                                                </ul>
-                                            </div>`
+            mostrarMensagem('erro', 'Todos os súditos estão ocupados!');
             break;
         case 'C':
-            divMensagens.innerHTML = `<div class="alert alert-info" id='msg'>
-                                                    <ul>
-                                                        <li> <strong> Senhor, ação ordenada foi finalizada! </strong> </li>
-                                                    </ul>
-                                                </div>`
+            mostrarMensagem('acerto', 'Senhor, a ação ordenada foi finalizada!');
             break;
         case 'Deleted':
-            divMensagens.innerHTML = ` <div class="alert alert-info" id='msg'>
-                                                    <ul>
-                                                        <li> <strong> Senhor, sua ordem foi revogada com sucesso! </strong> </li>
-                                                    </ul>
-                                                </div>`
+            mostrarMensagem('acerto', 'Senhor, sua ordem foi revogada com sucesso!');
             break;
-
         case 'quantidadeDeveSerNumerica':
-            divMensagens.innerHTML = ` <div class="alert alert-info" id='msg'>
-                                                    <ul>
-                                                        <li> <strong> Quantidade deve ser numerica! </strong> </li>
-                                                    </ul>
-                                                </div>`
+            mostrarMensagem('erro', 'A quantidade deve ser numérica!');
             break;
-
-
-
+        case 'semMoeda':
+            mostrarMensagem('erro', 'Moedas insuficientes para essa ordem!');
+            break;
+        case 'acaoJaConcluida':
+            mostrarMensagem('erro', 'Essa ordem já foi concluída e não pode ser revogada.');
+            break;
         default:
             break;
     }
-
-
-    setTimeout(() => {
-        divMensagens.innerHTML = '';
-    }, 8000);
-
-
 }
 
 function apagaMensagem() {
-    divMensagens.innerHTML = '';
+    if (divMensagens) {
+        divMensagens.innerHTML = '';
+    }
 }
 
-function gerarPergaminhos(usarClearTimeOut) {
-
-    return fetch(`/gerarPergaminhos?jogoid=${usuario.jogo._id}`,
-        {
-            method: "GET",
-        })
-        .then(function (response) {
-            return response
-                .text()
-                .then(function (response) {
-                    response = JSON.parse(response);
-                    if (response) {
-                        // apenas se pergaminhos estiver na tela
-                        const acoes = response.acoes;
-                        let conteudo = ` <div id="pergaminhos">
-                                                      <h3>Atividades:</h3>`;
-                        for (let i = 0; i < acoes.length; i++) {
-                            let txt_acao = '';
-                            let imagem = '';
-                            switch (acoes[i].acao) {
-                                case '1': txt_acao = 'aldeão(ões) coletando recursos';
-                                    imagem = 'walk.gif';
-                                    break;
-                                case '2': txt_acao = 'enforcamento(s) programado';
-                                    imagem = 'dead.gif';
-                                    break;
-                                case '3': txt_acao = 'aldeão(ões) em treinamento de história';
-                                    imagem = 'book.gif';
-                                    break;
-                                case '4': txt_acao = 'aldeão(ões) em treinamento de magia';
-                                    imagem = 'fire.gif';
-                                    break;
-                                default: console.log("error");
-                                    break;
-                            }
-                            const momentoAtual = new Date().getTime();
-                            const segundosRestantes = Math.round((acoes[i].acao_termina_em - momentoAtual) / 1000);
-                            conteudo += `<div class="row acoes-pergaminho">
-                                                <div class="col-xs-10">`;
-                            if (imagem) {
-                                conteudo += `	<img class="imagem-acao" src="images/${imagem}" loading=lazy>`
-                            }
-                            conteudo += `${acoes[i].quantidade} ${txt_acao} - <small>restam`;
-                            if (parseInt(segundosRestantes) > 59) {
-                                conteudo += `	${Math.round(segundosRestantes / 60)}   minutos`;
-                            }
-                            conteudo += `<span class="tempo_restante" id="tempo_restante">${segundosRestantes % 60}</span> segundos
-
-                                                </small>
-                                                </div>
-                                                <div class="col-xs-2">
-                                                    <a class="btn-acao" href="/revogar_acao?id_acao=${acoes[i]._id}&jogoid=${usuario.jogo._id}">revogar ordem</a>
-                                                </div>
-                                            </div>`;
-
-                        }
-                        conteudo += `</div>`;
-                        $('#pergaminhos').html(conteudo);
-                    }
-                });
-        })
-        .catch(e => {
-            alert(' Deu erro 500');
-            throw ("Oops, we haven't got JSON!");
-        });
+function atualizarMoeda() {
+    const elemento = document.getElementById('moeda');
+    if (elemento && usuario.jogo) {
+        elemento.textContent = usuario.jogo.moeda;
+    }
 }
 
-document.addEventListener("DOMContentLoaded", function () {
-    // inicar atualizando a tela  
-    buscaJogoUsuario()
-        .then(() => {
-            atualizarAcoesDeJogo()
-                .then(() => buscaJogoUsuario())
-            cronometro();
-            cronometro10seg();
+function atualizarSuditos() {
+    if (!usuario.jogo) {
+        return;
+    }
+    const numeroSuditosLivre = document.getElementById('numero-de-suditos-livres');
+    if (numeroSuditosLivre) {
+        numeroSuditosLivre.innerHTML = usuario.jogo.suditos - usuario.jogo.suditosTrabalhando;
+    }
+    const numeroSuditosTrab = document.getElementById('numero-de-suditos-trab');
+    if (numeroSuditosTrab) {
+        numeroSuditosTrab.innerHTML = usuario.jogo.suditosTrabalhando;
+    }
+    const suditosTrabalhando = document.getElementById('suditosTrabalhando');
+    if (suditosTrabalhando) {
+        suditosTrabalhando.innerHTML = usuario.jogo.suditosTrabalhando;
+    }
+
+    /* mantém o formulário de ordens com os valores atuais do jogo */
+    const campoJogo = document.getElementById('jogo');
+    if (campoJogo) {
+        campoJogo.value = JSON.stringify({
+            _id: usuario.jogo._id,
+            suditos: usuario.jogo.suditos,
+            suditosTrabalhando: usuario.jogo.suditosTrabalhando,
+            moeda: usuario.jogo.moeda
         });
+    }
+}
 
+function montarCeleiro() {
+    const container = document.getElementById('lista-recursos');
+    if (!container || !usuario.jogo) {
+        return;
+    }
+    if (container.dataset.montado === '1') {
+        atualizarCeleiro();
+        return;
+    }
+    const precos = usuario.jogo.precos || PRECOS_PADRAO;
+    const comercio = Number(usuario.jogo.comercio) || 0;
 
+    container.innerHTML = Object.keys(precos).map(function (recurso) {
+        const preco = Math.max(1, Math.round(precos[recurso] * (1 + comercio / 1000)));
+        const label = RECURSO_LABEL[recurso] || recurso;
+        return '<div class="recurso-linha" data-recurso="' + recurso + '">' +
+            '<span class="recurso-nome">' + label + '</span>' +
+            '<span class="recurso-qtd" data-qtd="' + recurso + '">0</span>' +
+            '<input type="number" class="recurso-input" min="1" value="1" aria-label="Quantidade de ' + label + '">' +
+            '<button type="button" class="btn-vender" data-recurso="' + recurso + '">Vender</button>' +
+            '<span class="recurso-preco">' + preco + ' moeda(s)/un</span>' +
+            '</div>';
+    }).join('');
+    container.dataset.montado = '1';
+    atualizarCeleiro();
+}
+
+function atualizarCeleiro() {
+    const container = document.getElementById('lista-recursos');
+    if (!container || !usuario.jogo) {
+        return;
+    }
+    if (container.dataset.montado !== '1') {
+        montarCeleiro();
+        return;
+    }
+    const recursos = usuario.jogo.recursos || {};
+    const precos = usuario.jogo.precos || PRECOS_PADRAO;
+    const comercio = Number(usuario.jogo.comercio) || 0;
+
+    container.querySelectorAll('.recurso-linha').forEach(function (linha) {
+        const recurso = linha.dataset.recurso;
+        const quantidade = Number(recursos[recurso]) || 0;
+        const preco = Math.max(1, Math.round((precos[recurso] || 1) * (1 + comercio / 1000)));
+        const input = linha.querySelector('.recurso-input');
+        const botao = linha.querySelector('.btn-vender');
+
+        linha.querySelector('.recurso-qtd').textContent = quantidade;
+        linha.querySelector('.recurso-preco').textContent = preco + ' moeda(s)/un';
+        input.max = quantidade > 0 ? quantidade : 1;
+
+        if (quantidade > 0) {
+            const valorAtual = parseInt(input.value, 10);
+            const maximoAnterior = ultimosMaximos[recurso];
+            if (!(valorAtual > 0) || (maximoAnterior !== undefined && valorAtual === maximoAnterior)) {
+                input.value = quantidade;
+            }
+            input.disabled = false;
+            botao.disabled = false;
+        } else {
+            input.value = 1;
+            input.disabled = true;
+            botao.disabled = true;
+        }
+        ultimosMaximos[recurso] = quantidade;
+    });
+}
+
+async function venderRecurso(recurso, linha) {
+    const input = linha.querySelector('.recurso-input');
+    const botao = linha.querySelector('.btn-vender');
+    const disponivel = Number((usuario.jogo.recursos || {})[recurso]) || 0;
+    let quantidade = parseInt(input.value, 10);
+
+    if (!Number.isInteger(quantidade) || quantidade <= 0) {
+        mostrarMensagem('erro', 'Informe uma quantidade válida para vender.');
+        return;
+    }
+    if (quantidade > disponivel) {
+        quantidade = disponivel;
+    }
+    if (quantidade <= 0) {
+        return;
+    }
+
+    botao.disabled = true;
+    try {
+        const resposta = await fetch('/venderRecurso', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ recurso: recurso, quantidade: quantidade })
+        });
+        const dados = await resposta.json();
+
+        if (!resposta.ok || !dados.ok) {
+            mostrarMensagem('erro', dados.msg || 'Não foi possível vender o recurso.');
+            return;
+        }
+
+        usuario.jogo.moeda = dados.moeda;
+        usuario.jogo.recursos = dados.recursos;
+        atualizarMoeda();
+        mostrarMensagem('sucesso', 'Vendidos ' + quantidade + ' de ' + (RECURSO_LABEL[recurso] || recurso).toLowerCase() + ' por ' + dados.ganho + ' moeda(s).');
+    } catch (erro) {
+        console.error('Falha ao vender recurso:', erro);
+        mostrarMensagem('erro', 'Não foi possível vender o recurso.');
+    } finally {
+        atualizarCeleiro();
+    }
+}
+
+function imagemDaAcao(tipo) {
+    return IMAGENS_ACAO[String(tipo)] || 'walk.gif';
+}
+
+function renderizarAcoes() {
+    const container = document.getElementById('pergaminhos');
+    if (!container) {
+        return;
+    }
+
+    if (!acoes.length) {
+        container.innerHTML = '<h3>Atividades:</h3><p class="sem-atividades">Nenhuma atividade em andamento.</p>';
+        return;
+    }
+
+    let conteudo = '<h3>Atividades:</h3>';
+
+    acoes.forEach(function (acao) {
+        const tipo = String(acao.acao);
+        const quantidade = parseInt(acao.quantidade, 10) || 0;
+        const termina = Number(acao.acao_termina_em);
+        const duracao = Number(acao.duracao_ms) || (DURACAO_BASE[tipo] || 0) * quantidade;
+        const inicio = Number(acao.acao_iniciada_em) || (termina - duracao);
+
+        /* mostra um aldeão por unidade (até 10) só na coleta; nas demais, um ícone */
+        const repeticoes = tipo === '1' ? Math.min(quantidade, 10) : 1;
+        let aldeoes = '';
+        for (let i = 0; i < repeticoes; i++) {
+            aldeoes += '<img class="imagem-acao aldeao" src="images/' + imagemDaAcao(tipo) + '" alt="" loading="lazy">';
+        }
+        if (tipo === '1' && quantidade > 10) {
+            aldeoes += '<span class="aldeoes-mais">+' + (quantidade - 10) + '</span>';
+        }
+
+        conteudo += '<div class="row acoes-pergaminho" data-id="' + acao._id + '" data-termina="' + termina + '" data-inicio="' + inicio + '" data-duracao="' + duracao + '">' +
+            '<div class="col-xs-10">' +
+            '<div class="aldeoes">' + aldeoes + '</div>' +
+            '<div class="acao-descricao">' + quantidade + ' ' + (TEXTOS_ACAO[tipo] || 'ordem em andamento') +
+            ' - <small>restam <span class="tempo-restante">--</span></small></div>' +
+            '<div class="progress acao-progresso"><div class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" style="width:0%"></div></div>' +
+            '</div>' +
+            '<div class="col-xs-2">' +
+            '<a class="btn-acao" href="/revogar_acao?id_acao=' + acao._id + '&jogoid=' + usuario.jogo._id + '">revogar ordem</a>' +
+            '</div>' +
+            '</div>';
+    });
+
+    container.innerHTML = conteudo;
+}
+
+function atualizarContadores() {
+    const linhas = document.querySelectorAll('.acoes-pergaminho');
+    const agora = Date.now();
+    let algumaExpirou = false;
+
+    linhas.forEach(function (linha) {
+        const termina = Number(linha.dataset.termina);
+        const inicio = Number(linha.dataset.inicio);
+        const duracao = Number(linha.dataset.duracao);
+        const restante = termina - agora;
+
+        if (restante <= 0) {
+            algumaExpirou = true;
+        }
+
+        const tempo = linha.querySelector('.tempo-restante');
+        if (tempo) {
+            tempo.textContent = formatarDuracao(restante / 1000);
+        }
+
+        const barra = linha.querySelector('.acao-progresso .progress-bar');
+        if (barra) {
+            const percentual = duracao > 0
+                ? Math.min(100, Math.max(0, ((agora - inicio) / duracao) * 100))
+                : 0;
+            barra.style.width = percentual.toFixed(1) + '%';
+            barra.setAttribute('aria-valuenow', Math.round(percentual));
+        }
+    });
+
+    if (algumaExpirou) {
+        sincronizar();
+    }
+}
+
+async function carregarAcoes() {
+    if (!usuario.jogo) {
+        return;
+    }
+    const resposta = await fetch('/gerarPergaminhos?jogoid=' + encodeURIComponent(usuario.jogo._id));
+    if (!resposta.ok) {
+        throw new Error('HTTP ' + resposta.status);
+    }
+    const dados = await resposta.json();
+    const lista = (dados && dados.acoes) || [];
+    const assinatura = JSON.stringify(lista.map(function (acao) {
+        return [acao._id, acao.acao, acao.quantidade, acao.acao_termina_em];
+    }));
+
+    if (assinatura === assinaturaAcoes) {
+        atualizarContadores();
+        return;
+    }
+
+    assinaturaAcoes = assinatura;
+    acoes = lista;
+    renderizarAcoes();
+    atualizarContadores();
+}
+
+function verPergaminhos() {
+    carregarAcoes().catch(function (erro) {
+        console.error('Falha ao carregar atividades:', erro);
+    });
+}
+
+function verSuditos() {
+    $.ajax({
+        url: '/gerarSuditos',
+        method: 'get',
+        success: function (htmlRequisicao) {
+            $('#acoes').html(htmlRequisicao);
+            buscaJogoUsuario().catch(function (erro) {
+                console.error('Falha ao atualizar o jogo:', erro);
+            });
+        }
+    });
+}
+
+async function buscaJogoUsuario() {
+    const resposta = await fetch('/buscaJogoUsuario', {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' }
+    });
+    if (!resposta.ok) {
+        throw new Error('HTTP ' + resposta.status);
+    }
+    const dados = await resposta.json();
+    if (!dados || !dados.jogo) {
+        throw new Error('Jogo não encontrado');
+    }
+    usuario = dados;
+    atualizarSuditos();
+    atualizarMoeda();
+    atualizarCeleiro();
+}
+
+async function sincronizar() {
+    if (sincronizando || !usuario.jogo) {
+        return;
+    }
+    sincronizando = true;
+    try {
+        const resposta = await fetch('/atualizarAcoesDeJogo?jogoid=' + encodeURIComponent(usuario.jogo._id), {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' }
+        });
+        if (!resposta.ok) {
+            throw new Error('HTTP ' + resposta.status);
+        }
+        const dados = await resposta.json();
+
+        if (dados && dados.concluidas && dados.concluidas.length) {
+            mostrarMensagem('sucesso', dados.concluidas.map(descreverConcluida).join('<br>'));
+        }
+
+        await buscaJogoUsuario();
+        await carregarAcoes();
+    } catch (erro) {
+        console.error('Falha ao sincronizar as ações:', erro);
+    } finally {
+        sincronizando = false;
+    }
+}
+
+async function iniciar() {
+    await buscaJogoUsuario();
+    montarCeleiro();
+    await sincronizar();
+
+    setInterval(function () {
+        atualizarContadores();
+    }, 1000);
+
+    /* rede de segurança para ações que terminaram com a aba em segundo plano */
+    setInterval(function () {
+        sincronizar();
+    }, 15000);
+}
+
+document.addEventListener('DOMContentLoaded', function () {
     divMensagens = document.getElementById('mensagens');
     lerNotificacoes();
+
+    const listaRecursos = document.getElementById('lista-recursos');
+    if (listaRecursos) {
+        listaRecursos.addEventListener('click', function (evento) {
+            const botao = evento.target.closest('.btn-vender');
+            if (!botao) {
+                return;
+            }
+            venderRecurso(botao.dataset.recurso, botao.closest('.recurso-linha'));
+        });
+    }
+
+    iniciar().catch(function (erro) {
+        console.error('Falha ao iniciar a tela do jogo:', erro);
+    });
 });

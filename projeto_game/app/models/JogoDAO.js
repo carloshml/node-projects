@@ -1,7 +1,65 @@
 let ObjectID = require('mongodb').ObjectID;
+
+/* custo em moedas por aldeão, por tipo de ação */
+const CUSTOS = { 1: 2, 2: 3, 3: 1, 4: 1 };
+
+/* duração em milissegundos por aldeão, por tipo de ação */
+const DURACOES = { 1: 10000, 2: 120000, 3: 180000, 4: 240000 };
+
+/* o que cada aldeão produz ao terminar a ação */
+const RECOMPENSAS = {
+    1: { madeira: 5, comida: 2, ferro: 1 },
+    2: { temor: 5 },
+    3: { sabedoria: 5 },
+    4: { magia: 5 }
+};
+
+/* preço base de venda de cada recurso (em moedas) */
+const PRECOS = { madeira: 1, comida: 2, ferro: 3 };
+
+/* recursos ficam dentro de jogo.recursos; habilidades ficam na raiz */
+const CAMPOS_RECURSO = ['madeira', 'comida', 'ferro'];
+
+function campoDoBanco(campo) {
+    return CAMPOS_RECURSO.indexOf(campo) !== -1 ? 'recursos.' + campo : campo;
+}
+
+/* o driver 4.x devolve { value: doc }; versões novas devolvem o doc direto */
+function documentoDe(resultado) {
+    if (!resultado) {
+        return null;
+    }
+    if (Object.prototype.hasOwnProperty.call(resultado, 'value')) {
+        return resultado.value;
+    }
+    return resultado;
+}
+
+function responderJson(res, status, corpo) {
+    if (res.headersSent) {
+        return;
+    }
+    res.status(status);
+    res.setHeader('Content-Type', 'application/json');
+    res.end(JSON.stringify(corpo));
+}
+
+function ganhosDaAcao(acao) {
+    const tipo = parseInt(acao.acao, 10);
+    const quantidade = Number(acao.quantidade) || 0;
+    const ganhos = {};
+    const base = RECOMPENSAS[tipo] || {};
+    Object.keys(base).forEach(function (campo) {
+        ganhos[campo] = base[campo] * quantidade;
+    });
+    return ganhos;
+}
+
 function JogoDAO(connection) {
     this._connection = connection;
 }
+
+JogoDAO.PRECOS = PRECOS;
 
 JogoDAO.prototype.gerarParametrosJogo = function (id, usuario) {
     this._connection.getDB()
@@ -17,6 +75,7 @@ JogoDAO.prototype.gerarParametrosJogo = function (id, usuario) {
                     sabedoria: Math.floor(Math.random() * 1000),
                     comercio: Math.floor(Math.random() * 1000),
                     magia: Math.floor(Math.random() * 1000),
+                    recursos: { madeira: 0, comida: 0, ferro: 0 }
                 });
         })
         .catch(error => {
@@ -31,8 +90,16 @@ JogoDAO.prototype.iniciaJogo = function (res, req, casa, msg) {
             db.db.collection("jogo")
                 .find({ idUsuario: ObjectID(usuarioId) })
                 .toArray(function (err, result) {
-                    result[0].nome = req.session.nome;
-                    res.render('jogo', { img_casa: casa, jogo: result[0], msg: msg });
+                    if (err || !result || !result[0]) {
+                        res.redirect('/');
+                        db.client.close();
+                        return;
+                    }
+                    const jogo = result[0];
+                    jogo.nome = req.session.nome;
+                    jogo.recursos = jogo.recursos || {};
+                    jogo.precos = PRECOS;
+                    res.render('jogo', { img_casa: casa, jogo: jogo, msg: msg });
                     db.client.close();
                 });
         })
@@ -42,53 +109,71 @@ JogoDAO.prototype.iniciaJogo = function (res, req, casa, msg) {
 }
 
 JogoDAO.prototype.gerarOrdemSuditos = async function (acao) {
-    await this._connection.getDB()
-        .then(async db => {
-            let tempoParaTermino = new Date().getTime();
-            switch (parseInt(acao.acao)) {
-                case 1: tempoParaTermino = tempoParaTermino + (1 * acao.quantidade * 10000);
-                    break;
-                case 2: tempoParaTermino = tempoParaTermino + (2 * acao.quantidade * 60000);
-                    break;
-                case 3: tempoParaTermino = tempoParaTermino + (3 * acao.quantidade * 60000);
-                    break;
-                case 4: tempoParaTermino = tempoParaTermino + (4 * acao.quantidade * 60000);
-                    break;
-                default: console.log("error");
-                    break;
+    const conexao = await this._connection.getDB();
+    const db = conexao.db;
+    try {
+        const tipo = parseInt(acao.acao, 10);
+        const quantidade = parseInt(acao.quantidade, 10);
+
+        if (!CUSTOS[tipo] || !(quantidade > 0)) {
+            return { ok: false, msg: 'erro' };
+        }
+
+        const custo = CUSTOS[tipo] * quantidade;
+        /* usa o usuário da sessão, não o id vindo do formulário */
+        const filtroJogo = acao.idUsuario
+            ? { idUsuario: ObjectID(acao.idUsuario) }
+            : { _id: ObjectID(acao.jogo._id) };
+
+        /* debita moedas e ocupa os aldeões de forma atômica */
+        const debito = await db.collection("jogo").findOneAndUpdate(
+            {
+                ...filtroJogo,
+                moeda: { $gte: custo },
+                $expr: { $gte: [{ $subtract: ['$suditos', '$suditosTrabalhando'] }, quantidade] }
+            },
+            { $inc: { moeda: -custo, suditosTrabalhando: quantidade } }
+        );
+
+        if (!documentoDe(debito)) {
+            const jogo = await db.collection("jogo").findOne(filtroJogo);
+            if (!jogo) {
+                return { ok: false, msg: 'erro' };
             }
-            acao.acao_termina_em = tempoParaTermino;
-            acao.terminado = false;
-            acao.quantidade = parseInt(acao.quantidade);
-            await db.db.collection("acao").insertOne(acao);
-
-
-            //  ATUALIZANDO O jogo 
-            let moedas = null;
-            switch (parseInt(acao.acao)) {
-                case 1: moedas = acao.jogo.moeda - (2 * acao.quantidade);
-                    break;
-                case 2: moedas = acao.jogo.moeda - (3 * acao.quantidade);
-                    break;
-                case 3: moedas = acao.jogo.moeda - (1 * acao.quantidade);
-                    break;
-                case 4: moedas = acao.jogo.moeda - (1 * acao.quantidade);
-                    break;
-                default: console.log("error");
-                    break;
+            if (Number(jogo.moeda) < custo) {
+                return { ok: false, msg: 'semMoeda' };
             }
+            return { ok: false, msg: 'todoSutidosOcupados' };
+        }
 
-            await db.db.collection("jogo")
-                .updateOne({ "_id": ObjectID(acao.jogo._id) },
-                    // { $set:{moeda:moedas} },
-                    { $set: { moeda: moedas, suditosTrabalhando: parseInt(acao.jogo.suditosTrabalhando) + parseInt(acao.quantidade) } },
-                    // {} como é apenas uma conexao esse permanece falso
-                );
-            db.client.close();
-        })
-        .catch(error => {
-            console.log('  algum erro foi encontrado  ', error);
-        });
+        const agora = new Date().getTime();
+        const duracao = DURACOES[tipo] * quantidade;
+        const novaAcao = {
+            usuario: acao.usuario,
+            acao: String(tipo),
+            quantidade: quantidade,
+            custo: custo,
+            acao_iniciada_em: agora,
+            acao_termina_em: agora + duracao,
+            duracao_ms: duracao,
+            terminado: false
+        };
+
+        try {
+            await db.collection("acao").insertOne(novaAcao);
+        } catch (erroInsercao) {
+            /* se não conseguiu registrar a ordem, devolve o que foi debitado */
+            await db.collection("jogo").updateOne(
+                filtroJogo,
+                { $inc: { moeda: custo, suditosTrabalhando: -quantidade } }
+            );
+            throw erroInsercao;
+        }
+
+        return { ok: true };
+    } finally {
+        conexao.client.close();
+    }
 }
 
 JogoDAO.prototype.gerarPergaminhos = function (req, res) {
@@ -99,9 +184,14 @@ JogoDAO.prototype.gerarPergaminhos = function (req, res) {
             const momento_atual = new Date().getTime();
             db.db.collection("acao")
                 .find(
-                    { usuario: usuario, acao_termina_em: { $gt: momento_atual } }
+                    { usuario: usuario, acao_termina_em: { $gt: momento_atual }, terminado: { $ne: true } }
                 )
                 .toArray(function (err, acoesNaoTerminadasResp) {
+                    if (err) {
+                        responderJson(res, 500, { ok: false, msg: 'erro' });
+                        db.client.close();
+                        return;
+                    }
                     acoesNaoTerminadas = acoesNaoTerminadasResp;
                     const jsonContent = JSON.stringify({ acoes: acoesNaoTerminadas });
                     res.setHeader("Content-Type", "application/json");
@@ -111,145 +201,217 @@ JogoDAO.prototype.gerarPergaminhos = function (req, res) {
         })
         .catch(error => {
             console.log('  algum erro foi encontrado  ', error);
-            res.end(error);
+            responderJson(res, 500, { ok: false, msg: 'erro' });
         });
 }
 
-JogoDAO.prototype.atualizarAcoesDeJogo = async function (req, res, connection) {
-
-    const jogoid = req.query.jogoid;
+JogoDAO.prototype.atualizarAcoesDeJogo = async function (req, res) {
     const usuario = req.session.usuario;
-    let totalSuditosAcoesTerminadas = 0;
-    const momento_atual = new Date().getTime();
-    await this._connection
-        .getDB()
-        .then(async db => {
+    const usuarioId = req.session._id;
+    let conexao;
 
-            await db.db.collection("acao")
-                .find(
-                    {
-                        usuario: usuario,
-                        acao_termina_em: { $lte: momento_atual },
-                        terminado: false
-                    }
-                )
-                .toArray(function (err, acoesTerminadas) {
-                    totalSuditosAcoesTerminadas = 0;
-                    acoesTerminadas.forEach(acoesDeJogo => {
-                        totalSuditosAcoesTerminadas = totalSuditosAcoesTerminadas + parseInt(acoesDeJogo.quantidade);
-                    });
+    try {
+        conexao = await this._connection.getDB();
+        const db = conexao.db;
 
-                    db.client.close();
-                });
+        const jogo = await db.collection("jogo").findOne({ idUsuario: ObjectID(usuarioId) });
+        if (!jogo) {
+            responderJson(res, 404, { ok: false, msg: 'jogoNaoEncontrado' });
+            return;
+        }
 
-        })
-        .catch(error => {
-            console.log('  algum erro foi encontrado  ', error);
-        });
+        const momento_atual = new Date().getTime();
+        const acoesTerminadas = await db.collection("acao")
+            .find({
+                usuario: usuario,
+                $or: [
+                    { terminado: false, acao_termina_em: { $lte: momento_atual } },
+                    /* ordens antigas que o código anterior encerrou sem pagar recompensa */
+                    { terminado: true, recompensado: { $ne: true } }
+                ]
+            })
+            .toArray();
 
-    await this._connection
-        .getDB()
-        .then(async db => {
-            teste = await db.db
-                .collection("jogo")
-                .find({ "_id": ObjectID(jogoid) })
-                .toArray(async function (err, jogo) {
+        const concluidas = [];
 
-                    await db.db.collection("jogo")
-                        .updateOne({ "_id": ObjectID(jogoid) },
-                            { $set: { suditosTrabalhando: jogo[0].suditosTrabalhando - totalSuditosAcoesTerminadas } }
-                        );
-                    db.client.close();
-                });
-        })
-        .catch(error => {
-            console.log('  algum erro foi encontrado  ', error);
-        });
+        for (const acao of acoesTerminadas) {
+            const pendente = acao.terminado === true;
 
-    await this._connection
-        .getDB()
-        .then(async db => {
+            /* garante que cada ordem seja paga exatamente uma vez */
+            const reivindicada = await db.collection("acao").findOneAndUpdate(
+                pendente
+                    ? { _id: acao._id, terminado: true, recompensado: { $ne: true } }
+                    : { _id: acao._id, terminado: false },
+                {
+                    $set: pendente
+                        ? { recompensado: true }
+                        : { terminado: true, recompensado: true, terminado_em: momento_atual }
+                }
+            );
 
-            await db.db.collection("acao")
-                .updateMany(
-                    {
-                        usuario: usuario,
-                        acao_termina_em: { $lte: momento_atual },
-                        terminado: false
-                    },
-                    { $set: { terminado: true } },
-                );
-            db.client.close();
-            const acerto = { tudoCerto: true };
-            const jsonContent = JSON.stringify(acerto);
-            res.setHeader("Content-Type", "application/json");
-            res.status(200).end(jsonContent);
-        })
-        .catch(error => {
-            console.log('  algum erro foi encontrado  ', error);
-            const jsonContent = JSON.stringify(error);
-            res.setHeader("Content-Type", "application/json");
-            res.status(500).end(jsonContent);
-        });
+            if (!documentoDe(reivindicada)) {
+                continue;
+            }
+
+            const quantidade = Number(acao.quantidade) || 0;
+            const ganhos = ganhosDaAcao(acao);
+            const incrementos = {};
+
+            /* ordens antigas já tiveram os aldeões liberados pelo código anterior */
+            if (!pendente) {
+                incrementos.suditosTrabalhando = -quantidade;
+            }
+
+            Object.keys(ganhos).forEach(function (campo) {
+                incrementos[campoDoBanco(campo)] = ganhos[campo];
+            });
+
+            if (Object.keys(incrementos).length > 0) {
+                await db.collection("jogo").updateOne({ _id: jogo._id }, { $inc: incrementos });
+            }
+
+            concluidas.push({
+                acao: acao.acao,
+                quantidade: quantidade,
+                ganhos: ganhos,
+                pendente: pendente
+            });
+        }
+
+        if (concluidas.length > 0) {
+            /* proteção contra dados antigos que deixaram o contador negativo */
+            await db.collection("jogo").updateOne(
+                { _id: jogo._id, suditosTrabalhando: { $lt: 0 } },
+                { $set: { suditosTrabalhando: 0 } }
+            );
+        }
+
+        responderJson(res, 200, { ok: true, concluidas: concluidas });
+    } catch (error) {
+        console.log('  algum erro foi encontrado  ', error);
+        responderJson(res, 500, { ok: false, msg: 'erro' });
+    } finally {
+        if (conexao) {
+            conexao.client.close();
+        }
+    }
 }
 
 JogoDAO.prototype.revogarAcao = async function (req, res) {
-
     const idAcao = req.query.id_acao;
-    const jogoid = req.query.jogoid;
+    const usuario = req.session.usuario;
+    let conexao;
 
-    let acaoParaDeletar = null;
-    await this._connection
-        .getDB()
-        .then(async db => {
-            await db.db.collection("acao")
-                .find({ _id: ObjectID(idAcao) })
-                .toArray(function (err, acaoParaDeletarResp) {
-                    acaoParaDeletar = acaoParaDeletarResp;
-                    db.client.close();
-                });
+    try {
+        conexao = await this._connection.getDB();
+        const db = conexao.db;
 
-        })
-        .catch(error => {
-            console.log('  algum erro foi encontrado  ', error);
+        const acao = await db.collection("acao").findOne({
+            _id: ObjectID(idAcao),
+            usuario: usuario
         });
 
-    await this._connection
-        .getDB()
-        .then(async db => {
+        if (!acao) {
+            res.redirect('jogo?msg=erro');
+            return;
+        }
 
-            await db.db.collection("jogo")
-                .find({ "_id": ObjectID(jogoid) })
-                .toArray(async function (err, jogo) {
+        if (acao.terminado || Number(acao.acao_termina_em) <= new Date().getTime()) {
+            res.redirect('jogo?msg=acaoJaConcluida');
+            return;
+        }
 
-                    await db.db
-                        .collection("jogo")
-                        .updateOne({ "_id": ObjectID(jogoid) },
-                            { $set: { suditosTrabalhando: jogo[0].suditosTrabalhando - acaoParaDeletar[0].quantidade } }
-                        );
-                    db.client.close();
-                });
+        /* só devolve o dinheiro de quem realmente conseguiu remover a ordem */
+        const removida = await db.collection("acao").deleteOne({ _id: acao._id, terminado: false });
 
-        })
-        .catch(error => {
-            console.log('  algum erro foi encontrado  ', error);
-        });
+        if (removida.deletedCount > 0) {
+            const quantidade = Number(acao.quantidade) || 0;
+            const custo = Number(acao.custo) || (CUSTOS[parseInt(acao.acao, 10)] || 0) * quantidade;
+            const jogo = await db.collection("jogo").findOne({ idUsuario: ObjectID(req.session._id) });
 
-    await this._connection
-        .getDB()
-        .then(async db => {
-            await db.db.collection("acao")
-                .deleteOne({ _id: ObjectID(idAcao) },
-                    function (err, result) {
-                        res.redirect('jogo?msg=Deleted');
-                        db.client.close();
-                    }
+            if (jogo) {
+                await db.collection("jogo").updateOne(
+                    { _id: jogo._id },
+                    { $inc: { moeda: custo, suditosTrabalhando: -quantidade } }
                 );
+                await db.collection("jogo").updateOne(
+                    { _id: jogo._id, suditosTrabalhando: { $lt: 0 } },
+                    { $set: { suditosTrabalhando: 0 } }
+                );
+            }
+        }
 
-        })
-        .catch(error => {
-            console.log('  algum erro foi encontrado  ', error);
+        res.redirect('jogo?msg=Deleted');
+    } catch (error) {
+        console.log('  algum erro foi encontrado  ', error);
+        res.redirect('jogo?msg=erro');
+    } finally {
+        if (conexao) {
+            conexao.client.close();
+        }
+    }
+}
+
+JogoDAO.prototype.venderRecurso = async function (req, res) {
+    const recurso = String((req.body && req.body.recurso) || '');
+    const quantidade = parseInt(req.body && req.body.quantidade, 10);
+    let conexao;
+
+    try {
+        if (!PRECOS[recurso]) {
+            responderJson(res, 400, { ok: false, msg: 'Recurso inválido.' });
+            return;
+        }
+        if (!Number.isInteger(quantidade) || quantidade <= 0) {
+            responderJson(res, 400, { ok: false, msg: 'Quantidade inválida.' });
+            return;
+        }
+
+        conexao = await this._connection.getDB();
+        const db = conexao.db;
+
+        const jogo = await db.collection("jogo").findOne({ idUsuario: ObjectID(req.session._id) });
+        if (!jogo) {
+            responderJson(res, 404, { ok: false, msg: 'Jogo não encontrado.' });
+            return;
+        }
+
+        const disponivel = Number(jogo.recursos && jogo.recursos[recurso]) || 0;
+        if (disponivel < quantidade) {
+            responderJson(res, 400, { ok: false, msg: 'Recursos insuficientes.' });
+            return;
+        }
+
+        const comercio = Number(jogo.comercio) || 0;
+        const precoUnitario = Math.max(1, Math.round(PRECOS[recurso] * (1 + comercio / 1000)));
+        const ganho = precoUnitario * quantidade;
+
+        const atualizado = await db.collection("jogo").findOneAndUpdate(
+            { _id: jogo._id, ['recursos.' + recurso]: { $gte: quantidade } },
+            { $inc: { ['recursos.' + recurso]: -quantidade, moeda: ganho } },
+            { returnDocument: 'after' }
+        );
+
+        const documento = documentoDe(atualizado);
+        if (!documento) {
+            responderJson(res, 409, { ok: false, msg: 'Recursos insuficientes.' });
+            return;
+        }
+
+        responderJson(res, 200, {
+            ok: true,
+            ganho: ganho,
+            moeda: documento.moeda,
+            recursos: documento.recursos || {}
         });
+    } catch (error) {
+        console.log('  algum erro foi encontrado  ', error);
+        responderJson(res, 500, { ok: false, msg: 'Não foi possível vender o recurso.' });
+    } finally {
+        if (conexao) {
+            conexao.client.close();
+        }
+    }
 }
 
 JogoDAO.prototype.buscaJogoUsuario = async function (res, req, casa, msg) {
@@ -260,8 +422,16 @@ JogoDAO.prototype.buscaJogoUsuario = async function (res, req, casa, msg) {
                 .collection("jogo")
                 .find({ idUsuario: ObjectID(usuarioId) })
                 .toArray(async function (err, result) {
-                    result[0].nome = req.session.nome;
-                    const usuario2 = { img_casa: casa, jogo: result[0], msg: msg };
+                    if (err || !result || !result[0]) {
+                        res.status(404).send({ ok: false, msg: 'jogoNaoEncontrado' });
+                        db.client.close();
+                        return;
+                    }
+                    const jogo = result[0];
+                    jogo.nome = req.session.nome;
+                    jogo.recursos = jogo.recursos || {};
+                    jogo.precos = PRECOS;
+                    const usuario2 = { img_casa: casa, jogo: jogo, msg: msg };
                     res.send(usuario2);
                     db.client.close();
                     return usuario2;

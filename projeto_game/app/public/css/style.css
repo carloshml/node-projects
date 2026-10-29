@@ -175,3 +175,126 @@ img {
       max-width: 576px !important;     
   }
 }
+
+/* Celeiro: venda de recursos */
+.celeiro {
+  margin-top: 15px;
+  padding: 15px;
+  background-color: #fff;
+  opacity: 0.9;
+  filter: alpha(opacity=90);
+  border-radius: 8px;
+}
+
+.celeiro h4 {
+  margin-top: 0;
+}
+
+.celeiro-dica {
+  font-size: 12px;
+  color: #666;
+}
+
+.recurso-linha {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 5px 0;
+  border-bottom: 1px solid #eee;
+  font-size: 13px;
+}
+
+.recurso-linha:last-child {
+  border-bottom: 0;
+}
+
+.recurso-nome {
+  flex: 1;
+  min-width: 60px;
+  font-weight: bold;
+}
+
+.recurso-qtd {
+  min-width: 26px;
+  text-align: right;
+  font-weight: bold;
+}
+
+.recurso-input {
+  width: 58px;
+  padding: 2px 4px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.btn-vender {
+  background: rgb(195, 96, 8);
+  color: #fff;
+  border: 0;
+  border-radius: 4px;
+  padding: 3px 8px;
+  font-size: 12px;
+}
+
+.btn-vender:disabled {
+  background: #bbb;
+  cursor: not-allowed;
+}
+
+.recurso-preco {
+  font-size: 11px;
+  color: #777;
+  white-space: nowrap;
+}
+
+/* Atividades: aldeões, tempo e progresso */
+.aldeoes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px;
+  margin-bottom: 3px;
+}
+
+.aldeoes .aldeao {
+  width: 22px;
+  height: 26px;
+  border-radius: 2px;
+}
+
+.aldeoes-mais {
+  font-size: 12px;
+  font-weight: bold;
+  color: #802727;
+  margin-left: 4px;
+}
+
+.acao-descricao {
+  font-size: 13px;
+}
+
+.tempo-restante {
+  font-variant-numeric: tabular-nums;
+}
+
+.acao-progresso {
+  height: 6px;
+  margin: 3px 0 6px;
+  background: #e6e6e6;
+  border-radius: 3px;
+  overflow: hidden;
+  box-shadow: none;
+}
+
+.acao-progresso .progress-bar {
+  background: rgb(195, 96, 8);
+  height: 100%;
+  width: 0;
+  transition: width 0.4s linear;
+}
+
+.sem-atividades {
+  font-size: 13px;
+  color: #777;
+}

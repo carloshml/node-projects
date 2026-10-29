@@ -61,7 +61,7 @@ module.exports.atualizarAcoesDeJogo = function (application, req, res) {
 
 }
 
-module.exports.gerarOrdemSuditos = function (application, req, res , validationResult) {
+module.exports.gerarOrdemSuditos = async function (application, req, res, validationResult) {
     if (!req.session.autorizado) {
         const errors = [
             { msg: 'Você não tem acesso a essa área' }
@@ -69,27 +69,50 @@ module.exports.gerarOrdemSuditos = function (application, req, res , validationR
         res.render('index', { validacao: errors, aviso: {} });
         return;
     }
-  
+
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         res.redirect('jogo?msg=erro');
         return;
     }
+
     const dadosForm = req.body;
-    dadosForm.jogo = JSON.parse(dadosForm.jogo);
-    if (isNaN(Number(dadosForm.quantidade).valueOf())) {
+    try {
+        dadosForm.jogo = JSON.parse(dadosForm.jogo);
+    } catch (erro) {
+        res.redirect('jogo?msg=erro');
+        return;
+    }
+
+    const quantidade = parseInt(dadosForm.quantidade, 10);
+    if (!Number.isInteger(quantidade) || quantidade <= 0) {
         res.redirect('jogo?msg=quantidadeDeveSerNumerica');
         return;
     }
-    if (dadosForm.quantidade > (dadosForm.jogo.suditos - dadosForm.jogo.suditosTrabalhando)) {
+
+    if (quantidade > (Number(dadosForm.jogo.suditos) - Number(dadosForm.jogo.suditosTrabalhando))) {
         res.redirect('jogo?msg=todoSutidosOcupados');
         return;
     }
+
     const connection = application.config.dbConection;
     const JogoDAO = new application.app.models.JogoDAO(connection);
+    dadosForm.quantidade = quantidade;
     dadosForm.usuario = req.session.usuario;
-    JogoDAO.gerarOrdemSuditos(dadosForm);
-    res.redirect('jogo?msg=acerto');
+    dadosForm.idUsuario = req.session._id;
+
+    try {
+        /* o DAO revalida saldo e aldeões livres direto no banco */
+        const resultado = await JogoDAO.gerarOrdemSuditos(dadosForm);
+        if (!resultado.ok) {
+            res.redirect('jogo?msg=' + resultado.msg);
+            return;
+        }
+        res.redirect('jogo?msg=acerto');
+    } catch (erro) {
+        console.log('  algum erro foi encontrado  ', erro);
+        res.redirect('jogo?msg=erro');
+    }
 }
 
 module.exports.revogarAcao = function (application, req, res) {
@@ -109,4 +132,14 @@ module.exports.buscaJogoUsuario = function (application, req, res) {
     var connection = application.config.dbConection;
     var JogoDAO = new application.app.models.JogoDAO(connection);
     JogoDAO.buscaJogoUsuario(res, req, req.session.casa);
+}
+
+module.exports.venderRecurso = function (application, req, res) {
+    if (!req.session.autorizado) {
+        res.status(401).json({ ok: false, msg: 'Você não tem acesso a essa área' });
+        return;
+    }
+    const connection = application.config.dbConection;
+    const JogoDAO = new application.app.models.JogoDAO(connection);
+    JogoDAO.venderRecurso(req, res);
 }

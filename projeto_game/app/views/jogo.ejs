@@ -85,6 +85,12 @@
 						<button class="btn btn-info" onclick="verSuditos()"> Ordenar</button>
 					</div>
 				</div>
+
+				<div id="celeiro" class="celeiro">
+					<h4>Celeiro</h4>
+					<p class="celeiro-dica">Venda os recursos da coleta para ganhar moedas. Comércio valoriza o preço.</p>
+					<div id="lista-recursos"></div>
+				</div>
 			</div>
 			<div class="col-sm-6  ">
 				<div id="pergaminhos" class="pergaminhos"></div>
@@ -123,7 +129,7 @@
 		<div class="col-sm-5"></div>
 		<div class="col-sm-2">
 			<img src="images/outros/moeda.jpg" title="Moeda" alt="Moeda" />
-			<span>
+			<span id="moeda">
 				<%=jogo.moeda%>
 			</span>
 		</div>
