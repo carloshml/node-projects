@@ -171,7 +171,8 @@ const MODAL_TIPOS = {
     recompensa: { classe: 'recompensa', selo: '◆', titulo: 'RECOMPENSA', duracao: 0 },
     sucesso: { classe: 'recompensa', selo: '◆', titulo: 'SUCESSO', duracao: 0 },
     acerto: { classe: 'info', selo: '◆', titulo: 'ORDEM RECEBIDA', duracao: 4500 },
-    erro: { classe: 'derrota', selo: '!', titulo: 'ATENÇÃO', duracao: 6000 }
+    erro: { classe: 'derrota', selo: '!', titulo: 'ATENÇÃO', duracao: 6000 },
+    pergaminhos: { classe: 'pergaminhos', selo: '✦', titulo: 'PERGAMINHOS', duracao: 0 }
 };
 
 function mostrarMensagem(tipo, html, titulo) {
@@ -777,7 +778,7 @@ function renderizarAcoes() {
             const repeticoes = Math.min(quantidade, 10);
 
             for (let i = 0; i < repeticoes; i++) {
-                aldeoes += '<img class="imagem-acao aldeao" src="images/outros/suditos.jpg" alt="" loading="lazy">';
+                aldeoes += '<img class="imagem-acao aldeao" src="images/walk.gif" alt="" loading="lazy">';
             }
             if (quantidade > 10) {
                 aldeoes += '<span class="aldeoes-mais">+' + (quantidade - 10) + '</span>';
@@ -961,10 +962,71 @@ async function carregarAcoes() {
     atualizarContadores();
 }
 
-function verPergaminhos() {
-    carregarAcoes().catch(function (erro) {
-        console.error('Falha ao carregar atividades:', erro);
-    });
+function montarHistorico(historico) {
+    if (!Array.isArray(historico) || !historico.length) {
+        return '<div class="historico-vazio">' +
+            '<img src="images/outros/pergaminho.jpg" alt="">' +
+            '<p>Nenhum pergaminho escrito ainda.</p>' +
+            '<small>Conclua uma ordem para começar a sua história.</small>' +
+            '</div>';
+    }
+
+    const nomes = {
+        '1': 'Coleta de recursos',
+        '2': 'Enforcamento',
+        '3': 'Treinamento de história',
+        '4': 'Treinamento de magia'
+    };
+
+    return '<div class="historico-lista">' + historico.map(function (item, indice) {
+        const tipo = String(item.acao);
+        const fera = item.fera ? acharFera(item.fera) : null;
+        const feraNome = item.feraNome || (fera ? fera.nome : 'fera');
+        const imagem = tipo === '5'
+            ? 'images/feras/' + (fera ? fera.imagem : 'fera.svg')
+            : 'images/' + (IMAGENS_ACAO[tipo] || 'walk.gif');
+        const titulo = tipo === '5' ? 'Caçada' : (nomes[tipo] || 'Ordem');
+        const detalhe = tipo === '5'
+            ? (item.vitoria ? 'Vitória contra ' : 'Derrota para ') + feraNome
+            : item.quantidade + ' aldeão(ões)';
+        const ganhos = descreverGanhos(item.ganhos);
+        const recompensa = ganhos
+            ? ganhos
+            : (tipo === '5' && item.vitoria === false ? 'A fera escapou.' : 'Sem recompensa.');
+        const data = item.terminado_em
+            ? new Date(item.terminado_em).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' })
+            : '';
+        const classe = tipo === '5'
+            ? (item.vitoria ? ' historico-item--vitoria' : ' historico-item--derrota')
+            : '';
+
+        return '<div class="historico-item' + classe + '" style="animation-delay:' + (indice * 0.04) + 's">' +
+            '<img class="historico-item__icone" src="' + imagem + '" alt="">' +
+            '<div class="historico-item__conteudo">' +
+            '<div class="historico-item__titulo">' + titulo + '</div>' +
+            '<div class="historico-item__meta">' + detalhe + (data ? ' · ' + data : '') + '</div>' +
+            '<div class="historico-item__ganhos">' + recompensa + '</div>' +
+            '</div>' +
+            '</div>';
+    }).join('') + '</div>';
+}
+
+async function verPergaminhos() {
+    try {
+        const resposta = await fetch('/historicoAcoes');
+        if (!resposta.ok) {
+            throw new Error('HTTP ' + resposta.status);
+        }
+        const dados = await resposta.json();
+        if (!dados || !dados.ok) {
+            throw new Error(dados && dados.msg ? dados.msg : 'Histórico indisponível');
+        }
+        mostrarMensagem('pergaminhos', montarHistorico(dados.historico), 'PERGAMINHOS');
+        tocarSom('clique');
+    } catch (erro) {
+        console.error('Falha ao carregar os pergaminhos:', erro);
+        mostrarMensagem('erro', 'Não foi possível abrir os pergaminhos agora.', 'PERGAMINHOS');
+    }
 }
 
 function verSuditos() {

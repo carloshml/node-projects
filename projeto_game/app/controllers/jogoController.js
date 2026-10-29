@@ -47,6 +47,16 @@ module.exports.gerarPergaminhos = function (application, req, res) {
     JogoDAO.gerarPergaminhos(req, res);
 }
 
+module.exports.historicoAcoes = function (application, req, res) {
+    if (!req.session.autorizado) {
+        res.status(401).json({ ok: false, msg: 'Você não tem acesso a essa área' });
+        return;
+    }
+    const connection = application.config.dbConection;
+    const JogoDAO = new application.app.models.JogoDAO(connection);
+    JogoDAO.historicoAcoes(req, res);
+}
+
 module.exports.atualizarAcoesDeJogo = function (application, req, res) {
     if (!req.session.autorizado) {
         const errors = [

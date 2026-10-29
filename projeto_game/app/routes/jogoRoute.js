@@ -16,6 +16,10 @@ module.exports = function (application) {
 		application.app.controllers.jogoController.gerarPergaminhos(application, req, res);
 	});
 
+	application.get('/historicoAcoes', function (req, res) {
+		application.app.controllers.jogoController.historicoAcoes(application, req, res);
+	});
+
 	application.get('/atualizarAcoesDeJogo', function (req, res) {
 		application.app.controllers.jogoController.atualizarAcoesDeJogo(application, req, res);
 	});

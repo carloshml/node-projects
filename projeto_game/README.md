@@ -96,6 +96,7 @@ Para produção, mova esses valores para variáveis de ambiente e troque o segre
 5. Ao concluir, o resultado aparece em um modal e os recursos/habilidades são creditados.
 6. Venda madeira, comida e ferro no **Celeiro** para ganhar moedas.
 7. Acompanhe sua posição no **Ranking**.
+8. Abra **Pergaminhos** para consultar o histórico de ordens concluídas, recompensas e caçadas.
 
 ### Estado inicial
 
@@ -193,6 +194,7 @@ O `consign` carrega automaticamente `app/routes`, `config/dbConection.js`, `app/
 | GET | `/gerarSuditos` | Fragmento HTML do formulário de ordens |
 | POST | `/gerarOrdemSuditos` | Cria uma ordem |
 | GET | `/gerarPergaminhos` | Lista as ordens em andamento (JSON) |
+| GET | `/historicoAcoes` | Histórico de ordens concluídas (JSON) |
 | GET | `/atualizarAcoesDeJogo` | Liquida ordens concluídas (JSON) |
 | GET | `/revogar_acao` | Revoga uma ordem e estorna o custo |
 | GET | `/buscaJogoUsuario` | Dados atuais do jogo (JSON) |

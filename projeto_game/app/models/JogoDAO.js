@@ -459,6 +459,41 @@ JogoDAO.prototype.venderRecurso = async function (req, res) {
     }
 }
 
+JogoDAO.prototype.historicoAcoes = async function (req, res) {
+    const conexao = await this._connection.getDB();
+
+    try {
+        const acoes = await conexao.db.collection("acao")
+            .find({ usuario: req.session.usuario, terminado: true })
+            .sort({ _id: -1 })
+            .limit(30)
+            .toArray();
+
+        const historico = acoes.map(function (acao) {
+            const resultado = resultadoDaAcao(acao);
+            const fera = acao.fera ? obterFera(acao.fera) : null;
+
+            return {
+                acao: acao.acao,
+                quantidade: Number(acao.quantidade) || 0,
+                ganhos: resultado.ganhos || {},
+                vitoria: resultado.vitoria,
+                fera: resultado.fera,
+                feraNome: fera ? fera.nome : null,
+                custo: Number(acao.custo) || null,
+                terminado_em: acao.terminado_em || acao.acao_termina_em || null
+            };
+        });
+
+        responderJson(res, 200, { ok: true, historico: historico });
+    } catch (error) {
+        console.log('  algum erro foi encontrado  ', error);
+        responderJson(res, 500, { ok: false, msg: 'erro' });
+    } finally {
+        await conexao.client.close();
+    }
+}
+
 JogoDAO.prototype.buscaJogoUsuario = async function (res, req, casa, msg) {
     const usuarioId = req.session._id;
     const conexao = await this._connection.getDB();
