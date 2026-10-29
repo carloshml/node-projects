@@ -10,43 +10,128 @@
 	<link href="css/style.css" rel="stylesheet">
 </head>
 
-<body class="body-index" style="background: white">
-	<nav class="navbar bg-light">
-		<div class="container d-flex justify-content-between align-items-center">
+<body class="body-ranking">
+	<%
+	const CASAS = {
+		arryn: 'Arryn',
+		baratheon: 'Baratheon',
+		greyjoy: 'Greyjoy',
+		lannister: 'Lannister',
+		martell: 'Martell',
+		stark: 'Stark',
+		targaryen: 'Targaryen',
+		tully: 'Tully',
+		tyrell: 'Tyrell'
+	};
+
+	function nomeCasa(slug) {
+		if (!slug) {
+			return 'Sem casa';
+		}
+		return CASAS[slug] || (slug.charAt(0).toUpperCase() + slug.slice(1));
+	}
+
+	const totalMoedas = usuarios.reduce(function (total, usuario) {
+		const jogo = usuario.jogo || {};
+		return total + (Number(jogo.moeda) || 0);
+	}, 0);
+	const posicaoAtual = usuarios.findIndex(function (usuario) {
+		return usuario.usuario === usuarioAtual;
+	}) + 1;
+	%>
+	<nav class="navbar navbar-ranking">
+		<div class="container-fluid ranking-navbar-conteudo">
 			<a class="navbar-brand" href="/home">
-				<img src="images/casa_<%=img_casa%>.jpg" width="30" height="30" class="display-logo align-top" alt="">
-				Ranking, <%=nome%>!
+				<img src="images/casa_<%=img_casa%>.jpg" width="36" height="36" class="display-logo"
+					alt="Casa <%=nomeCasa(img_casa)%>">
+				<span>Ranking, <%=nome%>!</span>
 			</a>
-			<a href="/sair" id="btn-sair" class="btn btn-info">Sair</a>
+			<div class="ranking-navbar-acoes">
+				<a href="/jogo" class="btn btn-sm btn-ranking-jogar">Voltar ao jogo</a>
+				<a href="/sair" id="btn-sair" class="btn btn-sm btn-ranking-sair">Sair</a>
+			</div>
 		</div>
 	</nav>
 
-	<section class="conteudo-pagina">
-		<h1>Ranking</h1>
+	<main class="ranking-pagina">
+		<header class="ranking-hero">
+			<p class="ranking-hero__eyebrow">A corte dos Sete Reinos</p>
+			<h1>Ranking <span>de moedas</span></h1>
+			<p class="ranking-hero__texto">Os senhores que mais encheram os cofres até agora.</p>
 
-		<div class="container">
-			<div class="row titulo">
-				<div class="col-md-2 text-center">moeda</div>
-				<div class="col-md-2 text-center">casa</div>
-				<div class="col-md-3 text-center">usuario</div>
+			<div class="ranking-resumo">
+				<div class="ranking-resumo__item">
+					<strong><%=usuarios.length%></strong>
+					<span>senhores</span>
+				</div>
+				<div class="ranking-resumo__item">
+					<strong><%=posicaoAtual > 0 ? '#' + posicaoAtual : '—'%></strong>
+					<span>sua posição</span>
+				</div>
+				<div class="ranking-resumo__item">
+					<strong><%=totalMoedas.toLocaleString('pt-BR')%></strong>
+					<span>moedas em jogo</span>
+				</div>
 			</div>
+		</header>
 
-			<% for (var i = 0; i < usuarios.length; i++) { %>
-				<div class="row elemento">
-					<div class="col-md-2 text-center">
-						<%= usuarios[i].jogo.moeda %>
+		<section class="ranking-painel">
+			<% if (usuarios.length) { %>
+				<div class="ranking-tabela" role="table" aria-label="Ranking de jogadores por moedas">
+					<div class="ranking-tabela__cabecalho" role="row">
+						<span role="columnheader">#</span>
+						<span role="columnheader">Senhor</span>
+						<span role="columnheader" class="ranking-col-casa">Casa</span>
+						<span role="columnheader" class="ranking-col-aldeoes">Aldeões</span>
+						<span role="columnheader" class="ranking-col-moedas">Moedas</span>
 					</div>
-					<div class="col-md-2 text-center">
-						<img class="ranking-img-casas" src="images/casa_<%=usuarios[i].img_casa%>.jpg"
-							alt="Casa <%=usuarios[i].img_casa%>" />
-					</div>
-					<div class="col-md-3 text-center">
-						<%= usuarios[i].nome %>
-					</div>
+
+					<% for (var i = 0; i < usuarios.length; i++) {
+						var usuario = usuarios[i];
+						var jogo = usuario.jogo || {};
+						var moeda = Number(jogo.moeda) || 0;
+						var suditos = Number(jogo.suditos) || 0;
+						var casa = usuario.img_casa || usuario.casa || 'stark';
+						var atual = usuario.usuario === usuarioAtual;
+						var topo = i < 3;
+					%>
+						<div class="ranking-linha<%= atual ? ' ranking-linha--voce' : '' %><%= topo ? ' ranking-linha--top' + (i + 1) : '' %>" role="row">
+							<span class="ranking-posicao" role="cell">
+								<% if (i === 0) { %><span class="ranking-coroa" aria-label="Primeiro lugar">♛</span><% } else { %><%= i + 1 %><% } %>
+							</span>
+
+							<span class="ranking-jogador" role="cell">
+								<img class="ranking-avatar" src="images/casa_<%=casa%>.jpg" alt="Casa <%=nomeCasa(casa)%>">
+								<span class="ranking-jogador__dados">
+									<strong><%=usuario.nome || usuario.usuario%><% if (atual) { %> <em class="ranking-voce">você</em><% } %></strong>
+									<small>@<%=usuario.usuario%></small>
+								</span>
+							</span>
+
+							<span class="ranking-casa ranking-col-casa" role="cell">Casa <%=nomeCasa(casa)%></span>
+
+							<span class="ranking-aldeoes ranking-col-aldeoes" role="cell">
+								<img src="images/icones/aldeao.svg" alt="">
+								<%=suditos%>
+							</span>
+
+							<span class="ranking-moedas ranking-col-moedas" role="cell">
+								<img src="images/icones/moeda.svg" alt="">
+								<%=moeda.toLocaleString('pt-BR')%>
+							</span>
+						</div>
+					<% } %>
+				</div>
+			<% } else { %>
+				<div class="ranking-vazio">
+					<img src="images/outros/pergaminho.jpg" alt="">
+					<h2>O trono ainda está vazio.</h2>
+					<p>Nenhum senhor acumulou moedas ainda. Seja o primeiro a escrever seu nome na história.</p>
+					<a href="/jogo" class="btn btn-sm btn-ranking-jogar">Começar a jogar</a>
 				</div>
 			<% } %>
-		</div>
-	</section>
+		</section>
+	</main>
 </body>
 
 </html>

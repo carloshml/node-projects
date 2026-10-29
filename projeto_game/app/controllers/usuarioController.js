@@ -115,15 +115,18 @@ module.exports.inserirUsuarioCrud = async function (application, req, res, valid
 }
 
 module.exports.verRanking = async function (application, req, res) {
+    /* links antigos carregavam o JSON do jogo na query; o ranking usa a sessão */
+    if (req.query.jogo || req.query.img_casa) {
+        res.redirect('/verRanking');
+        return;
+    }
+
     if (req.session.autorizado) {
         var connection = application.config.dbConection;
         var UsuarioDAO = new application.app.models.UsuariosDAO(connection);
 
         var comandoInvalido = false;
-        var msg = '';
-        if (req.query.msg !== '') {
-            msg = req.query.msg;
-        }
+        var msg = typeof req.query.msg === 'string' ? req.query.msg : '';
         await UsuarioDAO.verRanking(res, req, req.session.casa, msg, application);
 
     } else {

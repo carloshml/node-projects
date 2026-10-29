@@ -291,9 +291,458 @@ img {
   box-shadow: none;
 }
 
-.ranking-img-casas{
-  border-radius: 49%;
-  height: 77px;
+/* Ranking */
+.body-ranking {
+  min-height: 100vh;
+  padding-bottom: 40px;
+  overflow-x: hidden;
+  color: #f4e7cf;
+  background:
+    linear-gradient(rgba(10, 7, 5, 0.88), rgba(10, 7, 5, 0.95)),
+    url("../images/mapa.gif") center / cover fixed;
+}
+
+.ranking-navbar {
+  padding: 10px 0;
+  background: rgba(10, 7, 5, 0.94) !important;
+  border-bottom: 1px solid rgba(255, 211, 77, 0.35);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+.ranking-navbar-conteudo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: min(1120px, 100%);
+  margin: 0 auto;
+  padding: 0 18px;
+}
+
+.ranking-navbar .navbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  color: #f4e7cf !important;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 15px;
+  letter-spacing: 0.03em;
+  text-shadow: 0 1px 4px #000;
+}
+
+.ranking-navbar .navbar-brand:hover {
+  color: #ffd34d !important;
+}
+
+.ranking-navbar .navbar-brand img {
+  width: 36px;
+  height: 36px;
+  border: 1px solid rgba(255, 211, 77, 0.55);
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.ranking-navbar-acoes {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.btn-ranking-jogar,
+.btn-ranking-sair {
+  border-radius: 4px;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.btn-ranking-jogar {
+  border: 1px solid rgba(255, 211, 77, 0.55);
+  background: transparent;
+  color: #ffd34d;
+}
+
+.btn-ranking-jogar:hover,
+.btn-ranking-jogar:focus {
+  border-color: #ffd34d;
+  background: #ffd34d;
+  color: #1b0f0a;
+}
+
+.btn-ranking-sair {
+  border: 1px solid #c36008;
+  background: #7a1f1f;
+  color: #fff;
+}
+
+.btn-ranking-sair:hover,
+.btn-ranking-sair:focus {
+  background: #a33026;
+  color: #fff;
+}
+
+.ranking-pagina {
+  width: min(1060px, 100%);
+  margin: 0 auto;
+  padding: 38px 18px 60px;
+}
+
+.ranking-hero {
+  margin-bottom: 26px;
+  text-align: center;
+}
+
+.ranking-hero__eyebrow {
+  margin: 0 0 8px;
+  color: #c9a227;
+  font-size: 10px;
+  font-weight: bold;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+}
+
+.ranking-hero h1 {
+  margin: 0;
+  color: #f4e7cf;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: clamp(34px, 5vw, 58px);
+  line-height: 1.02;
+  text-shadow: 0 3px 20px #000;
+}
+
+.ranking-hero h1 span {
+  display: block;
+  margin-top: 8px;
+  color: #ffd34d;
+  font-size: 0.46em;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.ranking-hero__texto {
+  max-width: 520px;
+  margin: 12px auto 0;
+  color: #c9b896;
+  font-size: 14px;
+}
+
+.ranking-resumo {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+
+.ranking-resumo__item {
+  min-width: 122px;
+  padding: 10px 16px;
+  border: 1px solid rgba(255, 211, 77, 0.18);
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.ranking-resumo__item strong {
+  display: block;
+  color: #ffd34d;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 23px;
+  line-height: 1.1;
+}
+
+.ranking-resumo__item span {
+  color: #c9b896;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.ranking-painel {
+  overflow: hidden;
+  border: 1px solid rgba(255, 211, 77, 0.22);
+  border-radius: 10px;
+  background: rgba(16, 10, 8, 0.84);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
+}
+
+.ranking-tabela__cabecalho,
+.ranking-linha {
+  display: grid;
+  grid-template-columns: 64px minmax(220px, 1.6fr) minmax(130px, 0.9fr) 100px 120px;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
+}
+
+.ranking-tabela__cabecalho {
+  border-bottom: 1px solid rgba(255, 211, 77, 0.2);
+  background: rgba(0, 0, 0, 0.35);
+  color: #c9a227;
+  font-size: 10px;
+  font-weight: bold;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.ranking-linha {
+  min-height: 66px;
+  border-bottom: 1px solid rgba(255, 211, 77, 0.08);
+  transition: background 0.15s ease;
+}
+
+.ranking-linha:last-child {
+  border-bottom: 0;
+}
+
+.ranking-linha:hover {
+  background: rgba(255, 211, 77, 0.05);
+}
+
+.ranking-linha--top1 {
+  background: linear-gradient(90deg, rgba(255, 211, 77, 0.12), transparent 60%);
+}
+
+.ranking-linha--top2 {
+  background: linear-gradient(90deg, rgba(199, 199, 199, 0.1), transparent 60%);
+}
+
+.ranking-linha--top3 {
+  background: linear-gradient(90deg, rgba(205, 127, 50, 0.1), transparent 60%);
+}
+
+.ranking-linha--voce {
+  background: rgba(255, 211, 77, 0.1);
+  box-shadow: inset 3px 0 0 #ffd34d;
+}
+
+.ranking-posicao {
+  color: #c9b896;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 18px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.ranking-linha--top1 .ranking-posicao {
+  color: #ffd34d;
+}
+
+.ranking-linha--top2 .ranking-posicao {
+  color: #d8d8d8;
+}
+
+.ranking-linha--top3 .ranking-posicao {
+  color: #cd7f32;
+}
+
+.ranking-coroa {
+  font-size: 22px;
+  line-height: 1;
+}
+
+.ranking-jogador {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.ranking-avatar {
+  flex-shrink: 0;
+  width: 42px;
+  height: 42px;
+  border: 1px solid rgba(255, 211, 77, 0.35);
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.ranking-jogador__dados {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.ranking-jogador__dados strong {
+  overflow: hidden;
+  color: #f4e7cf;
+  font-size: 14px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ranking-jogador__dados small {
+  color: #9b8668;
+  font-size: 11px;
+}
+
+.ranking-voce {
+  display: inline-block;
+  margin-left: 3px;
+  padding: 1px 6px;
+  border-radius: 10px;
+  background: #ffd34d;
+  color: #1b0f0a;
+  font-size: 8px;
+  font-style: normal;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  vertical-align: 1px;
+}
+
+.ranking-casa {
+  overflow: hidden;
+  color: #c9b896;
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ranking-aldeoes,
+.ranking-moedas {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-variant-numeric: tabular-nums;
+}
+
+.ranking-aldeoes {
+  color: #c9b896;
+  font-size: 13px;
+}
+
+.ranking-aldeoes img {
+  width: 18px;
+  height: 18px;
+}
+
+.ranking-moedas {
+  color: #ffd34d;
+  font-size: 15px;
+  font-weight: bold;
+}
+
+.ranking-moedas img {
+  width: 20px;
+  height: 20px;
+}
+
+.ranking-vazio {
+  padding: 48px 20px;
+  text-align: center;
+  color: #c9b896;
+}
+
+.ranking-vazio img {
+  width: 52px;
+  height: 52px;
+  margin-bottom: 10px;
+  border-radius: 50%;
+  opacity: 0.85;
+  object-fit: cover;
+}
+
+.ranking-vazio h2 {
+  margin: 0 0 6px;
+  color: #f4e7cf;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 22px;
+}
+
+.ranking-vazio p {
+  max-width: 420px;
+  margin: 0 auto 16px;
+  font-size: 13px;
+}
+
+@media (max-width: 767px) {
+  .ranking-navbar-conteudo {
+    padding: 0 10px;
+  }
+
+  .ranking-navbar .navbar-brand {
+    gap: 6px;
+    font-size: 13px;
+  }
+
+  .ranking-navbar .navbar-brand img {
+    width: 28px;
+    height: 28px;
+  }
+
+  .ranking-navbar .navbar-brand span {
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .btn-ranking-jogar,
+  .btn-ranking-sair {
+    padding: 4px 8px;
+    font-size: 10px;
+  }
+
+  .ranking-pagina {
+    padding: 26px 10px 40px;
+  }
+
+  .ranking-hero {
+    margin-bottom: 20px;
+  }
+
+  .ranking-hero__texto {
+    font-size: 13px;
+  }
+
+  .ranking-resumo {
+    gap: 6px;
+  }
+
+  .ranking-resumo__item {
+    min-width: 90px;
+    padding: 8px 10px;
+  }
+
+  .ranking-resumo__item strong {
+    font-size: 19px;
+  }
+
+  .ranking-tabela__cabecalho,
+  .ranking-linha {
+    grid-template-columns: 38px minmax(0, 1fr) 86px;
+    gap: 8px;
+    padding: 10px 12px;
+  }
+
+  .ranking-col-casa,
+  .ranking-col-aldeoes {
+    display: none;
+  }
+
+  .ranking-tabela__cabecalho .ranking-col-moedas {
+    text-align: right;
+  }
+
+  .ranking-moedas {
+    justify-content: flex-end;
+    font-size: 14px;
+  }
+
+  .ranking-avatar {
+    width: 34px;
+    height: 34px;
+  }
+
+  .ranking-jogador__dados strong {
+    font-size: 13px;
+  }
+
+  .ranking-posicao {
+    font-size: 16px;
+  }
 }
 
 .tam-img-crud {

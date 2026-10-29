@@ -172,7 +172,12 @@ UsuarioDAO.prototype.buscarUsuarios = async function (res, req, casa, msg, jogos
             usuarios.push(usuario);
         }
 
-        res.render('ranking', { img_casa: casa, nome: req.session.nome, usuarios });
+        res.render('ranking', {
+            img_casa: casa,
+            nome: req.session.nome,
+            usuarioAtual: req.session.usuario,
+            usuarios
+        });
     } catch (error) {
         console.log('  algum erro foi encontrado  ', error);
     } finally {
