@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img" aria-labelledby="tituloSerpente">
+  <title id="tituloSerpente">Serpente Marinha</title>
+  <defs>
+    <radialGradient id="aguaSerpente" cx="50%" cy="30%" r="75%">
+      <stop offset="0%" stop-color="#11312c"/>
+      <stop offset="100%" stop-color="#04100e"/>
+    </radialGradient>
+    <linearGradient id="corpoSerpente" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#5fae72"/>
+      <stop offset="100%" stop-color="#245c38"/>
+    </linearGradient>
+  </defs>
+  <circle cx="100" cy="100" r="96" fill="url(#aguaSerpente)" stroke="#1f4a3d" stroke-width="4"/>
+  <path d="M12 168 C36 156 56 176 80 166 C104 156 124 176 148 166 C164 159 178 162 190 170" stroke="#2f7d70" stroke-width="4" fill="none" opacity="0.5"/>
+  <path d="M24 182 C48 172 68 190 92 180 C116 170 136 190 160 180 C172 175 182 177 190 182" stroke="#2f7d70" stroke-width="4" fill="none" opacity="0.35"/>
+  <path d="M62 96 C80 100 88 114 88 132 C88 156 108 170 132 164 C156 158 164 132 152 112" stroke="url(#corpoSerpente)" stroke-width="17" fill="none" stroke-linecap="round"/>
+  <path d="M62 96 C74 92 82 86 86 78" stroke="url(#corpoSerpente)" stroke-width="15" fill="none" stroke-linecap="round"/>
+  <path d="M44 64 L82 70 L84 92 L54 100 L34 86 Z" fill="#3f8f56"/>
+  <path d="M34 86 L48 100 L42 108 L26 96 Z" fill="#2d6e41"/>
+  <path d="M56 76 L68 73 L66 84 Z" fill="#ffd23f"/>
+  <path d="M52 78 L60 76 L59 82 Z" fill="#101410"/>
+  <path d="M40 98 L40 110 L45 101 Z" fill="#f2ecda"/>
+  <path d="M52 98 L52 110 L47 101 Z" fill="#f2ecda"/>
+  <path d="M34 88 C24 90 18 94 10 92" stroke="#d94a4a" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path d="M10 92 L4 86 M10 92 L2 98" stroke="#d94a4a" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <circle cx="100" cy="140" r="3" fill="#9fd6a8" opacity="0.7"/>
+  <circle cx="118" cy="154" r="3.5" fill="#9fd6a8" opacity="0.6"/>
+  <circle cx="138" cy="156" r="3" fill="#9fd6a8" opacity="0.5"/>
+</svg>

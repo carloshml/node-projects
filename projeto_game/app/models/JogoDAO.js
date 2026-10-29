@@ -1,10 +1,11 @@
 let ObjectID = require('mongodb').ObjectID;
+const { FERAS, PODER_ALDEAO, obterFera } = require('./feras');
 
 /* custo em moedas por aldeão, por tipo de ação */
-const CUSTOS = { 1: 2, 2: 3, 3: 1, 4: 1 };
+const CUSTOS = { 1: 2, 2: 3, 3: 1, 4: 1, 5: 5 };
 
 /* duração em milissegundos por aldeão, por tipo de ação */
-const DURACOES = { 1: 10000, 2: 120000, 3: 180000, 4: 240000 };
+const DURACOES = { 1: 10000, 2: 120000, 3: 180000, 4: 240000, 5: 30000 };
 
 /* o que cada aldeão produz ao terminar a ação */
 const RECOMPENSAS = {
@@ -55,6 +56,29 @@ function ganhosDaAcao(acao) {
     return ganhos;
 }
 
+function resultadoDaAcao(acao) {
+    const tipo = parseInt(acao.acao, 10);
+    const quantidade = Number(acao.quantidade) || 0;
+
+    if (tipo === 5) {
+        const fera = obterFera(acao.fera);
+        if (!fera) {
+            return { ganhos: {}, vitoria: false, fera: null };
+        }
+
+        const vitoria = (quantidade * PODER_ALDEAO) >= fera.vida;
+        return {
+            ganhos: vitoria
+                ? { moeda: fera.recompensa, temor: Math.ceil(fera.vida / 3) }
+                : {},
+            vitoria: vitoria,
+            fera: fera.id
+        };
+    }
+
+    return { ganhos: ganhosDaAcao(acao), vitoria: null, fera: null };
+}
+
 function JogoDAO(connection) {
     this._connection = connection;
 }
@@ -99,6 +123,7 @@ JogoDAO.prototype.iniciaJogo = function (res, req, casa, msg) {
                     jogo.nome = req.session.nome;
                     jogo.recursos = jogo.recursos || {};
                     jogo.precos = PRECOS;
+                    jogo.feras = FERAS;
                     res.render('jogo', { img_casa: casa, jogo: jogo, msg: msg });
                     db.client.close();
                 });
@@ -118,6 +143,11 @@ JogoDAO.prototype.gerarOrdemSuditos = async function (acao) {
         if (!CUSTOS[tipo] || !(quantidade > 0)) {
             return { ok: false, msg: 'erro' };
         }
+
+        /* a fera é sorteada pelo jogo; o jogador não escolhe */
+        const fera = tipo === 5
+            ? FERAS[Math.floor(Math.random() * FERAS.length)]
+            : null;
 
         const custo = CUSTOS[tipo] * quantidade;
         /* usa o usuário da sessão, não o id vindo do formulário */
@@ -158,6 +188,10 @@ JogoDAO.prototype.gerarOrdemSuditos = async function (acao) {
             duracao_ms: duracao,
             terminado: false
         };
+
+        if (fera) {
+            novaAcao.fera = fera.id;
+        }
 
         try {
             await db.collection("acao").insertOne(novaAcao);
@@ -254,7 +288,8 @@ JogoDAO.prototype.atualizarAcoesDeJogo = async function (req, res) {
             }
 
             const quantidade = Number(acao.quantidade) || 0;
-            const ganhos = ganhosDaAcao(acao);
+            const resultado = resultadoDaAcao(acao);
+            const ganhos = resultado.ganhos;
             const incrementos = {};
 
             /* ordens antigas já tiveram os aldeões liberados pelo código anterior */
@@ -274,6 +309,8 @@ JogoDAO.prototype.atualizarAcoesDeJogo = async function (req, res) {
                 acao: acao.acao,
                 quantidade: quantidade,
                 ganhos: ganhos,
+                vitoria: resultado.vitoria,
+                fera: resultado.fera,
                 pendente: pendente
             });
         }
@@ -313,6 +350,12 @@ JogoDAO.prototype.revogarAcao = async function (req, res) {
 
         if (!acao) {
             res.redirect('jogo?msg=erro');
+            return;
+        }
+
+        /* a fera já foi revelada; revogar permitiria sortear outra */
+        if (parseInt(acao.acao, 10) === 5) {
+            res.redirect('jogo?msg=batalhaEmCurso');
             return;
         }
 
@@ -431,6 +474,7 @@ JogoDAO.prototype.buscaJogoUsuario = async function (res, req, casa, msg) {
                     jogo.nome = req.session.nome;
                     jogo.recursos = jogo.recursos || {};
                     jogo.precos = PRECOS;
+                    jogo.feras = FERAS;
                     const usuario2 = { img_casa: casa, jogo: jogo, msg: msg };
                     res.send(usuario2);
                     db.client.close();

@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img" aria-labelledby="tituloUrso">
+  <title id="tituloUrso">Urso-Sombra</title>
+  <defs>
+    <radialGradient id="ceuUrso" cx="50%" cy="30%" r="75%">
+      <stop offset="0%" stop-color="#2b2018"/>
+      <stop offset="100%" stop-color="#0d0906"/>
+    </radialGradient>
+    <linearGradient id="peloUrso" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#8a5632"/>
+      <stop offset="100%" stop-color="#4d2c18"/>
+    </linearGradient>
+  </defs>
+  <circle cx="100" cy="100" r="96" fill="url(#ceuUrso)" stroke="#4b3424" stroke-width="4"/>
+  <circle cx="64" cy="62" r="22" fill="#5c3720"/>
+  <circle cx="136" cy="62" r="22" fill="#5c3720"/>
+  <circle cx="64" cy="62" r="11" fill="#2a1810"/>
+  <circle cx="136" cy="62" r="11" fill="#2a1810"/>
+  <ellipse cx="100" cy="106" rx="52" ry="50" fill="url(#peloUrso)"/>
+  <path d="M56 116 L64 142 L76 124 L86 148 L100 128 L114 148 L124 124 L136 142 L144 116 Z" fill="#3a2112"/>
+  <ellipse cx="100" cy="124" rx="27" ry="21" fill="#b3835a"/>
+  <ellipse cx="79" cy="94" rx="7" ry="8" fill="#16100b"/>
+  <ellipse cx="121" cy="94" rx="7" ry="8" fill="#16100b"/>
+  <circle cx="81" cy="92" r="2.5" fill="#e8d7b0"/>
+  <circle cx="123" cy="92" r="2.5" fill="#e8d7b0"/>
+  <path d="M91 114 L109 114 L100 124 Z" fill="#1a100a"/>
+  <path d="M100 124 L100 134" stroke="#1a100a" stroke-width="4" stroke-linecap="round"/>
+  <path d="M100 134 C94 140 88 138 86 134" stroke="#1a100a" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path d="M100 134 C106 140 112 138 114 134" stroke="#1a100a" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path d="M78 130 L78 145 L83 133 Z" fill="#f3ecd8"/>
+  <path d="M122 130 L122 145 L117 133 Z" fill="#f3ecd8"/>
+</svg>

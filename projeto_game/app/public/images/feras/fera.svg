@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img" aria-labelledby="tituloFera">
+  <title id="tituloFera">Fera desconhecida</title>
+  <defs>
+    <radialGradient id="ceuFera" cx="50%" cy="35%" r="72%">
+      <stop offset="0%" stop-color="#2a2320"/>
+      <stop offset="100%" stop-color="#0b0908"/>
+    </radialGradient>
+    <linearGradient id="garraFera" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#e0593c"/>
+      <stop offset="100%" stop-color="#8c241b"/>
+    </linearGradient>
+  </defs>
+  <circle cx="100" cy="100" r="96" fill="url(#ceuFera)" stroke="#4a3a33" stroke-width="4"/>
+  <g fill="url(#garraFera)">
+    <path d="M48 42 C68 70 82 100 92 132 C80 124 62 96 44 62 Z"/>
+    <path d="M84 36 C102 68 112 102 118 138 C106 128 90 96 76 58 Z"/>
+    <path d="M122 40 C136 74 142 108 144 144 C132 132 120 98 112 58 Z"/>
+  </g>
+  <circle cx="70" cy="150" r="7" fill="#ffd34d" opacity="0.85"/>
+  <circle cx="130" cy="152" r="6" fill="#ffd34d" opacity="0.7"/>
+</svg>

@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img" aria-labelledby="tituloLobo">
+  <title id="tituloLobo">Lobo Gigante</title>
+  <defs>
+    <radialGradient id="ceuLobo" cx="50%" cy="35%" r="72%">
+      <stop offset="0%" stop-color="#26333d"/>
+      <stop offset="100%" stop-color="#0a0e12"/>
+    </radialGradient>
+    <linearGradient id="peloLobo" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#b9c0c7"/>
+      <stop offset="100%" stop-color="#59616a"/>
+    </linearGradient>
+  </defs>
+  <circle cx="100" cy="100" r="96" fill="url(#ceuLobo)" stroke="#3e4a55" stroke-width="4"/>
+  <circle cx="140" cy="54" r="25" fill="#ded6b8" opacity="0.85"/>
+  <path d="M62 80 L52 36 L88 60 Z" fill="#6c747d"/>
+  <path d="M138 80 L148 36 L112 60 Z" fill="#6c747d"/>
+  <path d="M66 72 L61 51 L80 64 Z" fill="#2f363d"/>
+  <path d="M134 72 L139 51 L120 64 Z" fill="#2f363d"/>
+  <path d="M100 50 L140 72 L134 112 L100 140 L66 112 L60 72 Z" fill="url(#peloLobo)"/>
+  <path d="M100 104 L120 112 L113 133 L100 142 L87 133 L80 112 Z" fill="#3d444c"/>
+  <path d="M76 84 L91 79 L88 91 Z" fill="#ffcf33"/>
+  <path d="M124 84 L109 79 L112 91 Z" fill="#ffcf33"/>
+  <path d="M79 85 L88 82 L86 88 Z" fill="#161a1e"/>
+  <path d="M121 85 L112 82 L114 88 Z" fill="#161a1e"/>
+  <path d="M93 128 L107 128 L100 137 Z" fill="#14181c"/>
+  <path d="M89 133 L89 144 L94 135 Z" fill="#f3f0e3"/>
+  <path d="M111 133 L111 144 L106 135 Z" fill="#f3f0e3"/>
+</svg>
