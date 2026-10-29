@@ -745,6 +745,441 @@ img {
   }
 }
 
+/* Home */
+.body-home {
+  min-height: 100vh;
+  overflow-x: hidden;
+  color: #f4e7cf;
+  background:
+    linear-gradient(rgba(10, 7, 5, 0.86), rgba(10, 7, 5, 0.95)),
+    url("../images/mapa.gif") center / cover fixed;
+}
+
+.navbar-home {
+  padding: 10px 0;
+  background: rgba(10, 7, 5, 0.94) !important;
+  border-bottom: 1px solid rgba(255, 211, 77, 0.35);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+.home-navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: min(1120px, 100%);
+  margin: 0 auto;
+  padding: 10px 18px;
+}
+
+.home-navbar .navbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  color: #f4e7cf !important;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 15px;
+  letter-spacing: 0.03em;
+  text-shadow: 0 1px 4px #000;
+}
+
+.home-navbar .navbar-brand:hover {
+  color: #ffd34d !important;
+}
+
+.home-navbar .navbar-brand img {
+  width: 38px;
+  height: 38px;
+  border: 1px solid rgba(255, 211, 77, 0.55);
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.home-navbar__acoes {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.home-navbar__jogador {
+  color: #c9b896;
+  font-size: 12px;
+}
+
+.btn-home-sair {
+  border: 1px solid #c36008;
+  border-radius: 4px;
+  background: #7a1f1f;
+  color: #fff;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.btn-home-sair:hover,
+.btn-home-sair:focus {
+  background: #a33026;
+  color: #fff;
+}
+
+.home-pagina {
+  width: min(1120px, 100%);
+  margin: 0 auto;
+  padding: 34px 18px 60px;
+}
+
+.home-hero {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 26px 28px;
+  border: 1px solid rgba(255, 211, 77, 0.22);
+  border-radius: 12px;
+  background:
+    linear-gradient(110deg, rgba(255, 211, 77, 0.06), transparent 55%),
+    rgba(16, 10, 8, 0.84);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
+}
+
+.home-hero__brasao {
+  flex-shrink: 0;
+}
+
+.home-hero__brasao img {
+  width: 96px;
+  height: 96px;
+  border: 2px solid rgba(255, 211, 77, 0.55);
+  border-radius: 50%;
+  box-shadow: 0 0 28px rgba(255, 200, 60, 0.16);
+  object-fit: cover;
+}
+
+.home-hero__texto {
+  flex: 1;
+  min-width: 0;
+}
+
+.home-hero__eyebrow {
+  margin: 0 0 4px;
+  color: #c9a227;
+  font-size: 10px;
+  font-weight: bold;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+}
+
+.home-hero h1 {
+  margin: 0;
+  overflow: hidden;
+  color: #f4e7cf;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: clamp(32px, 4.4vw, 52px);
+  line-height: 1.05;
+  text-overflow: ellipsis;
+  text-shadow: 0 3px 20px #000;
+  white-space: nowrap;
+}
+
+.home-hero__casa {
+  margin: 8px 0 0;
+  color: #c9b896;
+  font-size: 13px;
+}
+
+.home-hero__casa span {
+  margin: 0 5px;
+  color: #776348;
+}
+
+.btn-home-jogar {
+  flex-shrink: 0;
+  padding: 11px 20px;
+  border: 1px solid #ffd34d;
+  border-radius: 4px;
+  background: #ffd34d;
+  color: #1b0f0a;
+  font-size: 12px;
+  font-weight: bold;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  box-shadow: 0 0 24px rgba(255, 200, 60, 0.18);
+}
+
+.btn-home-jogar:hover,
+.btn-home-jogar:focus {
+  background: #ffe485;
+  border-color: #ffe485;
+  color: #1b0f0a;
+}
+
+.btn-home-jogar span {
+  margin-left: 6px;
+}
+
+.home-status {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+  margin: 14px 0;
+}
+
+.home-stat {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  padding: 12px 14px;
+  border: 1px solid rgba(255, 211, 77, 0.16);
+  border-radius: 8px;
+  background: rgba(16, 10, 8, 0.78);
+}
+
+.home-stat--moeda {
+  border-color: rgba(255, 211, 77, 0.42);
+  background: rgba(255, 211, 77, 0.07);
+}
+
+.home-stat__icone {
+  display: grid;
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(255, 211, 77, 0.1);
+}
+
+.home-stat__icone img {
+  width: 24px;
+  height: 24px;
+}
+
+.home-stat > div:last-child {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.home-stat strong {
+  overflow: hidden;
+  color: #f4e7cf;
+  font-size: 17px;
+  line-height: 1.15;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.home-stat strong small {
+  color: #9b8668;
+  font-size: 11px;
+  font-weight: normal;
+}
+
+.home-stat span {
+  overflow: hidden;
+  color: #9b8668;
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.home-acoes {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.home-card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  overflow: hidden;
+  padding: 18px;
+  border: 1px solid rgba(255, 211, 77, 0.2);
+  border-radius: 10px;
+  background: rgba(16, 10, 8, 0.82);
+  color: #f4e7cf;
+  text-decoration: none;
+  transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+}
+
+.home-card:hover,
+.home-card:focus {
+  transform: translateY(-2px);
+  border-color: rgba(255, 211, 77, 0.6);
+  background: rgba(30, 20, 14, 0.92);
+  color: #f4e7cf;
+}
+
+.home-card--jogar {
+  border-color: rgba(255, 211, 77, 0.45);
+  background: linear-gradient(120deg, rgba(255, 211, 77, 0.14), rgba(16, 10, 8, 0.85));
+}
+
+.home-card--ranking {
+  border-color: rgba(141, 255, 158, 0.2);
+}
+
+.home-card--usuarios {
+  border-color: rgba(155, 134, 104, 0.35);
+}
+
+.home-card__icone {
+  display: grid;
+  flex-shrink: 0;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(255, 211, 77, 0.12);
+}
+
+.home-card__icone img {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.home-card__conteudo {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.home-card__conteudo strong {
+  color: #ffd34d;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 16px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.home-card__conteudo small {
+  margin-top: 2px;
+  color: #c9b896;
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.home-card__seta {
+  flex-shrink: 0;
+  color: #ffd34d;
+  font-size: 20px;
+  transition: transform 0.15s ease;
+}
+
+.home-card:hover .home-card__seta {
+  transform: translateX(4px);
+}
+
+.home-dica {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-top: 14px;
+  padding: 12px 16px;
+  border-left: 2px solid #c9a227;
+  background: rgba(0, 0, 0, 0.28);
+  color: #c9b896;
+  font-size: 12px;
+}
+
+.home-dica__marca {
+  flex-shrink: 0;
+  color: #c9a227;
+  font-size: 9px;
+  font-weight: bold;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.home-dica p {
+  margin: 0;
+}
+
+@media (max-width: 900px) {
+  .home-status {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .home-acoes {
+    grid-template-columns: 1fr;
+  }
+
+  .home-hero {
+    flex-wrap: wrap;
+  }
+
+  .home-hero__texto {
+    flex-basis: calc(100% - 120px);
+  }
+
+  .btn-home-jogar {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+@media (max-width: 575px) {
+  .home-navbar {
+    padding: 8px 10px;
+  }
+
+  .home-navbar .navbar-brand {
+    gap: 6px;
+    font-size: 13px;
+  }
+
+  .home-navbar .navbar-brand img {
+    width: 30px;
+    height: 30px;
+  }
+
+  .home-navbar__jogador {
+    display: none;
+  }
+
+  .home-pagina {
+    padding: 22px 10px 40px;
+  }
+
+  .home-hero {
+    padding: 18px;
+  }
+
+  .home-hero__brasao img {
+    width: 72px;
+    height: 72px;
+  }
+
+  .home-hero__texto {
+    flex-basis: calc(100% - 92px);
+  }
+
+  .home-hero h1 {
+    font-size: 30px;
+  }
+
+  .home-status {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .home-stat {
+    padding: 10px;
+  }
+
+  .home-card {
+    padding: 14px;
+  }
+}
+
 .tam-img-crud {
   width: 100%;
   height: 170px;

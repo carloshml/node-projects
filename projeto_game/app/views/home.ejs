@@ -4,53 +4,151 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>MMORPG - Game of Thrones</title>
+	<title>MMORPG-GOT | Início</title>
 
 	<link rel="stylesheet" href="css/bootstrap.min.css">
 	<link href="css/style.css" rel="stylesheet">
 </head>
 
-<body class="body-index">
-	<nav class="navbar bg-light">
-		<div class="container d-flex justify-content-between align-items-center">
-			<a class="navbar-brand" href="#">
-				<img src="images/casa_<%=img_casa%>.jpg" width="30" height="30" class="display-logo align-top" alt="">
-				Oi, <%=jogo.nome%>!
+<body class="body-home">
+	<%
+	const CASAS = {
+		arryn: 'Arryn',
+		baratheon: 'Baratheon',
+		greyjoy: 'Greyjoy',
+		lannister: 'Lannister',
+		martell: 'Martell',
+		stark: 'Stark',
+		targaryen: 'Targaryen',
+		tully: 'Tully',
+		tyrell: 'Tyrell'
+	};
+
+	const casa = img_casa || jogo.casa || 'stark';
+	const casaNome = CASAS[casa] || (casa.charAt(0).toUpperCase() + casa.slice(1));
+	const recursos = jogo.recursos || {};
+	const moeda = Number(jogo.moeda) || 0;
+	const suditos = Number(jogo.suditos) || 0;
+	const trabalhando = Number(jogo.suditosTrabalhando) || 0;
+	const livres = Math.max(0, suditos - trabalhando);
+	const madeira = Number(recursos.madeira) || 0;
+	const comida = Number(recursos.comida) || 0;
+	const ferro = Number(recursos.ferro) || 0;
+	const queryJogo = encodeURIComponent(JSON.stringify(jogo));
+	%>
+
+	<nav class="navbar navbar-home">
+		<div class="container-fluid home-navbar">
+			<a class="navbar-brand" href="/home">
+				<img src="images/casa_<%=casa%>.jpg" width="38" height="38" alt="Casa <%=casaNome%>">
+				<span>Casa <%=casaNome%></span>
 			</a>
-			<a href="/sair" id="btn-sair" class="btn btn-info">Sair</a>
+
+			<div class="home-navbar__acoes">
+				<span class="home-navbar__jogador"><%=jogo.nome%></span>
+				<a href="/sair" id="btn-sair" class="btn btn-sm btn-home-sair">Sair</a>
+			</div>
 		</div>
 	</nav>
 
-	<div class="container">
-		<div class="row">
-			<div class="col-12 col-md-6 text-center">
-				<a href="/jogo" id="btn-jogar" class="btn btn-success btn-home">
-					<span>Jogar</span>
-				</a>
+	<main class="home-pagina">
+		<section class="home-hero">
+			<div class="home-hero__brasao">
+				<img src="images/casa_<%=casa%>.jpg" alt="Brasão da Casa <%=casaNome%>">
 			</div>
 
-			<div class="col-12 col-md-6 text-center">
-				<a href="/buscarUsuarios?img_casa=<%=img_casa%>&jogo=<%=JSON.stringify(jogo)%>&msg="
-					id="btn-ver-usuario" class="btn btn-success btn-home">
-					<span>Ver usuários</span>
-				</a>
+			<div class="home-hero__texto">
+				<p class="home-hero__eyebrow">Bem-vindo de volta aos Sete Reinos</p>
+				<h1><%=jogo.nome%></h1>
+				<p class="home-hero__casa">
+					Casa <%=casaNome%>
+					<span>·</span>
+					<%=livres%> aldeão(ões) livre(s)
+					<% if (trabalhando > 0) { %><span>·</span> <%=trabalhando%> trabalhando<% } %>
+				</p>
 			</div>
 
-			<div class="col-12 col-md-6 text-center">
-				<a href="/verRanking" id="btn-ver-ranking" class="btn btn-success btn-home">
-					<span>Ranking</span>
-				</a>
-			</div>
-		</div>
+			<a href="/jogo" id="btn-jogar" class="btn btn-home-jogar">
+				Continuar jornada <span aria-hidden="true">→</span>
+			</a>
+		</section>
 
-		<div class="row">
-			<div class="col-md-2"></div>
-			<div class="col-md-8 text-center">
-				<img class="imagem-home img-fluid" src="images/game_of_thrones_logo.jpg" alt="Game of Thrones" />
+		<section class="home-status" aria-label="Seus recursos">
+			<div class="home-stat home-stat--moeda">
+				<div class="home-stat__icone"><img src="images/icones/moeda.svg" alt=""></div>
+				<div>
+					<strong><%=moeda.toLocaleString('pt-BR')%></strong>
+					<span>moedas</span>
+				</div>
 			</div>
-			<div class="col-md-2"></div>
-		</div>
-	</div>
+
+			<div class="home-stat">
+				<div class="home-stat__icone"><img src="images/icones/aldeao.svg" alt=""></div>
+				<div>
+					<strong><%=livres%><small>/<%=suditos%></small></strong>
+					<span>aldeões livres</span>
+				</div>
+			</div>
+
+			<div class="home-stat">
+				<div class="home-stat__icone"><img src="images/icones/madeira.svg" alt=""></div>
+				<div>
+					<strong><%=madeira.toLocaleString('pt-BR')%></strong>
+					<span>madeira</span>
+				</div>
+			</div>
+
+			<div class="home-stat">
+				<div class="home-stat__icone"><img src="images/icones/comida.svg" alt=""></div>
+				<div>
+					<strong><%=comida.toLocaleString('pt-BR')%></strong>
+					<span>comida</span>
+				</div>
+			</div>
+
+			<div class="home-stat">
+				<div class="home-stat__icone"><img src="images/icones/ferro.svg" alt=""></div>
+				<div>
+					<strong><%=ferro.toLocaleString('pt-BR')%></strong>
+					<span>ferro</span>
+				</div>
+			</div>
+		</section>
+
+		<section class="home-acoes" aria-label="O que você quer fazer">
+			<a href="/jogo" class="home-card home-card--jogar">
+				<span class="home-card__icone"><img src="images/icones/aldeao.svg" alt=""></span>
+				<span class="home-card__conteudo">
+					<strong>Jogar</strong>
+					<small>Envie ordens, colete recursos e cace as feras.</small>
+				</span>
+				<span class="home-card__seta" aria-hidden="true">→</span>
+			</a>
+
+			<a href="/verRanking" id="btn-ver-ranking" class="home-card home-card--ranking">
+				<span class="home-card__icone"><img src="images/icones/moeda.svg" alt=""></span>
+				<span class="home-card__conteudo">
+					<strong>Ranking</strong>
+					<small>Veja quem tem mais moedas nos Sete Reinos.</small>
+				</span>
+				<span class="home-card__seta" aria-hidden="true">→</span>
+			</a>
+
+			<a href="/buscarUsuarios?img_casa=<%=casa%>&jogo=<%=queryJogo%>&msg=" id="btn-ver-usuario" class="home-card home-card--usuarios">
+				<span class="home-card__icone"><img src="images/outros/pergaminho.jpg" alt=""></span>
+				<span class="home-card__conteudo">
+					<strong>Ver usuários</strong>
+					<small>Gerencie os senhores e seus jogos.</small>
+				</span>
+				<span class="home-card__seta" aria-hidden="true">→</span>
+			</a>
+		</section>
+
+		<section class="home-dica">
+			<span class="home-dica__marca">Dica do mestre</span>
+			<p>Aldeões ociosos não geram moedas. Envie ordens no painel do jogo e mantenha o povo trabalhando.</p>
+		</section>
+	</main>
 </body>
 
 </html>
