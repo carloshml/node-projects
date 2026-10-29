@@ -10,8 +10,8 @@ module.exports = function (application) {
 			[
 				check('nome', 'nome não pode ser vazio').notEmpty(),
 				check('usuario', 'usuário não pode ser vazio').notEmpty(),
-				check('senha', 'senha não pode ser vazio').notEmpty(),
-				check('casa', 'casa não pode ser vazio').notEmpty(),
+				check('senha', 'senha não pode ser vazia').notEmpty(),
+				check('casa', 'casa não pode ser vazia').notEmpty(),
 			],
 			function (req, res) {
 				application.app.controllers.usuarioController.inserirUsuario(application, req, res, validationResult);
@@ -22,8 +22,8 @@ module.exports = function (application) {
 			[
 				check('nome', 'nome não pode ser vazio').notEmpty(),
 				check('usuario', 'usuário não pode ser vazio').notEmpty(),
-				check('senha', 'senha não pode ser vazio').notEmpty(),
-				check('casa', 'casa não pode ser vazio').notEmpty(),
+				check('senha', 'senha não pode ser vazia').notEmpty(),
+				check('casa', 'casa não pode ser vazia').notEmpty(),
 			],
 			function (req, res) {
 				application.app.controllers.usuarioController.inserirUsuarioCrud(application, req, res, validationResult);

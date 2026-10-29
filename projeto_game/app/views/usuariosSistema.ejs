@@ -1,87 +1,155 @@
-<% const jogoAtual = (jogo && typeof jogo === 'object') ? jogo : {}; %>
-<% const queryJogo = encodeURIComponent(JSON.stringify(jogoAtual)); %>
-<% const queryMsg = encodeURIComponent(typeof msg === 'string' ? msg : ''); %>
 <!DOCTYPE HTML>
 <html lang="pt-br">
 
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>MMORPG-GOT | Usuários</title>
+	<title>MMORPG-GOT | Administração</title>
 
 	<link rel="stylesheet" href="css/bootstrap.min.css">
 	<link rel="stylesheet" href="css/style.css">
 </head>
 
-<body class="body-index" style="background: white">
-	<nav class="navbar bg-light">
-		<div class="container d-flex justify-content-between align-items-center">
+<body class="body-admin">
+	<%
+	const CASAS = {
+		arryn: 'Arryn',
+		baratheon: 'Baratheon',
+		greyjoy: 'Greyjoy',
+		lannister: 'Lannister',
+		martell: 'Martell',
+		stark: 'Stark',
+		targaryen: 'Targaryen',
+		tully: 'Tully',
+		tyrell: 'Tyrell'
+	};
+
+	function nomeCasa(slug) {
+		return CASAS[slug] || (slug ? slug.charAt(0).toUpperCase() + slug.slice(1) : 'Sem casa');
+	}
+
+	const usuarios = resultados || [];
+	const erros = validacao || [];
+	const casaAtual = img_casa || 'stark';
+	const opcoesCasas = [
+		{ slug: 'arryn', nome: 'Arryn' },
+		{ slug: 'baratheon', nome: 'Baratheon' },
+		{ slug: 'greyjoy', nome: 'Greyjoy' },
+		{ slug: 'lannister', nome: 'Lannister' },
+		{ slug: 'martell', nome: 'Martell' },
+		{ slug: 'stark', nome: 'Stark' },
+		{ slug: 'targaryen', nome: 'Targaryen' },
+		{ slug: 'tully', nome: 'Tully' },
+		{ slug: 'tyrell', nome: 'Tyrell' }
+	];
+	%>
+
+	<nav class="navbar navbar-admin">
+		<div class="container-fluid admin-navbar">
 			<a class="navbar-brand" href="/home">
-				<img src="images/casa_<%=img_casa%>.jpg" width="30" height="30"
-					class="display-logo align-text-top" alt="">
-				Veja os usuários, <%=jogoAtual.nome%>!
+				<img src="images/casa_<%=casaAtual%>.jpg" width="34" height="34" alt="">
+				<span>
+					<strong>Administração</strong>
+					<small>Painel de contas</small>
+				</span>
 			</a>
 
-			<div class="d-flex gap-2">
-				<button id="btn-create-usuario" class="btn btn-info" data-bs-toggle="modal"
-					data-bs-target="#modal-create">
-					Cadastro
-				</button>
-				<a href="/sair" id="btn-sair" class="btn btn-info">Sair</a>
+			<div class="admin-navbar__acoes">
+				<span class="admin-navbar__usuario"><%=nome%></span>
+				<a href="/sair" id="btn-sair" class="btn btn-sm btn-admin-sair">Sair</a>
 			</div>
 		</div>
 	</nav>
 
-	<section class="conteudo-pagina">
-		<h1>Veja os usuários</h1>
-
-		<div class="container">
-			<div class="row titulo">
-				<div class="col-md-5 text-center">nome</div>
-				<div class="col-md-5 text-center">usuario</div>
-				<div class="col-md-2 text-center"></div>
+	<main class="admin-pagina">
+		<header class="admin-hero">
+			<div>
+				<p class="admin-hero__eyebrow">Área administrativa</p>
+				<h1>Usuários</h1>
+				<p class="admin-hero__texto">Gerencie as contas cadastradas no sistema.</p>
 			</div>
 
-			<% for (var i = 0; i < resultados.length; i++) { %>
-				<div class="row elemento align-items-center">
-					<div class="col-md-5 text-center">
-						<%= resultados[i].nome %>
+			<button id="btn-create-usuario" class="btn btn-admin-primary" data-bs-toggle="modal"
+				data-bs-target="#modal-create">
+				+ Novo usuário
+			</button>
+		</header>
+
+		<section class="admin-painel">
+			<div class="admin-painel__topo">
+				<div class="admin-contagem">
+					<strong><%=usuarios.length%></strong>
+					<span>conta<%=usuarios.length === 1 ? '' : 's'%></span>
+				</div>
+
+				<div class="admin-busca">
+					<input id="busca-usuarios" class="form-control admin-busca__campo" type="search"
+						placeholder="Filtrar por nome, usuário ou casa" aria-label="Filtrar usuários">
+				</div>
+			</div>
+
+			<% if (usuarios.length) { %>
+				<div class="admin-tabela">
+					<div class="admin-tabela__cabecalho">
+						<span>Usuário</span>
+						<span class="admin-col-casa">Casa</span>
+						<span class="admin-col-acao">Ações</span>
 					</div>
-					<div class="col-md-5 text-center">
-						<%= resultados[i].usuario %>
-					</div>
-					<div class="col-md-2 text-center">
-						<button type="button" class="btn btn-success btn-sm btn-editar"
-							data-bs-toggle="modal" data-bs-target="#modal-update"
-							data-id="<%= resultados[i]._id %>"
-							data-nome="<%= resultados[i].nome %>"
-							data-usuario="<%= resultados[i].usuario %>">
-							Editar
-						</button>
-					</div>
+
+					<% for (var i = 0; i < usuarios.length; i++) {
+						var usuario = usuarios[i];
+						var casa = usuario.casa || 'stark';
+						var busca = (usuario.nome + ' ' + usuario.usuario + ' ' + nomeCasa(casa)).toLowerCase();
+					%>
+						<div class="admin-linha" data-busca="<%=busca%>">
+							<div class="admin-pessoa">
+								<span class="admin-avatar"><%= (usuario.nome || '?').charAt(0).toUpperCase() %></span>
+								<span class="admin-pessoa__dados">
+									<strong><%=usuario.nome%></strong>
+									<small>@<%=usuario.usuario%></small>
+								</span>
+							</div>
+
+							<span class="admin-casa admin-col-casa">
+								<img src="images/casa_<%=casa%>.jpg" alt="">
+								Casa <%=nomeCasa(casa)%>
+							</span>
+
+							<div class="admin-col-acao">
+								<button type="button" class="btn btn-sm btn-admin-editar btn-editar"
+									data-bs-toggle="modal" data-bs-target="#modal-update"
+									data-id="<%=usuario._id%>"
+									data-nome="<%=usuario.nome%>"
+									data-usuario="<%=usuario.usuario%>">
+									Editar
+								</button>
+							</div>
+						</div>
+					<% } %>
 				</div>
 			<% } %>
-		</div>
-	</section>
 
-	<input type="hidden" id="tem-validacao" value="<%= validacao.length > 0 ? 'S' : 'F' %>">
+			<div id="admin-vazio" class="admin-vazio"<%=usuarios.length ? ' hidden' : ''%>>
+				<p>Nenhum usuário cadastrado ainda.</p>
+				<small>Use “Novo usuário” para criar a primeira conta.</small>
+			</div>
+		</section>
+	</main>
 
-	<!-- Modal de atualização -->
+	<input type="hidden" id="tem-validacao" value="<%=erros.length > 0 ? 'S' : 'F'%>">
+
+	<!-- Editar usuário -->
 	<div class="modal fade" id="modal-update" tabindex="-1" aria-labelledby="modal-update-label" aria-hidden="true">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<form id="form-update"
-					action="/atualizarUsuario?img_casa=<%=img_casa%>&jogo=<%=queryJogo%>&msg=<%=queryMsg%>"
-					method="post">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content admin-modal">
+				<form id="form-update" action="/atualizarUsuario" method="post">
 					<div class="modal-header">
-						<h5 class="modal-title" id="modal-update-label">Atualizar usuário</h5>
+						<h2 class="modal-title h5" id="modal-update-label">Editar usuário</h2>
 						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
 					</div>
 
 					<div class="modal-body">
 						<input type="hidden" name="_id" id="update-id">
-						<input type="hidden" name="id_jogo"
-							value="img_casa=<%=img_casa%>&jogo=<%=queryJogo%>&msg=<%=queryMsg%>">
 
 						<div class="mb-3">
 							<label for="update-id-display" class="form-label">Código</label>
@@ -100,33 +168,31 @@
 					</div>
 
 					<div class="modal-footer">
-						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
-						<button type="submit" class="btn btn-success">Atualizar</button>
+						<button type="button" class="btn btn-admin-secundario" data-bs-dismiss="modal">Cancelar</button>
+						<button type="submit" class="btn btn-admin-primary">Salvar alterações</button>
 					</div>
 				</form>
 			</div>
 		</div>
 	</div>
 
-	<!-- Modal de cadastro -->
+	<!-- Novo usuário -->
 	<div class="modal fade" id="modal-create" tabindex="-1" aria-labelledby="modal-create-label" aria-hidden="true">
-		<div class="modal-dialog modal-lg">
-			<div class="modal-content">
-				<form
-					action="/inserirUsuarioCrud?img_casa=<%=img_casa%>&jogo=<%=queryJogo%>&msg=<%=queryMsg%>"
-					method="post">
+		<div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+			<div class="modal-content admin-modal">
+				<form action="/inserirUsuarioCrud" method="post">
 					<div class="modal-header">
-						<h5 class="modal-title" id="modal-create-label">Novo usuário</h5>
+						<h2 class="modal-title h5" id="modal-create-label">Novo usuário</h2>
 						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
 					</div>
 
 					<div class="modal-body">
-						<% if (validacao.length > 0) { %>
+						<% if (erros.length > 0) { %>
 							<div class="alert alert-danger">
-								<strong>Atenção</strong>
+								<strong>Não foi possível salvar</strong>
 								<ul class="mb-0">
-									<% for (var i = 0; i < validacao.length; i++) { %>
-										<li><%= validacao[i].msg %></li>
+									<% for (var i = 0; i < erros.length; i++) { %>
+										<li><%=erros[i].msg%></li>
 									<% } %>
 								</ul>
 							</div>
@@ -149,75 +215,23 @@
 							</div>
 						</div>
 
-						<div class="row g-2 center mt-3">
-							<div class="col-6 col-sm-4 col-md-3">
-								<img src="images/casa_arryn.jpg" class="img-fluid img-radio tam-img-crud" alt="Casa Arryn">
-								<label class="d-block text-center">
-									<input type="radio" name="casa" value="arryn" required> Casa Arryn
+						<div class="admin-casas-titulo">Casa</div>
+						<div class="admin-casas">
+							<% for (var c = 0; c < opcoesCasas.length; c++) {
+								var opcao = opcoesCasas[c];
+							%>
+								<label class="admin-casa-opcao">
+									<img src="images/casa_<%=opcao.slug%>.jpg" alt="Casa <%=opcao.nome%>">
+									<span>Casa <%=opcao.nome%></span>
+									<input type="radio" name="casa" value="<%=opcao.slug%>" required>
 								</label>
-							</div>
-
-							<div class="col-6 col-sm-4 col-md-3">
-								<img src="images/casa_baratheon.jpg" class="img-fluid img-radio tam-img-crud" alt="Casa Baratheon">
-								<label class="d-block text-center">
-									<input type="radio" name="casa" value="baratheon" required> Casa Baratheon
-								</label>
-							</div>
-
-							<div class="col-6 col-sm-4 col-md-3">
-								<img src="images/casa_greyjoy.jpg" class="img-fluid img-radio tam-img-crud" alt="Casa Greyjoy">
-								<label class="d-block text-center">
-									<input type="radio" name="casa" value="greyjoy" required> Casa Greyjoy
-								</label>
-							</div>
-
-							<div class="col-6 col-sm-4 col-md-3">
-								<img src="images/casa_lannister.jpg" class="img-fluid img-radio tam-img-crud" alt="Casa Lannister">
-								<label class="d-block text-center">
-									<input type="radio" name="casa" value="lannister" required> Casa Lannister
-								</label>
-							</div>
-
-							<div class="col-6 col-sm-4 col-md-3">
-								<img src="images/casa_martell.jpg" class="img-fluid img-radio tam-img-crud" alt="Casa Martell">
-								<label class="d-block text-center">
-									<input type="radio" name="casa" value="martell" required> Casa Martell
-								</label>
-							</div>
-
-							<div class="col-6 col-sm-4 col-md-3">
-								<img src="images/casa_stark.jpg" class="img-fluid img-radio tam-img-crud" alt="Casa Stark">
-								<label class="d-block text-center">
-									<input type="radio" name="casa" value="stark" required> Casa Stark
-								</label>
-							</div>
-
-							<div class="col-6 col-sm-4 col-md-3">
-								<img src="images/casa_targaryen.jpg" class="img-fluid img-radio tam-img-crud" alt="Casa Targaryen">
-								<label class="d-block text-center">
-									<input type="radio" name="casa" value="targaryen" required> Casa Targaryen
-								</label>
-							</div>
-
-							<div class="col-6 col-sm-4 col-md-3">
-								<img src="images/casa_tully.jpg" class="img-fluid img-radio tam-img-crud" alt="Casa Tully">
-								<label class="d-block text-center">
-									<input type="radio" name="casa" value="tully" required> Casa Tully
-								</label>
-							</div>
-
-							<div class="col-6 col-sm-4 col-md-3">
-								<img src="images/casa_tyrell.jpg" class="img-fluid img-radio tam-img-crud" alt="Casa Tyrell">
-								<label class="d-block text-center">
-									<input type="radio" name="casa" value="tyrell" required> Casa Tyrell
-								</label>
-							</div>
+							<% } %>
 						</div>
 					</div>
 
 					<div class="modal-footer">
-						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
-						<button type="submit" class="btn btn-success">Salvar</button>
+						<button type="button" class="btn btn-admin-secundario" data-bs-dismiss="modal">Cancelar</button>
+						<button type="submit" class="btn btn-admin-primary">Criar usuário</button>
 					</div>
 				</form>
 			</div>
@@ -240,6 +254,33 @@
 				document.getElementById('update-nome').value = botao.getAttribute('data-nome') || '';
 				document.getElementById('update-usuario').value = botao.getAttribute('data-usuario') || '';
 			});
+
+			const busca = document.getElementById('busca-usuarios');
+			if (busca) {
+				busca.addEventListener('input', function () {
+					const termo = busca.value.trim().toLowerCase();
+					let visiveis = 0;
+
+					document.querySelectorAll('.admin-linha').forEach(function (linha) {
+						const combina = !termo || (linha.dataset.busca || '').indexOf(termo) !== -1;
+						linha.hidden = !combina;
+						if (combina) {
+							visiveis++;
+						}
+					});
+
+					const vazio = document.getElementById('admin-vazio');
+					if (vazio) {
+						vazio.hidden = visiveis > 0;
+						const texto = vazio.querySelector('p');
+						if (texto) {
+							texto.textContent = termo
+								? 'Nenhum usuário corresponde à busca.'
+								: 'Nenhum usuário cadastrado ainda.';
+						}
+					}
+				});
+			}
 
 			const temValidacao = document.getElementById('tem-validacao');
 			if (temValidacao && temValidacao.value === 'S') {

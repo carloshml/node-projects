@@ -38,7 +38,6 @@
 	const posicaoRanking = Number(rankingInfo.posicao) || 0;
 	const totalRanking = Number(rankingInfo.total) || 0;
 	const liderMoeda = Number(rankingInfo.liderMoeda) || 0;
-	const queryJogo = encodeURIComponent(JSON.stringify(jogo));
 	%>
 
 	<nav class="navbar navbar-home">
@@ -144,20 +143,21 @@
 				</span>
 				<span class="home-card__seta" aria-hidden="true">→</span>
 			</a>
-
-			<a href="/buscarUsuarios?img_casa=<%=casa%>&jogo=<%=queryJogo%>&msg=" id="btn-ver-usuario" class="home-card home-card--usuarios">
-				<span class="home-card__icone"><img src="images/outros/pergaminho.jpg" alt=""></span>
-				<span class="home-card__conteudo">
-					<strong>Ver usuários</strong>
-					<small>Gerencie os senhores e seus jogos.</small>
-				</span>
-				<span class="home-card__seta" aria-hidden="true">→</span>
-			</a>
 		</section>
 
 		<section class="home-dica">
 			<span class="home-dica__marca">Dica do mestre</span>
 			<p>Aldeões ociosos não geram moedas. Envie ordens no painel do jogo e mantenha o povo trabalhando.</p>
+		</section>
+
+		<section class="home-admin">
+			<div class="home-admin__texto">
+				<span class="home-admin__rotulo">Área administrativa</span>
+				<p>Gerenciamento de contas do sistema. Não faz parte do jogo.</p>
+			</div>
+			<a href="/buscarUsuarios" id="btn-ver-usuario" class="home-admin__link">
+				Gerenciar usuários <span aria-hidden="true">→</span>
+			</a>
 		</section>
 	</main>
 </body>

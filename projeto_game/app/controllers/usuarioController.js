@@ -1,4 +1,9 @@
 module.exports.buscarUsuarios = function (application, req, res) {
+    /* URLs antigas carregavam o JSON do jogo; a tela administrativa usa a sessão */
+    if (req.query.jogo || req.query.img_casa || req.query.msg) {
+        res.redirect('/buscarUsuarios');
+        return;
+    }
     listaUsuarios(application, req, res, []);
 }
 
@@ -8,20 +13,12 @@ async function listaUsuarios(application, req, res, errors) {
         var UsuarioDAO = new application.app.models.UsuariosDAO(connection);
         const result = await UsuarioDAO.listarUsuarios();
 
-        const opcoes = Object.assign({}, req.query, {
+        res.render('usuariosSistema', {
             resultados: result,
-            validacao: errors
+            validacao: errors,
+            nome: req.session.nome,
+            img_casa: req.session.casa
         });
-
-        if (typeof opcoes.jogo === 'string') {
-            try {
-                opcoes.jogo = JSON.parse(opcoes.jogo);
-            } catch (erro) {
-                /* mantém a string se não for um JSON válido */
-            }
-        }
-
-        res.render('usuariosSistema', opcoes);
     } else {
         var errors = [
             { msg: 'Você não tem acesso a essa área' }
@@ -50,16 +47,20 @@ module.exports.autenticar = function (application, req, res, validationResult) {
 }
 
 module.exports.atualizarUsuario = async function (application, req, res, validationResult) {
+    if (!req.session.autorizado) {
+        res.redirect('/');
+        return;
+    }
     var dadosForm = req.body;
     var errors = validationResult(req);
     if (!errors.isEmpty()) {
-        res.redirect('/buscarUsuarios?' + (dadosForm.id_jogo || ''));
+        res.redirect('/buscarUsuarios');
         return;
     }
     var connection = application.config.dbConection;
     var UsuariosDAO = new application.app.models.UsuariosDAO(connection);
     if (await UsuariosDAO.atualizarUsuario(dadosForm, req)) {
-        res.redirect('/buscarUsuarios?' + dadosForm.id_jogo);
+        res.redirect('/buscarUsuarios');
     }
 }
 
@@ -94,6 +95,10 @@ module.exports.inserirUsuario = async function (application, req, res, validatio
 }
 
 module.exports.inserirUsuarioCrud = async function (application, req, res, validationResult) {
+    if (!req.session.autorizado) {
+        res.redirect('/');
+        return;
+    }
     var errors = validationResult(req);
     if (!errors.isEmpty()) {
         console.log('errors  ::: ', errors);
