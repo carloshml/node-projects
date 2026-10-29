@@ -8,6 +8,7 @@
 
 	<link rel="stylesheet" href="css/bootstrap.min.css">
 	<link href="css/style.css" rel="stylesheet">
+	<script src="jsView/som.js" defer></script>
 	<script src="jsView/jogoView.js" defer></script>
 </head>
 
@@ -19,45 +20,81 @@
 					class="display-logo align-text-top" alt="">
 				Este é seu jogo, <%=jogo.nome%>!
 			</a>
-			<a href="/sair" id="btn-sair" class="btn btn-info">Sair</a>
+
+			<div class="d-flex align-items-center gap-2">
+				<button id="btn-som" type="button" class="btn btn-sm btn-outline-secondary"
+					aria-pressed="false">Som: off</button>
+				<a href="/sair" id="btn-sair" class="btn btn-info btn-sm">Sair</a>
+			</div>
 		</div>
 	</nav>
 
-	<section>
-		<div class="row">
-			<div class="col-sm-3 casa">
-				<img src="images/casa_<%=img_casa%>.jpg" alt="Casa <%=img_casa%>" />
+	<div class="hud-jogo">
+		<div class="hud-grupo hud-grupo--recursos">
+			<div class="hud-item" title="Moedas">
+				<img src="images/icones/moeda.svg" alt="" class="hud-icone">
+				<span class="hud-rotulo">moedas</span>
+				<span class="hud-valor" id="hud-moeda"><%=jogo.moeda%></span>
 			</div>
 
-			<div class="col-sm-9">
-				<div class="row barra-superior">
-					<div class="col-sm-2">
-						<img src="images/habilidades/temor.jpg" title="Temor" alt="Temor" />
-						<div>Temor</div>
-						<span><%=jogo.temor%></span>
-					</div>
+			<div class="hud-item" title="Aldeões livres / total">
+				<img src="images/icones/aldeao.svg" alt="" class="hud-icone">
+				<span class="hud-rotulo">aldeões</span>
+				<span class="hud-valor" id="hud-suditos-livres"><%=jogo.suditos - jogo.suditosTrabalhando%></span>
+				<span class="hud-sep">/</span>
+				<span class="hud-valor" id="hud-suditos-total"><%=jogo.suditos%></span>
+				<span class="hud-extra" id="hud-suditos-trabalhando"><%=jogo.suditosTrabalhando%> trab.</span>
+			</div>
 
-					<div class="col-sm-2">
-						<img src="images/habilidades/sabedoria.jpg" title="Sabedoria" alt="Sabedoria" />
-						<div>Sabedoria</div>
-						<span><%=jogo.sabedoria%></span>
-					</div>
+			<div class="hud-item" title="Madeira">
+				<img src="images/icones/madeira.svg" alt="" class="hud-icone">
+				<span class="hud-rotulo">madeira</span>
+				<span class="hud-valor" id="hud-madeira"><%=jogo.recursos.madeira || 0%></span>
+			</div>
 
-					<div class="col-sm-2">
-						<img src="images/habilidades/comercio.jpg" title="Comércio" alt="Comércio" />
-						<div>comércio</div>
-						<span><%=jogo.comercio%></span>
-					</div>
+			<div class="hud-item" title="Comida">
+				<img src="images/icones/comida.svg" alt="" class="hud-icone">
+				<span class="hud-rotulo">comida</span>
+				<span class="hud-valor" id="hud-comida"><%=jogo.recursos.comida || 0%></span>
+			</div>
 
-					<div class="col-sm-2">
-						<img src="images/habilidades/magia.jpg" title="Magia" alt="Magia" />
-						<div>magia</div>
-						<span><%=jogo.magia%></span>
-					</div>
-				</div>
+			<div class="hud-item" title="Ferro">
+				<img src="images/icones/ferro.svg" alt="" class="hud-icone">
+				<span class="hud-rotulo">ferro</span>
+				<span class="hud-valor" id="hud-ferro"><%=jogo.recursos.ferro || 0%></span>
 			</div>
 		</div>
 
+		<span class="hud-divisor" aria-hidden="true"></span>
+
+		<div class="hud-grupo hud-grupo--habilidades">
+			<div class="hud-item hud-item--habilidade" title="Temor">
+				<img src="images/habilidades/temor.jpg" alt="" class="hud-icone hud-icone--redondo">
+				<span class="hud-rotulo">temor</span>
+				<span class="hud-valor" id="valor-temor"><%=jogo.temor%></span>
+			</div>
+
+			<div class="hud-item hud-item--habilidade" title="Sabedoria">
+				<img src="images/habilidades/sabedoria.jpg" alt="" class="hud-icone hud-icone--redondo">
+				<span class="hud-rotulo">sabedoria</span>
+				<span class="hud-valor" id="valor-sabedoria"><%=jogo.sabedoria%></span>
+			</div>
+
+			<div class="hud-item hud-item--habilidade" title="Comércio">
+				<img src="images/habilidades/comercio.jpg" alt="" class="hud-icone hud-icone--redondo">
+				<span class="hud-rotulo">comércio</span>
+				<span class="hud-valor" id="valor-comercio"><%=jogo.comercio%></span>
+			</div>
+
+			<div class="hud-item hud-item--habilidade" title="Magia">
+				<img src="images/habilidades/magia.jpg" alt="" class="hud-icone hud-icone--redondo">
+				<span class="hud-rotulo">magia</span>
+				<span class="hud-valor" id="valor-magia"><%=jogo.magia%></span>
+			</div>
+		</div>
+	</div>
+
+	<section>
 		<div class="row">
 			<div class="col-sm-1"></div>
 
@@ -84,32 +121,19 @@
 		</div>
 	</section>
 
-	<div class="row barra-inferior">
-		<div class="col-sm-2">
-			<img src="images/outros/suditos.jpg" title="suditos" alt="suditos" id="btn-suditos"
-				onclick="verSuditos()" />
-			<div>Total Suditos</div>
-			<span><%=jogo.suditos%></span>
-		</div>
+	<div class="barra-inferior">
+		<div class="toolbar-jogo">
+			<button type="button" class="toolbar-botao" onclick="verSuditos()">
+				<img src="images/outros/suditos.jpg" alt=""> Ordenar
+			</button>
 
-		<div class="col-sm-2">
-			<img src="images/outros/suditos.jpg" title="suditos" alt="suditos"
-				onclick="verSuditos()" />
-			<div>Suditos Trabalhando</div>
-			<span id="suditosTrabalhando"><%=jogo.suditosTrabalhando%></span>
-		</div>
+			<button type="button" class="toolbar-botao" onclick="irParaCeleiro()">
+				<img src="images/icones/madeira.svg" alt=""> Celeiro
+			</button>
 
-		<div class="col-sm-2">
-			<img src="images/outros/pergaminho.jpg" title="Pergaminhos" alt="Pergaminhos" id="btn-pergaminhos"
-				onclick="verPergaminhos()" />
-			<div>Ver Pergaminhos</div>
-		</div>
-
-		<div class="col-sm-4"></div>
-
-		<div class="col-sm-2">
-			<img src="images/outros/moeda.jpg" title="Moeda" alt="Moeda" />
-			<span id="moeda"><%=jogo.moeda%></span>
+			<button type="button" class="toolbar-botao" onclick="verPergaminhos()">
+				<img src="images/outros/pergaminho.jpg" alt=""> Pergaminhos
+			</button>
 		</div>
 	</div>
 

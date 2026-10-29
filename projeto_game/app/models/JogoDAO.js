@@ -62,17 +62,22 @@ function resultadoDaAcao(acao) {
 
     if (tipo === 5) {
         const fera = obterFera(acao.fera);
+        const ataque = quantidade * PODER_ALDEAO;
+
         if (!fera) {
-            return { ganhos: {}, vitoria: false, fera: null };
+            return { ganhos: {}, vitoria: false, fera: null, ataque: ataque, vida: null, minimo: null };
         }
 
-        const vitoria = (quantidade * PODER_ALDEAO) >= fera.vida;
+        const vitoria = ataque >= fera.vida;
         return {
             ganhos: vitoria
                 ? { moeda: fera.recompensa, temor: Math.ceil(fera.vida / 3) }
                 : {},
             vitoria: vitoria,
-            fera: fera.id
+            fera: fera.id,
+            ataque: ataque,
+            vida: fera.vida,
+            minimo: fera.minimo
         };
     }
 
@@ -311,6 +316,9 @@ JogoDAO.prototype.atualizarAcoesDeJogo = async function (req, res) {
                 ganhos: ganhos,
                 vitoria: resultado.vitoria,
                 fera: resultado.fera,
+                ataque: resultado.ataque,
+                vida: resultado.vida,
+                minimo: resultado.minimo,
                 pendente: pendente
             });
         }

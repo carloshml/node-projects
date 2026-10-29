@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-labelledby="icoAldeao">
+  <title id="icoAldeao">Aldeão</title>
+  <circle cx="32" cy="19" r="11" fill="#e8d3ad" stroke="#5a3b22" stroke-width="3"/>
+  <path d="M12 56 C12 40 21 33 32 33 C43 33 52 40 52 56 Z" fill="#8a5a2b" stroke="#5a3b22" stroke-width="3"/>
+  <path d="M24 35 L32 44 L40 35" fill="none" stroke="#e8d3ad" stroke-width="3" stroke-linecap="round"/>
+</svg>

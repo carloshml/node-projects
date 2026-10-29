@@ -1,49 +1,61 @@
 
 <div id="aldecoes">
-	<h3>Súdito</h3>
+	<form class="form-cadastro form-ordens" action="/gerarOrdemSuditos" method="post">
+		<input type="hidden" name="jogo" id="jogo" value="<%=JSON.stringify(jogo)%>">
+		<input type="hidden" name="acao" id="acao" value="">
+		<input type="hidden" name="quantidade" id="quantidade" value="1">
 
-	<form class="form-cadastro" action="/gerarOrdemSuditos" method="post">
-		<input type="hidden" name="jogo" class="form-control" id="jogo" value="<%=JSON.stringify(jogo)%>">
+		<h3>Escolha a ordem</h3>
 
-		<div class="row g-2">
-			<div class="col-12 col-sm-9">
-				<div class="mb-3">
-					<label for="acao" class="form-label">Ação</label>
-					<select name="acao" id="acao" class="form-select">
-						<option value="">-- Escolha a ação</option>
-						<option value="1">Coletar recursos (2 moedas por aldeão, 10s cada)</option>
-						<option value="2">Enforcar aldeão (3 moedas por aldeão, 2min cada)</option>
-						<option value="3">Ensinar história (1 moeda por aldeão, 3min cada)</option>
-						<option value="4">Ensinar magia (1 moeda por aldeão, 4min cada)</option>
-						<option value="5">Matar a fera (5 moedas por aldeão, 30s cada) - fera surpresa, mais aldeões = mais força</option>
-					</select>
-				</div>
-			</div>
+		<div class="cards-acoes">
+			<button type="button" class="card-acao" data-acao="1" data-custo="2" data-duracao="10000">
+				<img src="images/walk.gif" alt="" loading="lazy">
+				<span class="card-acao__titulo">Coletar</span>
+				<span class="card-acao__info">2 moedas · 10s/aldeão</span>
+			</button>
 
-			<div class="col-12 col-sm-3">
-				<div class="mb-3">
-					<label for="quantidade" class="form-label">Quantidade</label>
-					<input type="number" min="1" name="quantidade" class="form-control" id="quantidade"
-						placeholder="Qtd." required>
-				</div>
-			</div>
+			<button type="button" class="card-acao" data-acao="2" data-custo="3" data-duracao="120000">
+				<img src="images/dead.gif" alt="" loading="lazy">
+				<span class="card-acao__titulo">Enforcar</span>
+				<span class="card-acao__info">3 moedas · 2min/aldeão</span>
+			</button>
 
-			<div class="col-12 col-sm-4">
-				<div class="mb-3">
-					<button type="submit" class="btn btn-primary">Ordenar</button>
-				</div>
-			</div>
+			<button type="button" class="card-acao" data-acao="3" data-custo="1" data-duracao="180000">
+				<img src="images/book.gif" alt="" loading="lazy">
+				<span class="card-acao__titulo">História</span>
+				<span class="card-acao__info">1 moeda · 3min/aldeão</span>
+			</button>
+
+			<button type="button" class="card-acao" data-acao="4" data-custo="1" data-duracao="240000">
+				<img src="images/fire.gif" alt="" loading="lazy">
+				<span class="card-acao__titulo">Magia</span>
+				<span class="card-acao__info">1 moeda · 4min/aldeão</span>
+			</button>
+
+			<button type="button" class="card-acao card-acao--full" data-acao="5" data-custo="5" data-duracao="30000">
+				<img src="images/feras/fera.svg" alt="" loading="lazy">
+				<span class="card-acao__titulo">Matar a fera</span>
+				<span class="card-acao__info">5 moedas · 30s/aldeão · fera surpresa</span>
+			</button>
 		</div>
 
-		<hr />
-
-		<div class="row">
-			<div class="col-12">
-				<span>Senhor, você possui
-					<span id="numero-de-suditos-livres"></span> súdito(s) desocupados e
-					<span id="numero-de-suditos-trab"></span> súdito(s) em atividade.
-				</span>
+		<div id="painel-ordem" class="painel-ordem d-none">
+			<div class="d-flex justify-content-between align-items-center mb-1">
+				<label for="qtd-range" class="form-label mb-0">Aldeões enviados</label>
+				<strong><span id="qtd-valor">1</span> / <span id="qtd-max">10</span></strong>
 			</div>
+
+			<input type="range" class="form-range" id="qtd-range" min="1" max="10" value="1">
+
+			<div id="ordem-resumo" class="ordem-resumo"></div>
+
+			<button type="submit" class="btn btn-primary w-100" id="btn-enviar-ordem">Enviar ordem</button>
 		</div>
+
+		<p class="form-text mb-2">
+			Cada aldeão vale 5 de ataque. As feras têm entre 20 e 50 de vida; enviar 10 aldeões vence qualquer fera.
+		</p>
+
+		<div id="ordem-status" class="ordem-status"></div>
 	</form>
 </div>

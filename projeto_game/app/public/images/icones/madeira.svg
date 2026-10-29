@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-labelledby="icoMadeira">
+  <title id="icoMadeira">Madeira</title>
+  <g stroke="#3b2312" stroke-width="2">
+    <rect x="10" y="18" width="44" height="12" rx="6" fill="#8a5a2b"/>
+    <rect x="10" y="32" width="44" height="12" rx="6" fill="#a06a36"/>
+    <ellipse cx="54" cy="24" rx="4" ry="6" fill="#d9a86b"/>
+    <ellipse cx="54" cy="38" rx="4" ry="6" fill="#d9a86b"/>
+    <path d="M54 21 a4 4 0 1 0 0 6" fill="none" stroke="#7a4a22" stroke-width="1.5"/>
+    <path d="M54 35 a4 4 0 1 0 0 6" fill="none" stroke="#7a4a22" stroke-width="1.5"/>
+  </g>
+</svg>
