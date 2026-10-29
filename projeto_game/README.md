@@ -10,9 +10,13 @@ Jogo web de estratégia ambientado em **Game of Thrones**, feito com Node.js, Ex
 
 - Cadastro e login de jogadores, com escolha de casa.
 - Painel com moedas, aldeões, recursos e habilidades (temor, sabedoria, comércio e magia).
+- HUD animado com ícones de moedas, aldeões, madeira, comida e ferro.
+- Cards de ação com custo, duração e previsão de recompensa.
+- Contadores animados e deltas flutuantes de ganho/perda.
 - Ordens com tempo real: coleta, enforcamento, treinamento de história, treinamento de magia e caçada a feras.
-- Barra de progresso e atualização automática das ordens em andamento.
-- Recompensas ao concluir cada ordem, com modal central de resultado.
+- Barra de progresso, vida da fera, dano flutuante e efeitos de impacto na batalha.
+- Recompensas ao concluir cada ordem, com modal central, loot reveal e contagem animada.
+- Efeitos sonoros e ambiente opcionais via Web Audio, com botão de som.
 - Celeiro para vender madeira, comida e ferro por moedas.
 - Cinco feras com vida, recompensa e imagem próprias; a fera é sorteada pelo jogo.
 - Ranking de jogadores por moedas.
@@ -166,7 +170,7 @@ projeto_game/
 │   └── public/
 │       ├── css/              # estilo do jogo
 │       ├── js/               # Bootstrap 5 bundle local
-│       ├── jsView/           # lógica de tela (jogoView.js)
+│       ├── jsView/           # lógica de tela e efeitos sonoros
 │       └── images/           # mapa, casas, ícones e imagens das feras
 ├── package.json
 └── README.md
