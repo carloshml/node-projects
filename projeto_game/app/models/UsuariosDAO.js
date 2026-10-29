@@ -143,7 +143,31 @@ UsuarioDAO.prototype.irParaHome = async function (res, usuario, casa, msg, req) 
 
         result[0].nome = req.session.nome;
         result[0]._id = req.session._id;
-        res.render('home', { img_casa: casa, jogo: result[0], msg: msg });
+
+        const jogos = await conexao.db.collection("jogo")
+            .find({}, { projection: { moeda: 1, idUsuario: 1, usuario: 1 } })
+            .sort({ moeda: -1 })
+            .toArray();
+
+        const indice = jogos.findIndex(function (jogo) {
+            return String(jogo.idUsuario) === String(req.session._id);
+        });
+
+        let liderNome = null;
+        if (jogos[0]) {
+            const lider = await conexao.db.collection("usuarios")
+                .findOne({ _id: new ObjectId(jogos[0].idUsuario) });
+            liderNome = (lider && lider.nome) || jogos[0].usuario || null;
+        }
+
+        const ranking = {
+            posicao: indice + 1,
+            total: jogos.length,
+            liderNome: liderNome,
+            liderMoeda: jogos[0] ? Number(jogos[0].moeda) || 0 : 0
+        };
+
+        res.render('home', { img_casa: casa, jogo: result[0], msg: msg, ranking: ranking });
     } catch (error) {
         console.log('  algum erro foi encontrado  ', error);
         const errors = [

@@ -34,6 +34,10 @@
 	const madeira = Number(recursos.madeira) || 0;
 	const comida = Number(recursos.comida) || 0;
 	const ferro = Number(recursos.ferro) || 0;
+	const rankingInfo = (typeof ranking !== 'undefined' && ranking) ? ranking : {};
+	const posicaoRanking = Number(rankingInfo.posicao) || 0;
+	const totalRanking = Number(rankingInfo.total) || 0;
+	const liderMoeda = Number(rankingInfo.liderMoeda) || 0;
 	const queryJogo = encodeURIComponent(JSON.stringify(jogo));
 	%>
 
@@ -116,20 +120,27 @@
 		</section>
 
 		<section class="home-acoes" aria-label="O que você quer fazer">
+			<a href="/verRanking" id="btn-ver-ranking" class="home-card home-card--ranking home-card--destaque">
+				<span class="home-card__faixa">Competição</span>
+				<span class="home-card__icone home-card__icone--destaque"><img src="images/icones/moeda.svg" alt=""></span>
+				<span class="home-card__conteudo">
+					<strong>Ranking dos Sete Reinos</strong>
+					<small>O trono não espera. Veja quem está à sua frente e dispute o topo.</small>
+					<% if (totalRanking > 0) { %>
+						<span class="home-ranking__dados">
+							<span>Sua posição <strong><%=posicaoRanking > 0 ? '#' + posicaoRanking : '—'%></strong> de <strong><%=totalRanking%></strong></span>
+							<span>Líder <strong><%=rankingInfo.liderNome || '—'%></strong> · <%=liderMoeda.toLocaleString('pt-BR')%> moedas</span>
+						</span>
+					<% } %>
+				</span>
+				<span class="home-card__seta" aria-hidden="true">→</span>
+			</a>
+
 			<a href="/jogo" class="home-card home-card--jogar">
 				<span class="home-card__icone"><img src="images/icones/aldeao.svg" alt=""></span>
 				<span class="home-card__conteudo">
 					<strong>Jogar</strong>
 					<small>Envie ordens, colete recursos e cace as feras.</small>
-				</span>
-				<span class="home-card__seta" aria-hidden="true">→</span>
-			</a>
-
-			<a href="/verRanking" id="btn-ver-ranking" class="home-card home-card--ranking">
-				<span class="home-card__icone"><img src="images/icones/moeda.svg" alt=""></span>
-				<span class="home-card__conteudo">
-					<strong>Ranking</strong>
-					<small>Veja quem tem mais moedas nos Sete Reinos.</small>
 				</span>
 				<span class="home-card__seta" aria-hidden="true">→</span>
 			</a>
