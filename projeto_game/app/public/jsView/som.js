@@ -6,9 +6,10 @@
     let botao = null;
 
     try {
-        somAtivo = localStorage.getItem(CHAVE) === '1';
+        const salvo = localStorage.getItem(CHAVE);
+        somAtivo = salvo === null ? true : salvo === '1';
     } catch (erro) {
-        somAtivo = false;
+        somAtivo = true;
     }
 
     function garantirContexto() {
@@ -219,6 +220,34 @@
             tom(392, 0, 0.18, 'sawtooth', 0.035);
             tom(329.63, 0.16, 0.22, 'sawtooth', 0.035);
             tom(261.63, 0.36, 0.4, 'sine', 0.04);
+        },
+
+        ordem: function () {
+            if (!somAtivo) {
+                return;
+            }
+            /* sequência marcial de ~4s, grave e sem notas alegres */
+            tom(73.42, 0, 3.8, 'sine', 0.03);          // drone grave
+            tom(73.42, 0, 0.25, 'sine', 0.06);         // tambor
+            tom(146.83, 0, 0.35, 'triangle', 0.05);    // D3
+            tom(174.61, 0.45, 0.35, 'triangle', 0.05); // F3
+            tom(110, 0.95, 0.5, 'sine', 0.055);        // A2
+            tom(73.42, 1.1, 0.25, 'sine', 0.06);       // tambor
+            tom(146.83, 1.8, 0.35, 'triangle', 0.05);  // D3
+            tom(174.61, 2.25, 0.35, 'triangle', 0.05); // F3
+            tom(73.42, 2.1, 0.25, 'sine', 0.06);       // tambor
+            tom(110, 2.75, 0.9, 'sine', 0.055);        // A2
+            tom(73.42, 3.1, 0.3, 'sine', 0.06);        // tambor final
+            ruido(0.08, 0.02);
+        },
+
+        conclusao: function () {
+            if (!somAtivo) {
+                return;
+            }
+            tom(1046.5, 0, 0.12, 'sine', 0.05);
+            tom(1318.5, 0.13, 0.16, 'sine', 0.05);
+            tom(1568, 0.3, 0.38, 'sine', 0.045);
         },
 
         recompensa: function () {

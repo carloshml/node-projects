@@ -38,6 +38,9 @@ const ICONES_GANHO = {
 };
 const RECURSO_LABEL = { madeira: 'Madeira', comida: 'Comida', ferro: 'Ferro' };
 const PRECOS_PADRAO = { madeira: 1, comida: 2, ferro: 3 };
+const DURACAO_DELTA = 2000;
+const PAUSA_ANTES_MODAL = 1400;
+const ATRASO_ENVIO_ORDEM = 4050;
 
 function formatarDuracao(segundos) {
     const total = Math.max(0, Math.ceil(segundos));
@@ -57,30 +60,51 @@ function tocarSom(nome) {
 
 /* ----------------------------- números animados ----------------------------- */
 
+function pausa(ms) {
+    return new Promise(function (resolver) {
+        setTimeout(resolver, ms);
+    });
+}
+
 function animarNumero(elemento, de, para, duracao) {
     if (!elemento) {
-        return;
+        return Promise.resolve();
     }
     if (elemento._animacao) {
         cancelAnimationFrame(elemento._animacao);
+        if (elemento._resolverAnimacao) {
+            elemento._resolverAnimacao();
+            elemento._resolverAnimacao = null;
+        }
+    }
+
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        elemento.textContent = para;
+        return Promise.resolve();
     }
 
     const inicio = performance.now();
     const tempo = duracao || 650;
 
-    function passo(agora) {
-        const fracao = Math.min(1, (agora - inicio) / tempo);
-        const suave = 1 - Math.pow(1 - fracao, 3);
-        elemento.textContent = Math.round(de + (para - de) * suave);
-        if (fracao < 1) {
-            elemento._animacao = requestAnimationFrame(passo);
-        } else {
-            elemento.textContent = para;
-            elemento._animacao = null;
-        }
-    }
+    return new Promise(function (resolver) {
+        elemento._resolverAnimacao = resolver;
 
-    elemento._animacao = requestAnimationFrame(passo);
+        function passo(agora) {
+            const fracao = Math.min(1, (agora - inicio) / tempo);
+            const suave = 1 - Math.pow(1 - fracao, 3);
+            elemento.textContent = Math.round(de + (para - de) * suave);
+            if (fracao < 1) {
+                elemento._animacao = requestAnimationFrame(passo);
+            } else {
+                elemento.textContent = para;
+                elemento._animacao = null;
+                elemento._resolverAnimacao = null;
+                resolver();
+            }
+        }
+
+        elemento._animacao = requestAnimationFrame(passo);
+    });
 }
 
 function mostrarDelta(elemento, delta, tipo) {
@@ -99,12 +123,12 @@ function mostrarDelta(elemento, delta, tipo) {
     document.body.appendChild(etiqueta);
     setTimeout(function () {
         etiqueta.remove();
-    }, 1000);
+    }, DURACAO_DELTA);
 }
 
 function atualizarValor(elemento, valor, tipo, comDelta) {
     if (!elemento || valor === undefined || valor === null || isNaN(Number(valor))) {
-        return;
+        return Promise.resolve();
     }
 
     const novo = Number(valor);
@@ -117,14 +141,14 @@ function atualizarValor(elemento, valor, tipo, comDelta) {
         elemento.textContent = novo;
         elemento.dataset.valor = novo;
         elemento.dataset.iniciado = '1';
-        return;
+        return Promise.resolve();
     }
 
     if (anterior === novo) {
-        return;
+        return Promise.resolve();
     }
 
-    animarNumero(elemento, exibido, novo);
+    const animacao = animarNumero(elemento, exibido, novo);
     elemento.classList.remove('valor-pulso');
     void elemento.offsetWidth;
     elemento.classList.add('valor-pulso');
@@ -136,6 +160,7 @@ function atualizarValor(elemento, valor, tipo, comDelta) {
         mostrarDelta(elemento, novo - anterior, tipo);
     }
     elemento.dataset.valor = novo;
+    return animacao;
 }
 
 /* ------------------------------- modal ------------------------------------ */
@@ -334,23 +359,24 @@ function atualizarMoeda() {
     }
 }
 
-function atualizarHud() {
+async function atualizarHud() {
     if (!usuario.jogo) {
         return;
     }
     const jogo = usuario.jogo;
 
-    atualizarValor(document.getElementById('hud-moeda'), jogo.moeda, 'moeda');
-    atualizarValor(document.getElementById('hud-suditos-livres'), jogo.suditos - jogo.suditosTrabalhando, 'aldeao');
-    atualizarValor(document.getElementById('hud-suditos-total'), jogo.suditos, 'aldeao');
-    atualizarValor(document.getElementById('hud-madeira'), (jogo.recursos && jogo.recursos.madeira) || 0, 'recurso');
-    atualizarValor(document.getElementById('hud-comida'), (jogo.recursos && jogo.recursos.comida) || 0, 'recurso');
-    atualizarValor(document.getElementById('hud-ferro'), (jogo.recursos && jogo.recursos.ferro) || 0, 'recurso');
-
-    atualizarValor(document.getElementById('valor-temor'), jogo.temor, 'habilidade');
-    atualizarValor(document.getElementById('valor-sabedoria'), jogo.sabedoria, 'habilidade');
-    atualizarValor(document.getElementById('valor-comercio'), jogo.comercio, 'habilidade');
-    atualizarValor(document.getElementById('valor-magia'), jogo.magia, 'habilidade');
+    const promessas = [
+        atualizarValor(document.getElementById('hud-moeda'), jogo.moeda, 'moeda'),
+        atualizarValor(document.getElementById('hud-suditos-livres'), jogo.suditos - jogo.suditosTrabalhando, 'aldeao'),
+        atualizarValor(document.getElementById('hud-suditos-total'), jogo.suditos, 'aldeao'),
+        atualizarValor(document.getElementById('hud-madeira'), (jogo.recursos && jogo.recursos.madeira) || 0, 'recurso'),
+        atualizarValor(document.getElementById('hud-comida'), (jogo.recursos && jogo.recursos.comida) || 0, 'recurso'),
+        atualizarValor(document.getElementById('hud-ferro'), (jogo.recursos && jogo.recursos.ferro) || 0, 'recurso'),
+        atualizarValor(document.getElementById('valor-temor'), jogo.temor, 'habilidade'),
+        atualizarValor(document.getElementById('valor-sabedoria'), jogo.sabedoria, 'habilidade'),
+        atualizarValor(document.getElementById('valor-comercio'), jogo.comercio, 'habilidade'),
+        atualizarValor(document.getElementById('valor-magia'), jogo.magia, 'habilidade')
+    ];
 
     const trabalhando = document.getElementById('hud-suditos-trabalhando');
     if (trabalhando) {
@@ -359,8 +385,10 @@ function atualizarHud() {
 
     const antigo = document.getElementById('moeda');
     if (antigo) {
-        atualizarValor(antigo, jogo.moeda, 'moeda');
+        promessas.push(atualizarValor(antigo, jogo.moeda, 'moeda'));
     }
+
+    await Promise.all(promessas);
 }
 
 function atualizarSuditos() {
@@ -430,7 +458,7 @@ function montarCeleiro() {
     atualizarCeleiro();
 }
 
-function atualizarCeleiro() {
+async function atualizarCeleiro() {
     const container = document.getElementById('lista-recursos');
     if (!container || !usuario.jogo) {
         return;
@@ -443,6 +471,7 @@ function atualizarCeleiro() {
     const recursos = usuario.jogo.recursos || {};
     const precos = usuario.jogo.precos || PRECOS_PADRAO;
     const comercio = Number(usuario.jogo.comercio) || 0;
+    const promessas = [];
 
     container.querySelectorAll('.recurso-linha').forEach(function (linha) {
         const recurso = linha.dataset.recurso;
@@ -451,7 +480,7 @@ function atualizarCeleiro() {
         const input = linha.querySelector('.recurso-input');
         const botao = linha.querySelector('.btn-vender');
 
-        atualizarValor(linha.querySelector('.recurso-qtd'), quantidade, 'recurso', false);
+        promessas.push(atualizarValor(linha.querySelector('.recurso-qtd'), quantidade, 'recurso', false));
         linha.querySelector('.recurso-preco').textContent = preco + ' moeda(s)/un';
         input.max = quantidade > 0 ? quantidade : 1;
 
@@ -470,6 +499,8 @@ function atualizarCeleiro() {
         }
         ultimosMaximos[recurso] = quantidade;
     });
+
+    await Promise.all(promessas);
 }
 
 async function venderRecurso(recurso, linha) {
@@ -505,9 +536,11 @@ async function venderRecurso(recurso, linha) {
 
         usuario.jogo.moeda = dados.moeda;
         usuario.jogo.recursos = dados.recursos;
-        atualizarHud();
-        atualizarCeleiro();
+        await Promise.all([atualizarHud(), atualizarCeleiro()]);
         tocarSom('moeda');
+
+        /* espera o contador terminar antes de abrir o modal */
+        await pausa(PAUSA_ANTES_MODAL);
         mostrarMensagem('acerto', 'Vendidos ' + quantidade + ' de ' + (RECURSO_LABEL[recurso] || recurso).toLowerCase() + ' por ' + dados.ganho + ' moeda(s).', 'VENDA REALIZADA');
     } catch (erro) {
         console.error('Falha ao vender recurso:', erro);
@@ -668,7 +701,26 @@ function inicializarFormularioOrdens() {
             evento.preventDefault();
             return;
         }
-        tocarSom('clique');
+
+        if (form.dataset.enviando === '1') {
+            evento.preventDefault();
+            return;
+        }
+        form.dataset.enviando = '1';
+
+        evento.preventDefault();
+        const botao = document.getElementById('btn-enviar-ordem');
+        if (botao) {
+            botao.disabled = true;
+            botao.textContent = 'Enviando...';
+        }
+
+        tocarSom('ordem');
+        const somLigado = window.SomJogo && typeof window.SomJogo.estaAtivo === 'function' && window.SomJogo.estaAtivo();
+        const atraso = somLigado ? ATRASO_ENVIO_ORDEM : 0;
+        setTimeout(function () {
+            HTMLFormElement.prototype.submit.call(form);
+        }, atraso);
     });
 
     atualizarFormularioOrdens();
@@ -694,7 +746,13 @@ function renderizarAcoes() {
     }
 
     if (!acoes.length) {
-        container.innerHTML = '<h3>Atividades:</h3><p class="sem-atividades">Nenhuma atividade em andamento.</p>';
+        container.innerHTML = '<h3>Atividades:</h3>' +
+            '<div class="sem-atividades">' +
+            '<img class="sem-atividades__icone" src="images/outros/pergaminho.jpg" alt="">' +
+            '<p class="sem-atividades__titulo">Ninguém está trabalhando.</p>' +
+            '<p class="sem-atividades__texto">Seu povo está ocioso — e cada minuto parado é moeda que não entra. Dê uma ordem e coloque os aldeões para trabalhar.</p>' +
+            '<button type="button" class="btn btn-warning btn-sm" onclick="verSuditos()">Dar uma ordem</button>' +
+            '</div>';
         return;
     }
 
@@ -948,10 +1006,10 @@ async function buscaJogoUsuario() {
     }
 
     usuario = dados;
-    atualizarHud();
+    const animacoes = Promise.all([atualizarHud(), atualizarCeleiro()]);
     atualizarSuditos();
-    atualizarCeleiro();
     atualizarFormularioOrdens();
+    await animacoes;
 }
 
 function efeitoBatalha(derrota) {
@@ -987,6 +1045,7 @@ async function sincronizar() {
         }
 
         const dados = await resposta.json();
+        let resultadoModal = null;
 
         if (dados && dados.concluidas && dados.concluidas.length) {
             const batalhas = dados.concluidas.filter(function (concluida) {
@@ -1024,19 +1083,39 @@ async function sincronizar() {
                 }
             }
 
-            if (batalhas.length) {
-                efeitoBatalha(todasDerrotas);
-                tocarSom('batalha');
-                tocarSom(todasDerrotas ? 'derrota' : 'vitoria');
-            } else if (loot) {
-                tocarSom('recompensa');
-            }
+            resultadoModal = {
+                tipo: tipo,
+                titulo: titulo,
+                html: imagem + loot + corpo,
+                temBatalha: batalhas.length > 0,
+                derrota: todasDerrotas
+            };
 
-            mostrarMensagem(tipo, imagem + loot + corpo, titulo);
+            /* fecha um modal antigo para a animação dos recursos ficar visível */
+            apagaMensagem();
         }
 
         await buscaJogoUsuario();
-        await carregarAcoes();
+        try {
+            await carregarAcoes();
+        } catch (erroAcoes) {
+            console.error('Falha ao recarregar as atividades:', erroAcoes);
+        }
+
+        if (resultadoModal) {
+            /* deixa o contador e os deltas visíveis antes de cobrir a tela */
+            await pausa(PAUSA_ANTES_MODAL);
+
+            if (resultadoModal.temBatalha) {
+                efeitoBatalha(resultadoModal.derrota);
+                tocarSom('batalha');
+                tocarSom(resultadoModal.derrota ? 'derrota' : 'vitoria');
+            } else {
+                tocarSom('conclusao');
+            }
+
+            mostrarMensagem(resultadoModal.tipo, resultadoModal.html, resultadoModal.titulo);
+        }
     } catch (erro) {
         console.error('Falha ao sincronizar as ações:', erro);
     } finally {

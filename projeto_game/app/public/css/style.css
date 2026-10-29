@@ -431,8 +431,37 @@ img {
 }
 
 .sem-atividades {
+  padding: 22px 18px;
+  border: 1px dashed rgba(128, 39, 39, 0.35);
+  border-radius: 8px;
+  background: rgba(128, 39, 39, 0.04);
+  text-align: center;
+}
+
+.sem-atividades__icone {
+  width: 44px;
+  height: 44px;
+  margin-bottom: 8px;
+  border-radius: 50%;
+  opacity: 0.85;
+  object-fit: cover;
+}
+
+.sem-atividades__titulo {
+  margin: 0 0 6px;
+  color: #5a1f16;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 18px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.sem-atividades__texto {
+  max-width: 440px;
+  margin: 0 auto 12px;
+  color: #6f6250;
   font-size: 13px;
-  color: #777;
+  line-height: 1.5;
 }
 
 /* Batalha contra a fera */
@@ -778,6 +807,51 @@ body.modal-aberto {
   padding-top: 12px;
 }
 
+/* Navbar escura do jogo */
+.body-jogo .navbar-jogo {
+  background: linear-gradient(180deg, rgba(24, 15, 10, 0.98), rgba(10, 7, 5, 0.99));
+  border-bottom: 1px solid rgba(255, 211, 77, 0.35);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.5);
+}
+
+.body-jogo .navbar-brand {
+  color: #f4e7cf !important;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 16px;
+  letter-spacing: 0.03em;
+  text-shadow: 0 1px 4px #000;
+}
+
+.body-jogo .navbar-brand:hover {
+  color: #ffd34d !important;
+}
+
+.body-jogo .navbar-brand img {
+  border: 1px solid rgba(255, 211, 77, 0.55);
+  border-radius: 6px;
+}
+
+.body-jogo #btn-som {
+  color: #ffd34d;
+  border-color: rgba(255, 211, 77, 0.55);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.body-jogo #btn-som:hover {
+  background: #ffd34d;
+  color: #1b0f0a;
+}
+
+.body-jogo #btn-sair {
+  background: #7a1f1f;
+  border-color: #c36008;
+  color: #fff;
+}
+
+.body-jogo #btn-sair:hover {
+  background: #a33026;
+}
+
 /* HUD de recursos */
 .hud-jogo {
   display: flex;
@@ -868,7 +942,7 @@ body.modal-aberto {
   font-weight: bold;
   text-shadow: 0 2px 7px #000;
   transform: translate(-50%, -100%);
-  animation: deltaSubir 1s ease-out forwards;
+  animation: deltaSubir 2s ease-out forwards;
 }
 
 .delta-negativo {
