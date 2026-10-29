@@ -3,54 +3,48 @@
 
 <head>
 	<meta charset="UTF-8">
-	<title>MMORPG-GOT | Usuários</title>
-	<!-- JQuery -->
-	<script src="https://code.jquery.com/jquery-3.3.1.js"
-		integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60=" crossorigin="anonymous"></script>
-	<!-- bootstrap - link cdn -->
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>MMORPG-GOT | Ranking</title>
+
 	<link rel="stylesheet" href="css/bootstrap.min.css">
-	<!-- incluindo css -->
-	<link rel="stylesheet" href="css/style.css">
-	<script src="js/bootstrap.min.js"></script>
+	<link href="css/style.css" rel="stylesheet">
 </head>
 
 <body class="body-index" style="background: white">
-	<nav class="navbar navbar-light bg-light">
-		<a class="navbar-brand" href="/home">
-			<img src="images/casa_<%=img_casa%>.jpg" width="30" height="30" class="display-logo align-top" alt="">
-			Ranking, <%=nome%>!
-		</a>
-		<a href="/sair" id="btn-sair" class="btn btn-info pull-right">Sair</a>
+	<nav class="navbar bg-light">
+		<div class="container d-flex justify-content-between align-items-center">
+			<a class="navbar-brand" href="/home">
+				<img src="images/casa_<%=img_casa%>.jpg" width="30" height="30" class="display-logo align-top" alt="">
+				Ranking, <%=nome%>!
+			</a>
+			<a href="/sair" id="btn-sair" class="btn btn-info">Sair</a>
+		</div>
 	</nav>
+
 	<section class="conteudo-pagina">
-		<h1>
-			Ranking
-		</h1>
+		<h1>Ranking</h1>
+
 		<div class="container">
 			<div class="row titulo">
-				<div class="col-md-2 text-center">
-					moeda
-				</div>
-				<div class="col-md-2 text-center">
-					casa
-				</div>
-				<div class="col-md-3 text-center">
-					usuario
-				</div>
+				<div class="col-md-2 text-center">moeda</div>
+				<div class="col-md-2 text-center">casa</div>
+				<div class="col-md-3 text-center">usuario</div>
 			</div>
-			<% for( var i=0; i< usuarios.length; i++ ){%>
+
+			<% for (var i = 0; i < usuarios.length; i++) { %>
 				<div class="row elemento">
 					<div class="col-md-2 text-center">
-						<%= usuarios[i].jogo.moeda%>
+						<%= usuarios[i].jogo.moeda %>
 					</div>
 					<div class="col-md-2 text-center">
-						<img class="ranking-img-casas" src="images/casa_<%=usuarios[i].img_casa%>.jpg" />
+						<img class="ranking-img-casas" src="images/casa_<%=usuarios[i].img_casa%>.jpg"
+							alt="Casa <%=usuarios[i].img_casa%>" />
 					</div>
 					<div class="col-md-3 text-center">
-						<%= usuarios[i].nome%>
+						<%= usuarios[i].nome %>
 					</div>
 				</div>
-				<%}%>
+			<% } %>
 		</div>
 	</section>
 </body>

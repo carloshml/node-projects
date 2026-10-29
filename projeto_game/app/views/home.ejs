@@ -3,70 +3,53 @@
 
 <head>
 	<meta charset="UTF-8">
-
+	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>MMORPG - Game of Thrones</title>
 
-	<!-- JQuery -->
-	<script src="js/jquery-2.2.1.js"></script>
-
-	<!-- bootstrap - link cdn -->
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
-		integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
-
-	<!-- incluindo css -->
+	<link rel="stylesheet" href="css/bootstrap.min.css">
 	<link href="css/style.css" rel="stylesheet">
 </head>
 
 <body class="body-index">
-	<nav class="navbar navbar-default navbar-static-top">
-		<a class="navbar-brand" href="#">
-			<img src="images/casa_<%=img_casa%>.jpg" width="30" height="30" class="display-logo align-top" alt="">
-			Oi, <%=jogo.nome%>!
-		</a>
-		<div class="container">
-			<div class="form-group sair">
-				<a href="/sair" type="button" id="btn-sair" class="btn btn-info pull-right">
-					Sair
-				</a>
-			</div>
+	<nav class="navbar bg-light">
+		<div class="container d-flex justify-content-between align-items-center">
+			<a class="navbar-brand" href="#">
+				<img src="images/casa_<%=img_casa%>.jpg" width="30" height="30" class="display-logo align-top" alt="">
+				Oi, <%=jogo.nome%>!
+			</a>
+			<a href="/sair" id="btn-sair" class="btn btn-info">Sair</a>
 		</div>
 	</nav>
+
 	<div class="container">
 		<div class="row">
-			<div class="col-md-6 text-center">
+			<div class="col-12 col-md-6 text-center">
 				<a href="/jogo" id="btn-jogar" class="btn btn-success btn-home">
-					<span>
-						jogar
-					</span>
+					<span>Jogar</span>
 				</a>
 			</div>
 
-			<div class="col-md-6 text-center">
+			<div class="col-12 col-md-6 text-center">
 				<a href="/buscarUsuarios?img_casa=<%=img_casa%>&jogo=<%=JSON.stringify(jogo)%>&msg="
-					id="btn-ver-usuario" class="btn btn-success  btn-home">
-					<span>
-						ver usuários
-					</span>
+					id="btn-ver-usuario" class="btn btn-success btn-home">
+					<span>Ver usuários</span>
 				</a>
 			</div>
 
-			<div class="col-md-6 text-center">
+			<div class="col-12 col-md-6 text-center">
 				<a href="/verRanking?img_casa=<%=img_casa%>&jogo=<%=JSON.stringify(jogo)%>&msg="
-					id="btn-ver-usuario" class="btn btn-success  btn-home">
-					<span>
-						Ranking
-					</span>
+					id="btn-ver-ranking" class="btn btn-success btn-home">
+					<span>Ranking</span>
 				</a>
 			</div>
 		</div>
-		<div class="container">
-			<div class="row">
-				<div class="col-md-2"></div>
-				<div class="col-md-8 text-center">
-					<img class="imagem-home" src="images/game_of_thrones_logo.jpg" />
-				</div>
-				<div class="col-md-2"></div>
+
+		<div class="row">
+			<div class="col-md-2"></div>
+			<div class="col-md-8 text-center">
+				<img class="imagem-home img-fluid" src="images/game_of_thrones_logo.jpg" alt="Game of Thrones" />
 			</div>
+			<div class="col-md-2"></div>
 		</div>
 	</div>
 </body>

@@ -1,402 +1,253 @@
+<% const jogoAtual = (jogo && typeof jogo === 'object') ? jogo : {}; %>
+<% const queryJogo = encodeURIComponent(JSON.stringify(jogoAtual)); %>
+<% const queryMsg = encodeURIComponent(typeof msg === 'string' ? msg : ''); %>
 <!DOCTYPE HTML>
 <html lang="pt-br">
 
 <head>
 	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>MMORPG-GOT | Usuários</title>
-	<!-- JQuery -->
-	<script src="https://code.jquery.com/jquery-3.3.1.js"
-		integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60=" crossorigin="anonymous"></script>
-	<!-- bootstrap - link cdn -->
+
 	<link rel="stylesheet" href="css/bootstrap.min.css">
-	<!-- incluindo css -->
 	<link rel="stylesheet" href="css/style.css">
-	<script src="js/bootstrap.min.js"></script>
-
-	<script type="text/javascript">
-		document.addEventListener("DOMContentLoaded", function () {
-
-			/*!
-			* Serialize all form data into a query string
-			* (c) 2018 Chris Ferdinandi, MIT License, https://gomakethings.com
-			* @param  {Node}   form The form to serialize
-			* @return {String}      The serialized form data
-			*/
-			var serialize = function (form) {
-
-				// Setup our serialized data
-				var serialized = [];
-
-				// Loop through each field in the form
-				for (var i = 0; i < form.elements.length; i++) {
-
-					var field = form.elements[i];
-
-					// Don't serialize fields without a name, submits, buttons, file and reset inputs, and disabled fields
-					if (!field.name || field.disabled || field.type === 'file' || field.type === 'reset' || field.type === 'submit' || field.type === 'button') continue;
-
-					// If a multi-select, get all selections
-					if (field.type === 'select-multiple') {
-						for (var n = 0; n < field.options.length; n++) {
-							if (!field.options[n].selected) continue;
-							serialized.push(encodeURIComponent(field.name) + "=" + encodeURIComponent(field.options[n].value));
-						}
-					}
-
-					// Convert field data to a query string
-					else if ((field.type !== 'checkbox' && field.type !== 'radio') || field.checked) {
-						serialized.push(encodeURIComponent(field.name) + "=" + encodeURIComponent(field.value));
-					}
-				}
-				return serialized.join('&');
-			};
-
-
-
-			$('.btn-up-usuario').click(function () {
-				const usuario = JSON.parse(this.getAttribute('item'));
-				document.getElementById('btn_concluir_update_contato')
-					.setAttribute('item', this.getAttribute('item'));
-				$('#input_id_contato').val(usuario._id);
-				$('#input_id_contato_1').val(usuario._id);
-				$('#input_nome_contato').val(usuario.nome);
-				$('#input_usuario').val(usuario.usuario);
-				const urlParams = new URLSearchParams(window.location.search);
-				$('#id_jogo').val(urlParams);
-			});
-
-			var mudarParametro = function () {
-				const urlParams = new URLSearchParams(window.location.search);
-				document.getElementById('form_contato_update').action = "atualizarUsuario?" + urlParams;
-			};
-			mudarParametro();
-
-
-			let temValicao = document.getElementById('tem-validacao').value;
-			if (temValicao === 'S') {
-				document.getElementById('btn-create-usuario').click();
-			}
-		});
-
-		function verSuditos() {
-			$.ajax({
-				url: "/gerarSuditos",
-				method: "get",
-				success: function (htmlRequisicao) {
-
-					console.log('htmlRequisicao ', htmlRequisicao);
-
-				}
-			});
-		}
-	</script>
 </head>
 
 <body class="body-index" style="background: white">
+	<nav class="navbar bg-light">
+		<div class="container d-flex justify-content-between align-items-center">
+			<a class="navbar-brand" href="/home">
+				<img src="images/casa_<%=img_casa%>.jpg" width="30" height="30"
+					class="display-logo align-text-top" alt="">
+				Veja os usuários, <%=jogoAtual.nome%>!
+			</a>
 
-
-	<input type="checkbox" name="" id="tem-validacao" hidden="true" value="<%=validacao.length>0?'S':'F'%>">
-	<nav class="navbar navbar-light bg-light">
-		<a class="navbar-brand" href="/home">
-			<img src="images/casa_<%=img_casa%>.jpg" width="30" height="30" class="display-logo align-top" alt="">
-			Veja os usuários, <%=jogo.nome%>!
-		</a>
-		<div>
-			<button id="btn-create-usuario" class="btn btn-info btn-up-usuario" data-toggle="modal"
-				data-target="#modal_create">
-				<i class="bi bi-file-plus-fill"></i>
-				Cadastro
-			</button>
-			<a href="/sair" id="btn-sair" class="btn btn-info pull-right">Sair</a>
+			<div class="d-flex gap-2">
+				<button id="btn-create-usuario" class="btn btn-info" data-bs-toggle="modal"
+					data-bs-target="#modal-create">
+					Cadastro
+				</button>
+				<a href="/sair" id="btn-sair" class="btn btn-info">Sair</a>
+			</div>
 		</div>
 	</nav>
+
 	<section class="conteudo-pagina">
-		<h1>
-			Veja os usuários
-		</h1>
+		<h1>Veja os usuários</h1>
+
 		<div class="container">
 			<div class="row titulo">
-				<div class="col-md-5 text-center">
-					nome
-				</div>
-				<div class="col-md-5 text-center">
-					usuario
-				</div>
-				<div class="col-md-2 text-center">
-
-				</div>
+				<div class="col-md-5 text-center">nome</div>
+				<div class="col-md-5 text-center">usuario</div>
+				<div class="col-md-2 text-center"></div>
 			</div>
-			<% for( var i=0; i< resultados.length; i++ ){%>
-				<div class="row elemento">
+
+			<% for (var i = 0; i < resultados.length; i++) { %>
+				<div class="row elemento align-items-center">
 					<div class="col-md-5 text-center">
-						<%= resultados[i].nome%>
+						<%= resultados[i].nome %>
 					</div>
 					<div class="col-md-5 text-center">
-						<%= resultados[i].usuario%>
+						<%= resultados[i].usuario %>
 					</div>
 					<div class="col-md-2 text-center">
-						<button id="btn-up-usuario-<%=i%>" item="<%= JSON.stringify(resultados[i])%>"
-							class="btn btn-success btn-up-usuario" data-toggle="modal" data-target="#modal_update"> Up
+						<button type="button" class="btn btn-success btn-sm btn-editar"
+							data-bs-toggle="modal" data-bs-target="#modal-update"
+							data-id="<%= resultados[i]._id %>"
+							data-nome="<%= resultados[i].nome %>"
+							data-usuario="<%= resultados[i].usuario %>">
+							Editar
 						</button>
 					</div>
 				</div>
-				<%}%>
+			<% } %>
 		</div>
 	</section>
-</body>
 
-</html>
+	<input type="hidden" id="tem-validacao" value="<%= validacao.length > 0 ? 'S' : 'F' %>">
 
+	<!-- Modal de atualização -->
+	<div class="modal fade" id="modal-update" tabindex="-1" aria-labelledby="modal-update-label" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<form id="form-update"
+					action="/atualizarUsuario?img_casa=<%=img_casa%>&jogo=<%=queryJogo%>&msg=<%=queryMsg%>"
+					method="post">
+					<div class="modal-header">
+						<h5 class="modal-title" id="modal-update-label">Atualizar usuário</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+					</div>
 
-<!-- Modal  Update-->
-<div class="modal fade" id="modal_update" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-	aria-hidden="true">
-	<div class="modal-dialog" role="document">
-		<div class="modal-content">
-			<div class="modal-header">
-				<h5 class="modal-title" id="exampleModalLabel"> Atualizar</h5>
-				<button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
-					<span aria-hidden="true">&times;</span>
-				</button>
-			</div>
-			<div class="modal-body">
-				<form id="form_contato_update" class="form-horizontal" action="" method="post">
-					<div class="container">
-						<div clas="span10 offset1">
-							<div class="card">
-								<div class="card-body">
-									<div class="form-row">
-										<div class="col col-md-2">
-											<div class="control-group">
-												<label class="control-label">Cód</label>
-												<div class="controls">
-													<input disabled name="_id_1" id="input_id_contato_1" size="50"
-														class="form-control" name="id" type="text" placeholder="Cód"
-														value="">
-													<input name="_id" type="hidden" id="input_id_contato" size="50"
-														class="form-control" name="id" type="text" placeholder="Cód"
-														value="">
-													<input name="id_jogo" type="hidden" id="id_jogo" size="50"
-														class="form-control" name="id" type="text" placeholder="Cód"
-														value="">
-												</div>
-											</div>
-										</div>
-										<div class="col">
-											<div class="control-group">
-												<label class="control-label">Nome</label>
-												<div class="controls">
-													<input size="50" id="input_nome_contato" class="form-control"
-														name="nome" type="text" placeholder="Nome" required="">
-													<span id="erro_nomeup" class="help-inline text-warning"></span>
-												</div>
-											</div>
-										</div>
-										<div class="control-group ">
-											<label class="control-label">usuario</label>
-											<div class="controls">
-												<input size="80" id="input_usuario" class="form-control" name="usuario"
-													type="text" placeholder="usuário" required="">
-												<span id="erro_enderecoup" class="help-inline text-warning"></span>
-											</div>
-										</div>
-									</div>
-								</div>
-							</div>
+					<div class="modal-body">
+						<input type="hidden" name="_id" id="update-id">
+						<input type="hidden" name="id_jogo"
+							value="img_casa=<%=img_casa%>&jogo=<%=queryJogo%>&msg=<%=queryMsg%>">
+
+						<div class="mb-3">
+							<label for="update-id-display" class="form-label">Código</label>
+							<input id="update-id-display" class="form-control" type="text" disabled>
+						</div>
+
+						<div class="mb-3">
+							<label for="update-nome" class="form-label">Nome</label>
+							<input id="update-nome" name="nome" class="form-control" type="text" required>
+						</div>
+
+						<div class="mb-3">
+							<label for="update-usuario" class="form-label">Usuário</label>
+							<input id="update-usuario" name="usuario" class="form-control" type="text" required>
 						</div>
 					</div>
-					<div class="form-group row center">
 
-						<div class="col-xs-2">
-							<img src="images/casa_arryn.jpg" class="img-responsive img-radio tam-img-crud">
-							<div class="center">
-								<input type="radio" id="left-item1" name="casa" value="arryn"> Casa Arryn
-							</div>
-						</div>
-
-						<div class="col-xs-2">
-							<img src="images/casa_baratheon.jpg" class="img-responsive img-radio tam-img-crud">
-							<div class="center">
-								<input type="radio" id="left-item2" name="casa" value="baratheon"> Casa Baratheon
-							</div>
-						</div>
-
-						<div class="col-xs-2">
-							<img src="images/casa_greyjoy.jpg" class="img-responsive img-radio tam-img-crud">
-							<div class="center">
-								<input type="radio" id="left-item3" name="casa" value="greyjoy"> Casa Greyjoy
-							</div>
-						</div>
-
-						<div class="col-xs-2">
-							<img src="images/casa_lannister.jpg" class="img-responsive img-radio tam-img-crud">
-							<div class="center">
-								<input type="radio" id="left-item4" name="casa" value="lannister"> Casa Lannister
-							</div>
-						</div>
-
-						<div class="col-xs-2">
-							<img src="images/casa_martell.jpg" class="img-responsive img-radio tam-img-crud">
-							<div class="center">
-								<input type="radio" id="left-item5" name="casa" value="martell"> Casa Martell
-							</div>
-						</div>
-
-						<div class="col-xs-2">
-							<img src="images/casa_stark.jpg" class="img-responsive img-radio tam-img-crud">
-							<div class="center">
-								<input type="radio" id="left-item6" name="casa" value="stark"> Casa Stark
-							</div>
-						</div>
-					</div>
 					<div class="modal-footer">
-						<button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
-						<button id="btn_concluir_update_contato" type="submit"
-							class="btn btn-success">Atualizar</button>
+						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+						<button type="submit" class="btn btn-success">Atualizar</button>
 					</div>
 				</form>
 			</div>
 		</div>
 	</div>
-</div>
 
-
-<!-- Modal  create-->
-<div class="modal fade" id="modal_create" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-	aria-hidden="true">
-	<div class="modal-dialog" role="document">
-		<div class="modal-content">
-			<div class="modal-header">
-				<h5 class="modal-title" id="exampleModalLabel"> Novo Usuário</h5>
-				<button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
-					<span aria-hidden="true">&times;</span>
-				</button>
-			</div>
-			<div class="modal-body">
-				<% if(validacao.length>0){%>
-					<div class="alert alert-danger">
-						<strong>Atenção</strong>
-						<ul>
-							<% for ( var i=0; i < validacao.length; i++ ){%>
-								<li>
-									<%= validacao[i].msg%>
-								</li>
-								<%}%>
-						</ul>
+	<!-- Modal de cadastro -->
+	<div class="modal fade" id="modal-create" tabindex="-1" aria-labelledby="modal-create-label" aria-hidden="true">
+		<div class="modal-dialog modal-lg">
+			<div class="modal-content">
+				<form
+					action="/inserirUsuarioCrud?img_casa=<%=img_casa%>&jogo=<%=queryJogo%>&msg=<%=queryMsg%>"
+					method="post">
+					<div class="modal-header">
+						<h5 class="modal-title" id="modal-create-label">Novo usuário</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
 					</div>
-					<%}%>
-						<form class="form-cadastro"
-							action="inserirUsuarioCrud?img_casa=<%=img_casa%>&jogo=<%=JSON.stringify(jogo)%>&msg="
-							method="POST">
-							<div class="container">
-								<div clas="span10 offset1">
-									<div class="card">
-										<div class="card-body">
-											<div class="form-row">
-												<div class="col col-md-2">
-													<div class="control-group">
-														<label class="control-label">Cód</label>
-														<div class="controls">
-															<input disabled name="_id_1" id="input_id_contato_1"
-																size="50" class="form-control" name="id" type="text"
-																placeholder="Cód" value="">
-															<input name="_id" type="hidden" id="input_id_contato"
-																size="50" class="form-control" name="id" type="text"
-																placeholder="Cód" value="">
-															<input name="id_jogo" type="hidden" id="id_jogo" size="50"
-																class="form-control" name="id" type="text"
-																placeholder="Cód" value="">
-														</div>
-													</div>
-												</div>
-												<div class="col">
-													<div class="control-group">
-														<label class="control-label">Nome</label>
-														<div class="controls">
-															<input size="50" id="input_nome_contato"
-																class="form-control" name="nome" type="text"
-																placeholder="Nome" required="">
-															<span id="erro_nomeup"
-																class="help-inline text-warning"></span>
-														</div>
-													</div>
-												</div>
-												<div class="control-group ">
-													<label class="control-label">Usuário</label>
-													<div class="controls">
-														<input size="80" id="input_usuario" class="form-control"
-															name="usuario" type="text" placeholder="usuário"
-															required="">
-														<span id="erro_enderecoup"
-															class="help-inline text-warning"></span>
-													</div>
-												</div>
-												<div class="control-group ">
-													<label class="control-label">senha</label>
-													<div class="controls">
-														<input type="password" class="form-control" id="senha"
-															name="senha" placeholder="Password">
-													</div>
 
-												</div>
-											</div>
-										</div>
-									</div>
-								</div>
+					<div class="modal-body">
+						<% if (validacao.length > 0) { %>
+							<div class="alert alert-danger">
+								<strong>Atenção</strong>
+								<ul class="mb-0">
+									<% for (var i = 0; i < validacao.length; i++) { %>
+										<li><%= validacao[i].msg %></li>
+									<% } %>
+								</ul>
 							</div>
-							<div class="form-group row center">
+						<% } %>
 
-								<div class="col-xs-2">
-									<img src="images/casa_arryn.jpg" class="img-responsive img-radio tam-img-crud">
-									<div class="center">
-										<input type="radio" id="left-item7" name="casa" value="arryn"> Casa Arryn
-									</div>
-								</div>
-
-								<div class="col-xs-2">
-									<img src="images/casa_baratheon.jpg" class="img-responsive img-radio tam-img-crud">
-									<div class="center">
-										<input type="radio" id="left-item8" name="casa" value="baratheon"> Casa
-										Baratheon
-									</div>
-								</div>
-
-								<div class="col-xs-2">
-									<img src="images/casa_greyjoy.jpg" class="img-responsive img-radio tam-img-crud">
-									<div class="center">
-										<input type="radio" id="left-item9" name="casa" value="greyjoy"> Casa Greyjoy
-									</div>
-								</div>
-
-								<div class="col-xs-2">
-									<img src="images/casa_lannister.jpg" class="img-responsive img-radio tam-img-crud">
-									<div class="center">
-										<input type="radio" id="left-item10" name="casa" value="lannister"> Casa
-										Lannister
-									</div>
-								</div>
-
-								<div class="col-xs-2">
-									<img src="images/casa_martell.jpg" class="img-responsive img-radio tam-img-crud">
-									<div class="center">
-										<input type="radio" id="left-item11" name="casa" value="martell"> Casa Martell
-									</div>
-								</div>
-
-								<div class="col-xs-2">
-									<img src="images/casa_stark.jpg" class="img-responsive img-radio tam-img-crud">
-									<div class="center">
-										<input type="radio" id="left-item12" name="casa" value="stark"> Casa Stark
-									</div>
-								</div>
+						<div class="row g-3">
+							<div class="col-12 col-md-6">
+								<label for="create-nome" class="form-label">Nome</label>
+								<input id="create-nome" name="nome" class="form-control" type="text" required>
 							</div>
-							<div class="modal-footer">
-								<button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
-								<button id="btn_concluir_update_contato" type="submit"
-									class="btn btn-success">salvar</button>
+
+							<div class="col-12 col-md-6">
+								<label for="create-usuario" class="form-label">Usuário</label>
+								<input id="create-usuario" name="usuario" class="form-control" type="text" required>
 							</div>
-						</form>
+
+							<div class="col-12 col-md-6">
+								<label for="create-senha" class="form-label">Senha</label>
+								<input id="create-senha" name="senha" class="form-control" type="password" required>
+							</div>
+						</div>
+
+						<div class="row g-2 center mt-3">
+							<div class="col-6 col-sm-4 col-md-3">
+								<img src="images/casa_arryn.jpg" class="img-fluid img-radio tam-img-crud" alt="Casa Arryn">
+								<label class="d-block text-center">
+									<input type="radio" name="casa" value="arryn" required> Casa Arryn
+								</label>
+							</div>
+
+							<div class="col-6 col-sm-4 col-md-3">
+								<img src="images/casa_baratheon.jpg" class="img-fluid img-radio tam-img-crud" alt="Casa Baratheon">
+								<label class="d-block text-center">
+									<input type="radio" name="casa" value="baratheon" required> Casa Baratheon
+								</label>
+							</div>
+
+							<div class="col-6 col-sm-4 col-md-3">
+								<img src="images/casa_greyjoy.jpg" class="img-fluid img-radio tam-img-crud" alt="Casa Greyjoy">
+								<label class="d-block text-center">
+									<input type="radio" name="casa" value="greyjoy" required> Casa Greyjoy
+								</label>
+							</div>
+
+							<div class="col-6 col-sm-4 col-md-3">
+								<img src="images/casa_lannister.jpg" class="img-fluid img-radio tam-img-crud" alt="Casa Lannister">
+								<label class="d-block text-center">
+									<input type="radio" name="casa" value="lannister" required> Casa Lannister
+								</label>
+							</div>
+
+							<div class="col-6 col-sm-4 col-md-3">
+								<img src="images/casa_martell.jpg" class="img-fluid img-radio tam-img-crud" alt="Casa Martell">
+								<label class="d-block text-center">
+									<input type="radio" name="casa" value="martell" required> Casa Martell
+								</label>
+							</div>
+
+							<div class="col-6 col-sm-4 col-md-3">
+								<img src="images/casa_stark.jpg" class="img-fluid img-radio tam-img-crud" alt="Casa Stark">
+								<label class="d-block text-center">
+									<input type="radio" name="casa" value="stark" required> Casa Stark
+								</label>
+							</div>
+
+							<div class="col-6 col-sm-4 col-md-3">
+								<img src="images/casa_targaryen.jpg" class="img-fluid img-radio tam-img-crud" alt="Casa Targaryen">
+								<label class="d-block text-center">
+									<input type="radio" name="casa" value="targaryen" required> Casa Targaryen
+								</label>
+							</div>
+
+							<div class="col-6 col-sm-4 col-md-3">
+								<img src="images/casa_tully.jpg" class="img-fluid img-radio tam-img-crud" alt="Casa Tully">
+								<label class="d-block text-center">
+									<input type="radio" name="casa" value="tully" required> Casa Tully
+								</label>
+							</div>
+
+							<div class="col-6 col-sm-4 col-md-3">
+								<img src="images/casa_tyrell.jpg" class="img-fluid img-radio tam-img-crud" alt="Casa Tyrell">
+								<label class="d-block text-center">
+									<input type="radio" name="casa" value="tyrell" required> Casa Tyrell
+								</label>
+							</div>
+						</div>
+					</div>
+
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+						<button type="submit" class="btn btn-success">Salvar</button>
+					</div>
+				</form>
 			</div>
 		</div>
 	</div>
-</div>
+
+	<script src="js/bootstrap.bundle.min.js"></script>
+	<script>
+		document.addEventListener('DOMContentLoaded', function () {
+			const modalUpdate = document.getElementById('modal-update');
+
+			modalUpdate.addEventListener('show.bs.modal', function (evento) {
+				const botao = evento.relatedTarget;
+				if (!botao) {
+					return;
+				}
+
+				document.getElementById('update-id').value = botao.getAttribute('data-id') || '';
+				document.getElementById('update-id-display').value = botao.getAttribute('data-id') || '';
+				document.getElementById('update-nome').value = botao.getAttribute('data-nome') || '';
+				document.getElementById('update-usuario').value = botao.getAttribute('data-usuario') || '';
+			});
+
+			const temValidacao = document.getElementById('tem-validacao');
+			if (temValidacao && temValidacao.value === 'S') {
+				const modalCreate = bootstrap.Modal.getOrCreateInstance(document.getElementById('modal-create'));
+				modalCreate.show();
+			}
+		});
+	</script>
+</body>
+
+</html>

@@ -9,6 +9,13 @@ async function listaUsuarios(application, req, res, errors) {
         const result = await UsuarioDAO.listarUsuarios();
         req.query.resultados = result;
         const opcoes = req.query;
+        if (typeof opcoes.jogo === 'string') {
+            try {
+                opcoes.jogo = JSON.parse(opcoes.jogo);
+            } catch (erro) {
+                /* mantém a string se não for um JSON válido */
+            }
+        }
         opcoes.validacao = errors;
         res.render('usuariosSistema', opcoes);
     } else {
@@ -38,17 +45,16 @@ module.exports.autenticar = function (application, req, res, validationResult) {
     //res.send('tudo certo para criar a sessão');
 }
 
-module.exports.atualizarUsuario = function (application, req, res, validationResult) {
+module.exports.atualizarUsuario = async function (application, req, res, validationResult) {
     var dadosForm = req.body;
     var errors = validationResult(req);
     if (!errors.isEmpty()) {
-        // res.redirect('usuarios-sistema',{validacao:errors, dadosForm: dadosForm});   
-        res.redirect('usuarios-sistema');
+        res.redirect('buscarUsuarios?' + (dadosForm.id_jogo || ''));
         return;
     }
     var connection = application.config.dbConection;
     var UsuariosDAO = new application.app.models.UsuariosDAO(connection);
-    if (UsuariosDAO.atualizarUsuario(dadosForm, req)) {
+    if (await UsuariosDAO.atualizarUsuario(dadosForm, req)) {
         res.redirect('buscarUsuarios?' + dadosForm.id_jogo);
     }
 }

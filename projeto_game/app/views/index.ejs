@@ -3,63 +3,48 @@
 
 <head>
 	<meta charset="UTF-8">
-
+	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>MMORPG - Game of Thrones</title>
 
-	<!-- JQuery -->
-	<script src="js/jquery-2.2.1.js"></script>
-
-	<!-- bootstrap - link cdn -->
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
-		integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
-
-	<!-- incluindo css -->
+	<link rel="stylesheet" href="css/bootstrap.min.css">
 	<link href="css/style.css" rel="stylesheet">
-
 </head>
 
 <body class="body-index">
 
-	<nav class="navbar navbar-default navbar-static-top">
+	<nav class="navbar bg-light">
 		<div class="container">
-			<div>
-				<%if(validacao.length>0){%>
+			<div class="w-100">
+				<% if (validacao.length > 0) { %>
 					<div class="alert alert-danger">
 						<strong>Atenção</strong>
-						<ul>
-							<% for( var i=0; i< validacao.length; i++ ){%>
-								<li>
-									<%= validacao[i].msg%>
-								</li>
-								<%}%>
+						<ul class="mb-0">
+							<% for (var i = 0; i < validacao.length; i++) { %>
+								<li><%= validacao[i].msg %></li>
+							<% } %>
 						</ul>
 					</div>
-					<%}%>
-			</div>
+				<% } %>
 
-			<div>
-				<%if(aviso.length>0){%>
+				<% if (aviso.length > 0) { %>
 					<div class="alert alert-success">
 						<strong>Atenção</strong>
-						<ul>
-							<% for( var i=0; i< aviso.length; i++ ){%>
-								<li>
-									<%= aviso[i].msg%>
-								</li>
-								<%}%>
+						<ul class="mb-0">
+							<% for (var i = 0; i < aviso.length; i++) { %>
+								<li><%= aviso[i].msg %></li>
+							<% } %>
 						</ul>
 					</div>
-					<%}%>
+				<% } %>
 			</div>
 
-			<form class="form-inline form-entrar" action="/autenticar" method="POST">
-				<div class="form-group">
-					<input type="text" name="usuario" id="usuario" placeholder="Usuário" class="form-control"
-						autocomplete="off" />
-					<input type="password" name="senha" id="senha" placeholder="Senha" class="form-control" />
-					<button type="submit" class="btn btn-success">Entrar</button>
-					<a href="/cadastro" class="btn btn-info">Cadastro</a>
-				</div>
+			<form class="d-flex flex-wrap gap-2 align-items-center form-entrar" action="/autenticar" method="POST">
+				<input type="text" name="usuario" id="usuario" placeholder="Usuário" class="form-control"
+					autocomplete="username" />
+				<input type="password" name="senha" id="senha" placeholder="Senha" class="form-control"
+					autocomplete="current-password" />
+				<button type="submit" class="btn btn-success">Entrar</button>
+				<a href="/cadastro" class="btn btn-info">Cadastro</a>
 			</form>
 		</div>
 	</nav>
@@ -68,8 +53,8 @@
 		<div class="row">
 			<div class="col-md-2"></div>
 
-			<div class="col-md-8">
-				<img src="images/game_of_thrones_logo.jpg" />
+			<div class="col-md-8 text-center">
+				<img src="images/game_of_thrones_logo.jpg" class="img-fluid" alt="Game of Thrones" />
 			</div>
 
 			<div class="col-md-2"></div>

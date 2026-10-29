@@ -372,13 +372,13 @@ function renderizarAcoes() {
             : '<a class="btn-acao" href="/revogar_acao?id_acao=' + acao._id + '&jogoid=' + usuario.jogo._id + '">revogar ordem</a>';
 
         conteudo += '<div class="row acoes-pergaminho" data-id="' + acao._id + '" data-tipo="' + tipo + '" data-termina="' + termina + '" data-inicio="' + inicio + '" data-duracao="' + duracao + '">' +
-            '<div class="col-xs-10">' +
+            '<div class="col-10">' +
             cabecalho +
             '<div class="acao-descricao">' + descricao +
             ' - <small>restam <span class="tempo-restante">--</span></small></div>' +
             '<div class="progress acao-progresso"><div class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" style="width:0%"></div></div>' +
             '</div>' +
-            '<div class="col-xs-2">' +
+            '<div class="col-2">' +
             botaoRevogar +
             '</div>' +
             '</div>';
@@ -454,16 +454,20 @@ function verPergaminhos() {
 }
 
 function verSuditos() {
-    $.ajax({
-        url: '/gerarSuditos',
-        method: 'get',
-        success: function (htmlRequisicao) {
-            $('#acoes').html(htmlRequisicao);
-            buscaJogoUsuario().catch(function (erro) {
-                console.error('Falha ao atualizar o jogo:', erro);
-            });
-        }
-    });
+    fetch('/gerarSuditos')
+        .then(function (resposta) {
+            if (!resposta.ok) {
+                throw new Error('HTTP ' + resposta.status);
+            }
+            return resposta.text();
+        })
+        .then(function (html) {
+            document.getElementById('acoes').innerHTML = html;
+            return buscaJogoUsuario();
+        })
+        .catch(function (erro) {
+            console.error('Falha ao carregar o formulário de ordens:', erro);
+        });
 }
 
 async function buscaJogoUsuario() {

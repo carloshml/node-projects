@@ -3,33 +3,30 @@
 
 <head>
 	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>MMORPG - Game of Thrones</title>
-	<!-- JQuery -->
-	<script src="js/jquery-2.2.1.js"></script>
-	<script src="jsView/jogoView.js"></script>
 
-	<!-- bootstrap - link cdn -->
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
-		integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
-
-	<!-- incluindo css -->
+	<link rel="stylesheet" href="css/bootstrap.min.css">
 	<link href="css/style.css" rel="stylesheet">
+	<script src="jsView/jogoView.js" defer></script>
 </head>
 
 <body class="body-jogo">
-	<nav class="navbar navbar-default navbar-static-top">
-		<a class="navbar-brand" href="/home">
-			<img src="images/casa_<%=img_casa%>.jpg" width="30" height="30" class="display-logo align-top" alt="">
-			Este é seu jogo, <%=jogo.nome%>!
-		</a>
-		<div class="form-group sair">
-			<a href="/sair" id="btn-sair" class="btn btn-info pull-right">Sair</a>
+	<nav class="navbar bg-light">
+		<div class="container-fluid d-flex justify-content-between align-items-center">
+			<a class="navbar-brand" href="/home">
+				<img src="images/casa_<%=img_casa%>.jpg" width="30" height="30"
+					class="display-logo align-text-top" alt="">
+				Este é seu jogo, <%=jogo.nome%>!
+			</a>
+			<a href="/sair" id="btn-sair" class="btn btn-info">Sair</a>
 		</div>
 	</nav>
+
 	<section>
 		<div class="row">
 			<div class="col-sm-3 casa">
-				<img src="images/casa_<%=img_casa%>.jpg" />
+				<img src="images/casa_<%=img_casa%>.jpg" alt="Casa <%=img_casa%>" />
 			</div>
 
 			<div class="col-sm-9">
@@ -37,47 +34,38 @@
 					<div class="col-sm-2">
 						<img src="images/habilidades/temor.jpg" title="Temor" alt="Temor" />
 						<div>Temor</div>
-						<span>
-							<%=jogo.temor%>
-						</span>
+						<span><%=jogo.temor%></span>
 					</div>
 
 					<div class="col-sm-2">
 						<img src="images/habilidades/sabedoria.jpg" title="Sabedoria" alt="Sabedoria" />
 						<div>Sabedoria</div>
-						<span>
-							<%=jogo.sabedoria%>
-						</span>
+						<span><%=jogo.sabedoria%></span>
 					</div>
 
 					<div class="col-sm-2">
 						<img src="images/habilidades/comercio.jpg" title="Comércio" alt="Comércio" />
-
-						<div>
-							comércio
-						</div>
-						<span>
-							<%=jogo.comercio%>
-						</span>
+						<div>comércio</div>
+						<span><%=jogo.comercio%></span>
 					</div>
 
 					<div class="col-sm-2">
 						<img src="images/habilidades/magia.jpg" title="Magia" alt="Magia" />
 						<div>magia</div>
-						<span>
-							<%=jogo.magia%>
-						</span>
+						<span><%=jogo.magia%></span>
 					</div>
 				</div>
 			</div>
 		</div>
+
 		<div class="row">
 			<div class="col-sm-1"></div>
-			<div class="col-sm-4 ">
+
+			<div class="col-sm-4">
 				<div id="acoes" class="acoes">
 					Senhor o que deseja fazer hoje?
 					<div>
-						<button class="btn btn-info" onclick="verSuditos()"> Ordenar</button>
+						<button class="btn btn-info" onclick="verSuditos()">Ordenar</button>
 					</div>
 				</div>
 
@@ -87,48 +75,44 @@
 					<div id="lista-recursos"></div>
 				</div>
 			</div>
-			<div class="col-sm-6  ">
+
+			<div class="col-sm-6">
 				<div id="pergaminhos" class="pergaminhos"></div>
 			</div>
+
 			<div class="col-sm-1"></div>
 		</div>
 	</section>
+
 	<div class="row barra-inferior">
 		<div class="col-sm-2">
 			<img src="images/outros/suditos.jpg" title="suditos" alt="suditos" id="btn-suditos"
 				onclick="verSuditos()" />
-			<div>
-				Total Suditos
-			</div>
-			<span>
-				<%=jogo.suditos%>
-			</span>
+			<div>Total Suditos</div>
+			<span><%=jogo.suditos%></span>
 		</div>
+
 		<div class="col-sm-2">
-			<img src="images/outros/suditos.jpg" title="suditos" alt="suditos" id="btn-suditos"
+			<img src="images/outros/suditos.jpg" title="suditos" alt="suditos"
 				onclick="verSuditos()" />
-			<div>
-				Suditos Trabalhando
-			</div>
-			<span id="suditosTrabalhando">
-				<%=jogo.suditosTrabalhando%>
-			</span>
+			<div>Suditos Trabalhando</div>
+			<span id="suditosTrabalhando"><%=jogo.suditosTrabalhando%></span>
 		</div>
+
 		<div class="col-sm-2">
 			<img src="images/outros/pergaminho.jpg" title="Pergaminhos" alt="Pergaminhos" id="btn-pergaminhos"
 				onclick="verPergaminhos()" />
-			<div>
-				Ver Pergaminhos
-			</div>
+			<div>Ver Pergaminhos</div>
 		</div>
-		<div class="col-sm-5"></div>
+
+		<div class="col-sm-4"></div>
+
 		<div class="col-sm-2">
 			<img src="images/outros/moeda.jpg" title="Moeda" alt="Moeda" />
-			<span id="moeda">
-				<%=jogo.moeda%>
-			</span>
+			<span id="moeda"><%=jogo.moeda%></span>
 		</div>
 	</div>
+
 	<div id="mensagens" aria-live="assertive" aria-atomic="true"></div>
 </body>
 
