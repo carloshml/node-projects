@@ -13,6 +13,7 @@ Jogo web de estratégia ambientado em **Game of Thrones**, feito com Node.js, Ex
 - HUD animado com ícones de moedas, aldeões, madeira, comida e ferro.
 - Cards de ação com custo, duração e previsão de recompensa.
 - Contadores animados e deltas flutuantes de ganho/perda.
+- O modal de resultado só é exibido depois que a animação dos recursos termina.
 - Ordens com tempo real: coleta, enforcamento, treinamento de história, treinamento de magia e caçada a feras.
 - Barra de progresso, vida da fera, dano flutuante e efeitos de impacto na batalha.
 - Recompensas ao concluir cada ordem, com modal central, loot reveal e contagem animada.
@@ -27,10 +28,10 @@ Jogo web de estratégia ambientado em **Game of Thrones**, feito com Node.js, Ex
 
 | Camada | Tecnologia |
 |---|---|
-| Runtime | Node.js 18+ (testado com 24.x) |
-| Servidor | Express 4 |
-| Views | EJS |
-| Banco | MongoDB 4.4+ (driver `mongodb` 4.x) |
+| Runtime | Node.js 20.19+ (testado com 24.x) |
+| Servidor | Express 5 |
+| Views | EJS 7 |
+| Banco | MongoDB 7.0+ (driver `mongodb` 7.x) |
 | Sessão | `express-session` (MemoryStore) |
 | Validação | `express-validator` |
 | Front-end | Bootstrap 5.3 local, CSS próprio e JavaScript puro (sem jQuery) |
@@ -38,7 +39,7 @@ Jogo web de estratégia ambientado em **Game of Thrones**, feito com Node.js, Ex
 
 ## Requisitos
 
-- Node.js 18 ou superior.
+- Node.js 20.19 ou superior.
 - npm.
 - MongoDB local em `127.0.0.1:27017` (ou ajuste a conexão).
 - Um navegador moderno (Chrome, Edge, Firefox ou Safari).
@@ -161,7 +162,7 @@ projeto_game/
 ├── app.js                    # inicialização e porta 8200
 ├── config/
 │   ├── dbConection.js        # conexão com o MongoDB
-│   └── server.js             # Express, EJS, sessão, body-parser e consign
+│   └── server.js             # Express, EJS, sessão e consign
 ├── app/
 │   ├── controllers/          # regras de entrada das rotas
 │   ├── models/               # JogoDAO, UsuariosDAO e definição das feras
