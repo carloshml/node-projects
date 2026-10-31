@@ -48,6 +48,13 @@
 				<span class="hud-extra" id="hud-suditos-trabalhando"><%=jogo.suditosTrabalhando%> trab.</span>
 			</div>
 
+			<div class="hud-item" title="Campeão: +10 de ataque por nível e +10% de moedas a cada 3 níveis">
+				<img src="images/icones/campeao.svg" alt="" class="hud-icone">
+				<span class="hud-rotulo">campeão</span>
+				<span class="hud-valor" id="hud-campeao"><%=jogo.campeao || 0%></span>
+				<span class="hud-extra" id="hud-campeao-bonus">+<%=jogo.campeaoAtaque || 0%> atq</span>
+			</div>
+
 			<div class="hud-item" title="Madeira">
 				<img src="images/icones/madeira.svg" alt="" class="hud-icone">
 				<span class="hud-rotulo">madeira</span>

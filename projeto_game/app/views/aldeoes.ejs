@@ -37,15 +37,25 @@
 				<span class="card-acao__titulo">Matar a fera</span>
 				<span class="card-acao__info">5 moedas · 30s/aldeão · fera surpresa</span>
 			</button>
+
+			<button type="button" class="card-acao card-acao--full card-acao--campeao" data-acao="6"
+				data-custo="2000" data-duracao="180000">
+				<img src="images/icones/campeao.svg" alt="" loading="lazy">
+				<span class="card-acao__titulo">Treinar campeão</span>
+				<span class="card-acao__info">2.000 moedas · 100 madeira · 50 ferro · 3min</span>
+				<span class="card-acao__requisito">Requer 150 temor · 150 sabedoria · 100 magia</span>
+			</button>
 		</div>
 
 		<div id="painel-ordem" class="painel-ordem d-none">
-			<div class="d-flex justify-content-between align-items-center mb-1">
-				<label for="qtd-range" class="form-label mb-0">Aldeões enviados</label>
-				<strong><span id="qtd-valor">1</span> / <span id="qtd-max">10</span></strong>
-			</div>
+			<div id="ordem-quantidade">
+				<div class="d-flex justify-content-between align-items-center mb-1">
+					<label for="qtd-range" class="form-label mb-0">Aldeões enviados</label>
+					<strong><span id="qtd-valor">1</span> / <span id="qtd-max">10</span></strong>
+				</div>
 
-			<input type="range" class="form-range" id="qtd-range" min="1" max="10" value="1">
+				<input type="range" class="form-range" id="qtd-range" min="1" max="10" value="1">
+			</div>
 
 			<div id="ordem-resumo" class="ordem-resumo"></div>
 
@@ -53,7 +63,7 @@
 		</div>
 
 		<p class="form-text mb-2">
-			Cada aldeão vale 5 de ataque. As feras têm entre 20 e 50 de vida; enviar 10 aldeões vence qualquer fera.
+			Cada aldeão vale 5 de ataque. As feras têm entre 20 e 50 de vida; o campeão soma +10 de ataque por nível.
 		</p>
 
 		<div id="ordem-status" class="ordem-status"></div>

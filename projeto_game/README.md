@@ -24,6 +24,7 @@ Jogo web de estratégia ambientado em **Game of Thrones**, feito com Node.js, Ex
 - Celeiro para vender madeira, comida e ferro por moedas.
 - Cinco feras com vida, recompensa e imagem próprias; a fera é sorteada pelo jogo.
 - Ranking de jogadores por moedas.
+- Treinamento de campeão com bônus permanentes de ataque e recompensa.
 - Tela de administração/CRUD de usuários.
 - Visual temático com mapa, casas, ícones e cards de atividade.
 
@@ -102,6 +103,7 @@ Para produção, mova esses valores para variáveis de ambiente e troque o segre
 7. Acompanhe sua posição no **Ranking**.
 8. Abra **Pergaminhos** para consultar o histórico de ordens concluídas, recompensas e caçadas.
 9. Contrate novos aldeões por **10.000 moedas** no botão abaixo de **Atividades**.
+10. Treine um **campeão** para aumentar permanentemente o ataque nas caçadas.
 
 ### Estado inicial
 
@@ -123,6 +125,15 @@ Para produção, mova esses valores para variáveis de ambiente e troque o segre
 | Matar a fera | 5 moedas | 30 s | depende da fera |
 
 O custo é debitado e os aldeões são ocupados no momento da ordem. Ao terminar, a ordem é liquidada uma única vez e os aldeões são liberados.
+
+### Campeão
+
+Treinar um campeão custa **2.000 moedas**, **100 madeira**, **50 ferro**, ocupa **1 aldeão por 3 minutos** e exige **150 temor**, **150 sabedoria** e **100 magia**.
+
+- Cada nível dá **+10 de ataque** nas caçadas.
+- A cada **3 níveis**, as feras passam a render **+10% de moedas**.
+- O nível e o bônus atual ficam visíveis no HUD.
+- O treinamento não pode ser revogado depois de iniciado.
 
 ### Feras
 

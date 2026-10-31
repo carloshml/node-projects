@@ -8,16 +8,32 @@ let temporizadorMensagem = null;
 let temporizadorFlash = null;
 let ultimosMaximos = {};
 
-const DURACAO_BASE = { '1': 10000, '2': 120000, '3': 180000, '4': 240000, '5': 30000 };
+const DURACAO_BASE = { '1': 10000, '2': 120000, '3': 180000, '4': 240000, '5': 30000, '6': 180000 };
 const PODER_ALDEAO = 5;
-const CUSTOS_ACAO = { '1': 2, '2': 3, '3': 1, '4': 1, '5': 5 };
-const IMAGENS_ACAO = { '1': 'walk.gif', '2': 'dead.gif', '3': 'book.gif', '4': 'fire.gif' };
+const PODER_CAMPEAO = 10;
+const CUSTOS_ACAO = { '1': 2, '2': 3, '3': 1, '4': 1, '5': 5, '6': 2000 };
+const CUSTO_CAMPEAO = {
+    moeda: 2000,
+    madeira: 100,
+    ferro: 50,
+    temor: 150,
+    sabedoria: 150,
+    magia: 100
+};
+const IMAGENS_ACAO = {
+    '1': 'walk.gif',
+    '2': 'dead.gif',
+    '3': 'book.gif',
+    '4': 'fire.gif',
+    '6': 'icones/campeao.svg'
+};
 const TEXTOS_ACAO = {
     '1': 'aldeão(ões) coletando recursos',
     '2': 'enforcamento(s) programado',
     '3': 'aldeão(ões) em treinamento de história',
     '4': 'aldeão(ões) em treinamento de magia',
-    '5': 'aldeão(ões) atacando a fera'
+    '5': 'aldeão(ões) atacando a fera',
+    '6': 'aldeão treinando um campeão'
 };
 const LABEL_GANHO = {
     madeira: 'madeira',
@@ -269,6 +285,11 @@ function descreverConcluida(concluida) {
             return 'Seus ' + quantidade + ' aldeão(ões) concluíram o treinamento de história: ' + ganhos + '.';
         case '4':
             return 'Seus ' + quantidade + ' aldeão(ões) concluíram o treinamento de magia: ' + ganhos + '.';
+        case '6': {
+            const nivel = Number(usuario.jogo && usuario.jogo.campeao) || 0;
+            return 'O treinamento terminou. Seu campeão chegou ao nível ' + nivel +
+                ' e agora soma +' + (nivel * PODER_CAMPEAO) + ' de ataque nas caçadas.';
+        }
         case '5': {
             const fera = acharFera(concluida.fera);
             const alvo = fera ? fera.artigo + ' ' + fera.nome : 'a fera';
@@ -325,6 +346,15 @@ function lerNotificacoes() {
             break;
         case 'batalhaEmCurso':
             mostrarMensagem('erro', 'A batalha contra a fera já começou; não é possível revogar.', 'BATALHA EM CURSO');
+            break;
+        case 'treinamentoEmCurso':
+            mostrarMensagem('erro', 'O treinamento do campeão já começou; não é possível revogar.', 'TREINAMENTO EM CURSO');
+            break;
+        case 'semRecursosCampeao':
+            mostrarMensagem('erro', 'São necessários 100 de madeira e 50 de ferro para treinar o campeão.', 'RECURSOS INSUFICIENTES');
+            break;
+        case 'requisitosCampeao':
+            mostrarMensagem('erro', 'O campeão exige 150 de temor, 150 de sabedoria e 100 de magia.', 'REQUISITOS INSUFICIENTES');
             break;
         default:
             break;
@@ -384,6 +414,16 @@ async function atualizarHud() {
     const trabalhando = document.getElementById('hud-suditos-trabalhando');
     if (trabalhando) {
         trabalhando.textContent = jogo.suditosTrabalhando + ' trab.';
+    }
+
+    const campeao = Number(jogo.campeao) || 0;
+    const hudCampeao = document.getElementById('hud-campeao');
+    if (hudCampeao) {
+        hudCampeao.textContent = campeao;
+    }
+    const hudCampeaoBonus = document.getElementById('hud-campeao-bonus');
+    if (hudCampeaoBonus) {
+        hudCampeaoBonus.textContent = '+' + (campeao * PODER_CAMPEAO) + ' atq';
     }
 
     const antigo = document.getElementById('moeda');
@@ -640,6 +680,7 @@ function atualizarFormularioOrdens() {
     }
 
     const painel = document.getElementById('painel-ordem');
+    const caixaQuantidade = document.getElementById('ordem-quantidade');
     const range = document.getElementById('qtd-range');
     const qtdValor = document.getElementById('qtd-valor');
     const qtdMax = document.getElementById('qtd-max');
@@ -648,23 +689,37 @@ function atualizarFormularioOrdens() {
     const status = document.getElementById('ordem-status');
     const botao = document.getElementById('btn-enviar-ordem');
     const card = form.querySelector('.card-acao.selecionado');
+    const acao = card ? String(card.dataset.acao) : '';
+    const especial = acao === '6';
     const livres = Math.max(0, Number(usuario.jogo.suditos) - Number(usuario.jogo.suditosTrabalhando));
+    const campeao = Number(usuario.jogo.campeao) || 0;
 
-    if (range) {
-        range.max = Math.max(1, livres);
-        range.disabled = livres <= 0;
-        if (Number(range.value) > Math.max(1, livres)) {
-            range.value = Math.max(1, livres);
+    if (especial) {
+        if (range) {
+            range.max = 1;
+            range.value = 1;
+            range.disabled = true;
         }
-    }
-    if (qtdMax) {
-        qtdMax.textContent = livres;
-    }
-
-    if (status) {
-        status.textContent = livres > 0
-            ? livres + ' aldeão(ões) livre(s) · ' + usuario.jogo.suditosTrabalhando + ' em atividade'
-            : 'Nenhum aldeão livre. Aguarde as ordens atuais.';
+        if (caixaQuantidade) {
+            caixaQuantidade.classList.add('d-none');
+        }
+        if (qtdMax) {
+            qtdMax.textContent = '1';
+        }
+    } else {
+        if (caixaQuantidade) {
+            caixaQuantidade.classList.remove('d-none');
+        }
+        if (range) {
+            range.max = Math.max(1, livres);
+            range.disabled = livres <= 0;
+            if (Number(range.value) > Math.max(1, livres)) {
+                range.value = Math.max(1, livres);
+            }
+        }
+        if (qtdMax) {
+            qtdMax.textContent = livres;
+        }
     }
 
     if (!card) {
@@ -677,6 +732,11 @@ function atualizarFormularioOrdens() {
         if (botao) {
             botao.disabled = true;
         }
+        if (status) {
+            status.textContent = livres > 0
+                ? livres + ' aldeão(ões) livre(s) · ' + usuario.jogo.suditosTrabalhando + ' em atividade'
+                : 'Nenhum aldeão livre. Aguarde as ordens atuais.';
+        }
         return;
     }
 
@@ -684,7 +744,7 @@ function atualizarFormularioOrdens() {
         painel.classList.remove('d-none');
     }
 
-    const numero = Math.max(1, parseInt(range ? range.value : 1, 10) || 1);
+    const numero = especial ? 1 : Math.max(1, parseInt(range ? range.value : 1, 10) || 1);
     if (quantidade) {
         quantidade.value = numero;
     }
@@ -692,22 +752,81 @@ function atualizarFormularioOrdens() {
         qtdValor.textContent = numero;
     }
 
-    const acao = String(card.dataset.acao);
     const custo = Number(card.dataset.custo) || CUSTOS_ACAO[acao] || 0;
     const duracao = Number(card.dataset.duracao) || DURACAO_BASE[acao] || 0;
-    const totalCusto = custo * numero;
-    const totalDuracao = duracao * numero;
+
+    if (especial) {
+        const recursos = usuario.jogo.recursos || {};
+        const valores = {
+            moeda: Number(usuario.jogo.moeda) || 0,
+            madeira: Number(recursos.madeira) || 0,
+            ferro: Number(recursos.ferro) || 0,
+            temor: Number(usuario.jogo.temor) || 0,
+            sabedoria: Number(usuario.jogo.sabedoria) || 0,
+            magia: Number(usuario.jogo.magia) || 0
+        };
+        const faltando = [];
+
+        if (valores.moeda < CUSTO_CAMPEAO.moeda) {
+            faltando.push(CUSTO_CAMPEAO.moeda.toLocaleString('pt-BR') + ' moedas');
+        }
+        if (valores.madeira < CUSTO_CAMPEAO.madeira) {
+            faltando.push(CUSTO_CAMPEAO.madeira + ' madeira');
+        }
+        if (valores.ferro < CUSTO_CAMPEAO.ferro) {
+            faltando.push(CUSTO_CAMPEAO.ferro + ' ferro');
+        }
+        if (valores.temor < CUSTO_CAMPEAO.temor) {
+            faltando.push(CUSTO_CAMPEAO.temor + ' temor');
+        }
+        if (valores.sabedoria < CUSTO_CAMPEAO.sabedoria) {
+            faltando.push(CUSTO_CAMPEAO.sabedoria + ' sabedoria');
+        }
+        if (valores.magia < CUSTO_CAMPEAO.magia) {
+            faltando.push(CUSTO_CAMPEAO.magia + ' magia');
+        }
+
+        const proximoNivel = campeao + 1;
+        const ganhaBonus = Math.floor(proximoNivel / 3) > Math.floor(campeao / 3);
+        const podeTreinar = livres >= 1 && faltando.length === 0;
+
+        if (resumo) {
+            resumo.innerHTML =
+                '<div class="ordem-linha"><span>Custo</span><strong>2.000 moedas · 100 madeira · 50 ferro</strong></div>' +
+                '<div class="ordem-linha"><span>Tempo</span><strong>' + formatarDuracao(180) + ' · 1 aldeão</strong></div>' +
+                '<div class="ordem-linha"><span>Requisitos</span><strong>150 temor · 150 sabedoria · 100 magia</strong></div>' +
+                '<div class="ordem-linha"><span>Recompensa</span><strong>+1 nível de campeão · +10 de ataque</strong></div>' +
+                (ganhaBonus
+                    ? '<div class="ordem-linha"><span>Bônus</span><strong>+10% de moedas nas caçadas</strong></div>'
+                    : '');
+        }
+
+        if (status) {
+            status.textContent = podeTreinar
+                ? 'Um aldeão ficará 3min treinando o campeão nível ' + proximoNivel + '.'
+                : (livres < 1
+                    ? 'Nenhum aldeão livre para o treinamento.'
+                    : 'Faltam: ' + faltando.join(' · ') + '.');
+        }
+
+        if (botao) {
+            botao.textContent = 'Treinar campeão';
+            botao.disabled = !podeTreinar;
+        }
+        return;
+    }
 
     let linhas = '<div class="ordem-linha"><span>Custo</span><strong>' +
-        '<img class="ordem-icone" src="images/icones/moeda.svg" alt=""> ' + totalCusto + ' moeda(s)</strong></div>' +
-        '<div class="ordem-linha"><span>Tempo</span><strong>' + formatarDuracao(totalDuracao / 1000) + '</strong></div>';
+        '<img class="ordem-icone" src="images/icones/moeda.svg" alt=""> ' + (custo * numero) + ' moeda(s)</strong></div>' +
+        '<div class="ordem-linha"><span>Tempo</span><strong>' + formatarDuracao((duracao * numero) / 1000) + '</strong></div>';
 
     if (acao === '1') {
         linhas += '<div class="ordem-linha"><span>Produção</span><strong>+' + (numero * 5) +
             ' madeira · +' + (numero * 2) + ' comida · +' + numero + ' ferro</strong></div>';
     } else if (acao === '5') {
-        linhas += '<div class="ordem-linha"><span>Força</span><strong>' + (numero * PODER_ALDEAO) +
-            ' de ataque</strong></div>' +
+        const bonus = campeao * PODER_CAMPEAO;
+        linhas += '<div class="ordem-linha"><span>Força</span><strong>' + (numero * PODER_ALDEAO + bonus) +
+            ' de ataque' + (bonus > 0 ? ' (+' + bonus + ' do campeão)' : '') + '</strong></div>' +
             '<div class="ordem-linha"><span>Fera</span><strong>surpresa</strong></div>';
     } else {
         const habilidade = { '2': 'temor', '3': 'sabedoria', '4': 'magia' }[acao];
@@ -721,7 +840,14 @@ function atualizarFormularioOrdens() {
         resumo.innerHTML = linhas;
     }
 
+    if (status) {
+        status.textContent = livres > 0
+            ? livres + ' aldeão(ões) livre(s) · ' + usuario.jogo.suditosTrabalhando + ' em atividade'
+            : 'Nenhum aldeão livre. Aguarde as ordens atuais.';
+    }
+
     if (botao) {
+        botao.textContent = 'Enviar ordem';
         botao.disabled = livres <= 0 || numero < 1 || numero > livres;
     }
 }
@@ -753,7 +879,7 @@ function inicializarFormularioOrdens() {
             const range = document.getElementById('qtd-range');
             const livres = Math.max(0, Number(usuario.jogo.suditos) - Number(usuario.jogo.suditosTrabalhando));
             if (range) {
-                range.value = Math.max(1, livres);
+                range.value = card.dataset.acao === '6' ? 1 : Math.max(1, livres);
             }
 
             atualizarFormularioOrdens();
@@ -859,7 +985,8 @@ function renderizarAcoes() {
             const alvo = fera ? fera.artigo + ' ' + fera.nome : 'a fera';
             const imagemFera = fera ? fera.imagem : 'fera.svg';
             const vida = fera ? Number(fera.vida) || 0 : 0;
-            const ataque = quantidade * PODER_ALDEAO;
+            const ataque = Number(acao.ataque) || (quantidade * PODER_ALDEAO);
+            const bonusCampeao = Math.max(0, ataque - (quantidade * PODER_ALDEAO));
             const repeticoes = Math.min(quantidade, 10);
 
             for (let i = 0; i < repeticoes; i++) {
@@ -877,7 +1004,9 @@ function renderizarAcoes() {
             cabecalho = '<div class="batalha" data-vida="' + vida + '" data-ataque="' + ataque + '">' +
                 '<div class="batalha-lado batalha-atacantes">' +
                 '<div class="aldeoes">' + aldeoes + '</div>' +
-                '<span class="batalha-contagem">' + quantidade + ' aldeão(ões)</span>' +
+                '<span class="batalha-contagem">' + quantidade + ' aldeão(ões)' +
+                (bonusCampeao > 0 ? ' · <span class="batalha-campeao">+' + bonusCampeao + ' campeão</span>' : '') +
+                '</span>' +
                 '</div>' +
                 '<div class="batalha-centro">VS</div>' +
                 '<div class="batalha-lado batalha-fera">' +
@@ -904,7 +1033,9 @@ function renderizarAcoes() {
 
         const botaoRevogar = tipo === '5'
             ? '<span class="btn-acao btn-acao-bloqueado" title="A batalha já começou">batalha em curso</span>'
-            : '<a class="btn-acao" href="/revogar_acao?id_acao=' + acao._id + '&jogoid=' + usuario.jogo._id + '">revogar ordem</a>';
+            : (tipo === '6'
+                ? '<span class="btn-acao btn-acao-bloqueado" title="O treinamento já começou">treinamento em curso</span>'
+                : '<a class="btn-acao" href="/revogar_acao?id_acao=' + acao._id + '&jogoid=' + usuario.jogo._id + '">revogar ordem</a>');
 
         conteudo += '<div class="row acoes-pergaminho" data-id="' + acao._id + '" data-tipo="' + tipo + '" data-termina="' + termina + '" data-inicio="' + inicio + '" data-duracao="' + duracao + '">' +
             '<div class="col-10">' +
@@ -1066,7 +1197,8 @@ function montarHistorico(historico) {
         '1': 'Coleta de recursos',
         '2': 'Enforcamento',
         '3': 'Treinamento de história',
-        '4': 'Treinamento de magia'
+        '4': 'Treinamento de magia',
+        '6': 'Treinamento de campeão'
     };
 
     return '<div class="historico-lista">' + historico.map(function (item, indice) {
@@ -1079,11 +1211,13 @@ function montarHistorico(historico) {
         const titulo = tipo === '5' ? 'Caçada' : (nomes[tipo] || 'Ordem');
         const detalhe = tipo === '5'
             ? (item.vitoria ? 'Vitória contra ' : 'Derrota para ') + feraNome
-            : item.quantidade + ' aldeão(ões)';
+            : (tipo === '6' ? 'Treinamento concluído' : item.quantidade + ' aldeão(ões)');
         const ganhos = descreverGanhos(item.ganhos);
         const recompensa = ganhos
             ? ganhos
-            : (tipo === '5' && item.vitoria === false ? 'A fera escapou.' : 'Sem recompensa.');
+            : (tipo === '5' && item.vitoria === false
+                ? 'A fera escapou.'
+                : (tipo === '6' ? '+1 nível de campeão' : 'Sem recompensa.'));
         const data = item.terminado_em
             ? new Date(item.terminado_em).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' })
             : '';
@@ -1364,11 +1498,17 @@ async function sincronizar() {
             const todasVitorias = soBatalhas && batalhas.every(function (concluida) {
                 return concluida.vitoria === true;
             });
+            const soCampeao = dados.concluidas.every(function (concluida) {
+                return String(concluida.acao) === '6';
+            });
 
             let tipo = 'recompensa';
             let titulo = dados.concluidas.length === 1 ? 'ORDEM CONCLUÍDA' : 'ORDENS CONCLUÍDAS';
 
-            if (todasDerrotas) {
+            if (soCampeao) {
+                tipo = 'vitoria';
+                titulo = 'CAMPEÃO TREINADO';
+            } else if (todasDerrotas) {
                 tipo = 'derrota';
                 titulo = 'A FERA ESCAPOU';
             } else if (todasVitorias) {
@@ -1382,7 +1522,9 @@ async function sincronizar() {
             }).join('');
 
             let imagem = '';
-            if (soBatalhas && batalhas.length === 1 && batalhas[0].fera) {
+            if (soCampeao) {
+                imagem = '<img class="modal-jogo__fera" src="images/icones/campeao.svg" alt="Campeão">';
+            } else if (soBatalhas && batalhas.length === 1 && batalhas[0].fera) {
                 const fera = acharFera(batalhas[0].fera);
                 if (fera) {
                     imagem = '<img class="modal-jogo__fera" src="images/feras/' + fera.imagem + '" alt="' + fera.nome + '">';

@@ -2764,6 +2764,11 @@ img {
   color: #d9c9ad;
 }
 
+.batalha-campeao {
+  color: #ffd34d;
+  font-weight: bold;
+}
+
 .batalha-centro {
   color: var(--acao-cor, #ffd34d);
   font-family: Georgia, 'Times New Roman', serif;
@@ -3448,6 +3453,27 @@ body.modal-aberto {
   font-size: 10px;
   line-height: 1.25;
   text-align: center;
+}
+
+.card-acao__requisito {
+  color: #c9a896;
+  font-size: 9px;
+  line-height: 1.25;
+  text-align: center;
+}
+
+.card-acao--campeao {
+  border-color: rgba(255, 211, 77, 0.5);
+  background: linear-gradient(120deg, rgba(90, 45, 18, 0.95), rgba(18, 10, 6, 0.99));
+  flex-wrap: wrap;
+}
+
+.card-acao--campeao .card-acao__requisito {
+  flex-basis: 100%;
+}
+
+.card-acao--campeao img {
+  background: #2b1a10;
 }
 
 .card-acao:hover {

@@ -66,6 +66,9 @@ UsuarioDAO.prototype.buscarUsuarioGerarAldeoes = async function (res, req, casa,
         }
 
         result[0].nome = req.session.nome;
+        result[0].campeao = Number(result[0].campeao) || 0;
+        result[0].campeaoAtaque = result[0].campeao * 10;
+        result[0].campeaoBonusMoeda = Math.floor(result[0].campeao / 3) * 0.1;
         res.render('aldeoes', {
             img_casa: casa,
             jogo: result[0],

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-labelledby="icoCampeao">
+  <title id="icoCampeao">Campeão</title>
+  <path d="M32 4 L55 14 V31 C55 45 45 55 32 60 C19 55 9 45 9 31 V14 Z" fill="#2b1a10" stroke="#ffd34d" stroke-width="3"/>
+  <path d="M32 12 L47 18 V31 C47 40 41 47 32 51 C23 47 17 40 17 31 V18 Z" fill="#5a1f16" stroke="#c9a227" stroke-width="2"/>
+  <path d="M32 17 V45 M22 25 H42" stroke="#ffd34d" stroke-width="4" stroke-linecap="round"/>
+  <path d="M32 17 L36 21 L32 25 L28 21 Z" fill="#ffd34d"/>
+  <circle cx="32" cy="35" r="7" fill="none" stroke="#f4e7cf" stroke-width="2"/>
+</svg>

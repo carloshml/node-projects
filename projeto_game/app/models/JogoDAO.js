@@ -2,10 +2,22 @@ let ObjectId = require('mongodb').ObjectId;
 const { FERAS, PODER_ALDEAO, obterFera } = require('./feras');
 
 /* custo em moedas por aldeão, por tipo de ação */
-const CUSTOS = { 1: 2, 2: 3, 3: 1, 4: 1, 5: 5 };
+const CUSTOS = { 1: 2, 2: 3, 3: 1, 4: 1, 5: 5, 6: 2000 };
 
 /* duração em milissegundos por aldeão, por tipo de ação */
-const DURACOES = { 1: 10000, 2: 120000, 3: 180000, 4: 240000, 5: 30000 };
+const DURACOES = { 1: 10000, 2: 120000, 3: 180000, 4: 240000, 5: 30000, 6: 180000 };
+
+/* requisitos fixos para treinar um campeão */
+const CAMPEAO = {
+    moeda: 2000,
+    madeira: 100,
+    ferro: 50,
+    duracao: 180000,
+    requisitos: { temor: 150, sabedoria: 150, magia: 100 },
+    ataquePorNivel: 10,
+    niveisPorBonus: 3,
+    bonusMoeda: 0.1
+};
 
 /* o que cada aldeão produz ao terminar a ação */
 const RECOMPENSAS = {
@@ -65,16 +77,21 @@ function resultadoDaAcao(acao) {
 
     if (tipo === 5) {
         const fera = obterFera(acao.fera);
-        const ataque = quantidade * PODER_ALDEAO;
+        const campeao = Number(acao.campeao) || 0;
+        const ataque = Number(acao.ataque) || (quantidade * PODER_ALDEAO);
 
         if (!fera) {
             return { ganhos: {}, vitoria: false, fera: null, ataque: ataque, vida: null, minimo: null };
         }
 
         const vitoria = ataque >= fera.vida;
+        const multiplicador = 1 + (Math.floor(campeao / CAMPEAO.niveisPorBonus) * CAMPEAO.bonusMoeda);
         return {
             ganhos: vitoria
-                ? { moeda: fera.recompensa, temor: Math.ceil(fera.vida / 3) }
+                ? {
+                    moeda: Math.round(fera.recompensa * multiplicador),
+                    temor: Math.ceil(fera.vida / 3)
+                }
                 : {},
             vitoria: vitoria,
             fera: fera.id,
@@ -99,7 +116,7 @@ function instanteDaVitoria(acao) {
     }
 
     const quantidade = Number(acao.quantidade) || 0;
-    const ataque = quantidade * PODER_ALDEAO;
+    const ataque = Number(acao.ataque) || (quantidade * PODER_ALDEAO);
     if (ataque < fera.vida) {
         return null;
     }
@@ -150,6 +167,7 @@ JogoDAO.prototype.gerarParametrosJogo = async function (id, usuario) {
             sabedoria: Math.floor(Math.random() * 1000),
             comercio: Math.floor(Math.random() * 1000),
             magia: Math.floor(Math.random() * 1000),
+            campeao: 0,
             recursos: { madeira: 0, comida: 0, ferro: 0 }
         });
     } catch (error) {
@@ -178,6 +196,9 @@ JogoDAO.prototype.iniciaJogo = async function (res, req, casa, msg) {
         jogo.recursos = jogo.recursos || {};
         jogo.precos = PRECOS;
         jogo.feras = FERAS;
+        jogo.campeao = Number(jogo.campeao) || 0;
+        jogo.campeaoAtaque = jogo.campeao * CAMPEAO.ataquePorNivel;
+        jogo.campeaoBonusMoeda = Math.floor(jogo.campeao / CAMPEAO.niveisPorBonus) * CAMPEAO.bonusMoeda;
         res.render('jogo', { img_casa: casa, jogo: jogo, msg: msg });
     } catch (error) {
         console.log('  algum erro foi encontrado  ', error);
@@ -191,7 +212,12 @@ JogoDAO.prototype.gerarOrdemSuditos = async function (acao) {
     const db = conexao.db;
     try {
         const tipo = parseInt(acao.acao, 10);
-        const quantidade = parseInt(acao.quantidade, 10);
+        let quantidade = parseInt(acao.quantidade, 10);
+
+        /* o treinamento do campeão usa exatamente um aldeão */
+        if (tipo === 6) {
+            quantidade = 1;
+        }
 
         if (!CUSTOS[tipo] || !(quantidade > 0)) {
             return { ok: false, msg: 'erro' };
@@ -208,36 +234,73 @@ JogoDAO.prototype.gerarOrdemSuditos = async function (acao) {
             ? { idUsuario: new ObjectId(acao.idUsuario) }
             : { _id: new ObjectId(acao.jogo._id) };
 
-        /* debita moedas e ocupa os aldeões de forma atômica */
+        const filtroDebito = {
+            ...filtroJogo,
+            moeda: { $gte: custo },
+            $expr: { $gte: [{ $subtract: ['$suditos', '$suditosTrabalhando'] }, quantidade] }
+        };
+        const incrementosDebito = {
+            moeda: -custo,
+            suditosTrabalhando: quantidade
+        };
+
+        if (tipo === 6) {
+            filtroDebito['recursos.madeira'] = { $gte: CAMPEAO.madeira };
+            filtroDebito['recursos.ferro'] = { $gte: CAMPEAO.ferro };
+            filtroDebito.temor = { $gte: CAMPEAO.requisitos.temor };
+            filtroDebito.sabedoria = { $gte: CAMPEAO.requisitos.sabedoria };
+            filtroDebito.magia = { $gte: CAMPEAO.requisitos.magia };
+            incrementosDebito['recursos.madeira'] = -CAMPEAO.madeira;
+            incrementosDebito['recursos.ferro'] = -CAMPEAO.ferro;
+        }
+
+        /* debita moedas/recursos e ocupa os aldeões de forma atômica */
         const debito = await db.collection("jogo").findOneAndUpdate(
-            {
-                ...filtroJogo,
-                moeda: { $gte: custo },
-                $expr: { $gte: [{ $subtract: ['$suditos', '$suditosTrabalhando'] }, quantidade] }
-            },
-            { $inc: { moeda: -custo, suditosTrabalhando: quantidade } }
+            filtroDebito,
+            { $inc: incrementosDebito },
+            { returnDocument: 'after' }
         );
 
-        if (!documentoDe(debito)) {
+        const jogoAposDebito = documentoDe(debito);
+        if (!jogoAposDebito) {
             const jogo = await db.collection("jogo").findOne(filtroJogo);
             if (!jogo) {
                 return { ok: false, msg: 'erro' };
             }
+
+            const livres = (Number(jogo.suditos) || 0) - (Number(jogo.suditosTrabalhando) || 0);
+            if (livres < quantidade) {
+                return { ok: false, msg: 'todoSutidosOcupados' };
+            }
             if (Number(jogo.moeda) < custo) {
                 return { ok: false, msg: 'semMoeda' };
             }
-            return { ok: false, msg: 'todoSutidosOcupados' };
+            if (tipo === 6) {
+                const recursos = jogo.recursos || {};
+                if ((Number(recursos.madeira) || 0) < CAMPEAO.madeira ||
+                    (Number(recursos.ferro) || 0) < CAMPEAO.ferro) {
+                    return { ok: false, msg: 'semRecursosCampeao' };
+                }
+                if ((Number(jogo.temor) || 0) < CAMPEAO.requisitos.temor ||
+                    (Number(jogo.sabedoria) || 0) < CAMPEAO.requisitos.sabedoria ||
+                    (Number(jogo.magia) || 0) < CAMPEAO.requisitos.magia) {
+                    return { ok: false, msg: 'requisitosCampeao' };
+                }
+            }
+            return { ok: false, msg: 'erro' };
         }
 
         const agora = new Date().getTime();
         let duracao = DURACOES[tipo] * quantidade;
 
         /* a batalha termina quando o dano acumulado zera a vida da fera */
-        if (tipo === 5 && fera) {
-            const ataque = quantidade * PODER_ALDEAO;
-            if (ataque >= fera.vida) {
-                duracao = Math.max(1000, Math.round(duracao * (fera.vida / ataque)));
-            }
+        const campeao = Number(jogoAposDebito.campeao) || 0;
+        const ataque = tipo === 5
+            ? (quantidade * PODER_ALDEAO) + (campeao * CAMPEAO.ataquePorNivel)
+            : 0;
+
+        if (tipo === 5 && fera && ataque >= fera.vida) {
+            duracao = Math.max(1000, Math.round(duracao * (fera.vida / ataque)));
         }
 
         const novaAcao = {
@@ -253,15 +316,26 @@ JogoDAO.prototype.gerarOrdemSuditos = async function (acao) {
 
         if (fera) {
             novaAcao.fera = fera.id;
+            novaAcao.ataque = ataque;
+            novaAcao.campeao = campeao;
         }
 
         try {
             await db.collection("acao").insertOne(novaAcao);
         } catch (erroInsercao) {
             /* se não conseguiu registrar a ordem, devolve o que foi debitado */
+            const reembolso = {
+                moeda: custo,
+                suditosTrabalhando: -quantidade
+            };
+            if (tipo === 6) {
+                reembolso['recursos.madeira'] = CAMPEAO.madeira;
+                reembolso['recursos.ferro'] = CAMPEAO.ferro;
+            }
+
             await db.collection("jogo").updateOne(
                 filtroJogo,
-                { $inc: { moeda: custo, suditosTrabalhando: -quantidade } }
+                { $inc: reembolso }
             );
             throw erroInsercao;
         }
@@ -363,6 +437,10 @@ JogoDAO.prototype.atualizarAcoesDeJogo = async function (req, res) {
                 incrementos[campoDoBanco(campo)] = ganhos[campo];
             });
 
+            if (String(acao.acao) === '6') {
+                incrementos.campeao = 1;
+            }
+
             if (Object.keys(incrementos).length > 0) {
                 await db.collection("jogo").updateOne({ _id: jogo._id }, { $inc: incrementos });
             }
@@ -376,6 +454,7 @@ JogoDAO.prototype.atualizarAcoesDeJogo = async function (req, res) {
                 ataque: resultado.ataque,
                 vida: resultado.vida,
                 minimo: resultado.minimo,
+                campeao: String(acao.acao) === '6',
                 pendente: pendente
             });
         }
@@ -421,6 +500,12 @@ JogoDAO.prototype.revogarAcao = async function (req, res) {
         /* a fera já foi revelada; revogar permitiria sortear outra */
         if (parseInt(acao.acao, 10) === 5) {
             res.redirect('/jogo?msg=batalhaEmCurso');
+            return;
+        }
+
+        /* o treinamento consome recursos e não deve ser interrompido */
+        if (parseInt(acao.acao, 10) === 6) {
+            res.redirect('/jogo?msg=treinamentoEmCurso');
             return;
         }
 
@@ -618,6 +703,9 @@ JogoDAO.prototype.buscaJogoUsuario = async function (res, req, casa, msg) {
         jogo.recursos = jogo.recursos || {};
         jogo.precos = PRECOS;
         jogo.feras = FERAS;
+        jogo.campeao = Number(jogo.campeao) || 0;
+        jogo.campeaoAtaque = jogo.campeao * CAMPEAO.ataquePorNivel;
+        jogo.campeaoBonusMoeda = Math.floor(jogo.campeao / CAMPEAO.niveisPorBonus) * CAMPEAO.bonusMoeda;
         res.send({ img_casa: casa, jogo: jogo, msg: msg });
     } catch (error) {
         console.log('  algum erro foi encontrado  ', error);
