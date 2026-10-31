@@ -404,7 +404,6 @@ function atualizarBotaoAldeao() {
     const moeda = Number(usuario.jogo.moeda) || 0;
     const podeComprar = moeda >= CUSTO_ALDEAO;
     botao.disabled = comprandoAldeao;
-    botao.classList.toggle('btn-comprar-aldeao--indisponivel', !podeComprar);
     botao.title = podeComprar
         ? 'Comprar um novo aldeão por 10.000 moedas'
         : 'Você precisa de 10.000 moedas para comprar um aldeão';

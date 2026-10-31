@@ -141,50 +141,90 @@
 }
 
 .btn-comprar-aldeao {
-  display: inline-flex;
+  position: relative;
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 8px;
-  margin-top: 10px;
-  padding: 6px 14px 6px 7px;
-  border: 1px solid rgba(255, 211, 77, 0.55);
-  border-radius: 999px;
-  background: linear-gradient(120deg, rgba(255, 211, 77, 0.14), rgba(16, 10, 8, 0.92));
+  justify-content: space-between;
+  gap: 4px;
+  width: 164px;
+  height: 164px;
+  margin: 12px auto 0;
+  padding: 12px 10px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 211, 77, 0.65);
+  border-radius: 10px;
+  background:
+    radial-gradient(circle at 50% 42%, rgba(255, 211, 77, 0.16), transparent 48%),
+    linear-gradient(160deg, rgba(34, 22, 13, 0.98), rgba(10, 7, 5, 0.99));
   color: #ffd34d;
-  font-size: 12px;
-  line-height: 1;
   cursor: pointer;
-  box-shadow: 0 0 16px rgba(255, 200, 60, 0.12);
-  transition: border-color 0.15s ease, background 0.15s ease, transform 0.15s ease;
+  box-shadow:
+    0 0 0 1px rgba(255, 211, 77, 0.08),
+    0 0 18px rgba(255, 180, 40, 0.22);
+  animation: brilhoCompra 2.6s ease-in-out infinite;
+  transition: border-color 0.15s ease, transform 0.15s ease;
 }
 
-.btn-comprar-aldeao:hover:not(:disabled),
+.btn-comprar-aldeao::after {
+  content: '';
+  position: absolute;
+  top: -40%;
+  left: -70%;
+  z-index: 0;
+  width: 55%;
+  height: 180%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.22), transparent);
+  transform: rotate(20deg);
+  animation: brilhoVarre 3.8s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.btn-comprar-aldeao > * {
+  position: relative;
+  z-index: 1;
+}
+
+.btn-comprar-aldeao:hover,
 .btn-comprar-aldeao:focus-visible {
-  border-color: #ffd34d;
-  background: linear-gradient(120deg, rgba(255, 211, 77, 0.24), rgba(30, 18, 10, 0.96));
+  border-color: #ffe485;
   outline: none;
-  transform: translateY(-1px);
+  transform: translateY(-2px) scale(1.015);
+  box-shadow:
+    0 0 0 1px rgba(255, 211, 77, 0.25),
+    0 0 34px rgba(255, 190, 50, 0.4);
 }
 
 .btn-comprar-aldeao:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  filter: grayscale(0.55);
+  opacity: 0.6;
+  cursor: wait;
 }
 
-.btn-comprar-aldeao--indisponivel {
-  opacity: 0.72;
+.btn-comprar-aldeao__rotulo {
+  color: #ffd34d;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  line-height: 1.1;
+  text-align: center;
+  text-transform: uppercase;
 }
 
-.btn-comprar-aldeao--indisponivel .btn-comprar-aldeao__aldeao {
-  filter: grayscale(0.35);
-  animation: none;
+.btn-comprar-aldeao__retrato {
+  display: grid;
+  width: 66px;
+  height: 66px;
+  place-items: center;
+  border: 1px solid rgba(255, 211, 77, 0.4);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 211, 77, 0.22), rgba(20, 12, 8, 0.9));
+  box-shadow: 0 0 18px rgba(255, 200, 60, 0.2);
 }
 
 .btn-comprar-aldeao__aldeao {
-  width: 30px;
-  height: 30px;
-  padding: 2px;
-  border: 1px solid rgba(255, 211, 77, 0.45);
+  width: 58px;
+  height: 58px;
+  padding: 3px;
   border-radius: 50%;
   background: #f4e7cf;
   object-fit: contain;
@@ -195,18 +235,12 @@
   animation: none;
 }
 
-.btn-comprar-aldeao__rotulo {
-  font-family: Georgia, 'Times New Roman', serif;
-  font-size: 13px;
-  letter-spacing: 0.02em;
-}
-
 .btn-comprar-aldeao__custo {
-  padding-left: 9px;
-  border-left: 1px solid rgba(255, 211, 77, 0.25);
-  color: #c9b896;
-  font-size: 10px;
-  letter-spacing: 0.04em;
+  color: #f4e7cf;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  line-height: 1;
+  text-align: center;
   text-transform: uppercase;
 }
 
@@ -217,6 +251,47 @@
   }
   50% {
     transform: translateY(-2px);
+  }
+}
+
+@keyframes brilhoCompra {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 1px rgba(255, 211, 77, 0.08),
+      0 0 18px rgba(255, 180, 40, 0.22);
+  }
+  50% {
+    box-shadow:
+      0 0 0 1px rgba(255, 211, 77, 0.18),
+      0 0 32px rgba(255, 190, 50, 0.42);
+  }
+}
+
+@keyframes brilhoVarre {
+  0% {
+    left: -70%;
+  }
+  55%,
+  100% {
+    left: 130%;
+  }
+}
+
+@media (max-width: 575px) {
+  .btn-comprar-aldeao {
+    width: 150px;
+    height: 150px;
+  }
+
+  .btn-comprar-aldeao__retrato {
+    width: 60px;
+    height: 60px;
+  }
+
+  .btn-comprar-aldeao__aldeao {
+    width: 52px;
+    height: 52px;
   }
 }
 
