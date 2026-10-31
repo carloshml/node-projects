@@ -153,3 +153,13 @@ module.exports.venderRecurso = function (application, req, res) {
     const JogoDAO = new application.app.models.JogoDAO(connection);
     JogoDAO.venderRecurso(req, res);
 }
+
+module.exports.comprarAldeao = function (application, req, res) {
+    if (!req.session.autorizado) {
+        res.status(401).json({ ok: false, msg: 'Você não tem acesso a essa área' });
+        return;
+    }
+    const connection = application.config.dbConection;
+    const JogoDAO = new application.app.models.JogoDAO(connection);
+    JogoDAO.comprarAldeao(req, res);
+}

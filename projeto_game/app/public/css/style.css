@@ -140,6 +140,86 @@
   overflow: auto;
 }
 
+.btn-comprar-aldeao {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  padding: 6px 14px 6px 7px;
+  border: 1px solid rgba(255, 211, 77, 0.55);
+  border-radius: 999px;
+  background: linear-gradient(120deg, rgba(255, 211, 77, 0.14), rgba(16, 10, 8, 0.92));
+  color: #ffd34d;
+  font-size: 12px;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 0 16px rgba(255, 200, 60, 0.12);
+  transition: border-color 0.15s ease, background 0.15s ease, transform 0.15s ease;
+}
+
+.btn-comprar-aldeao:hover:not(:disabled),
+.btn-comprar-aldeao:focus-visible {
+  border-color: #ffd34d;
+  background: linear-gradient(120deg, rgba(255, 211, 77, 0.24), rgba(30, 18, 10, 0.96));
+  outline: none;
+  transform: translateY(-1px);
+}
+
+.btn-comprar-aldeao:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  filter: grayscale(0.55);
+}
+
+.btn-comprar-aldeao--indisponivel {
+  opacity: 0.72;
+}
+
+.btn-comprar-aldeao--indisponivel .btn-comprar-aldeao__aldeao {
+  filter: grayscale(0.35);
+  animation: none;
+}
+
+.btn-comprar-aldeao__aldeao {
+  width: 30px;
+  height: 30px;
+  padding: 2px;
+  border: 1px solid rgba(255, 211, 77, 0.45);
+  border-radius: 50%;
+  background: #f4e7cf;
+  object-fit: contain;
+  animation: aldeaoEspera 2.2s ease-in-out infinite;
+}
+
+.btn-comprar-aldeao:disabled .btn-comprar-aldeao__aldeao {
+  animation: none;
+}
+
+.btn-comprar-aldeao__rotulo {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 13px;
+  letter-spacing: 0.02em;
+}
+
+.btn-comprar-aldeao__custo {
+  padding-left: 9px;
+  border-left: 1px solid rgba(255, 211, 77, 0.25);
+  color: #c9b896;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+@keyframes aldeaoEspera {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-2px);
+  }
+}
+
 #pergaminhos > h3 {
   margin-top: 0;
   padding-bottom: 6px;

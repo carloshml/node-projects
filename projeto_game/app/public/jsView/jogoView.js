@@ -2,6 +2,7 @@ let usuario = {};
 let acoes = [];
 let assinaturaAcoes = '';
 let sincronizando = false;
+let comprandoAldeao = false;
 let divMensagens = null;
 let temporizadorMensagem = null;
 let temporizadorFlash = null;
@@ -37,6 +38,7 @@ const ICONES_GANHO = {
     magia: 'images/habilidades/magia.jpg'
 };
 const RECURSO_LABEL = { madeira: 'Madeira', comida: 'Comida', ferro: 'Ferro' };
+const CUSTO_ALDEAO = 10000;
 const PRECOS_PADRAO = { madeira: 1, comida: 2, ferro: 3 };
 const DURACAO_DELTA = 2000;
 const PAUSA_ANTES_MODAL = 1400;
@@ -389,7 +391,23 @@ async function atualizarHud() {
         promessas.push(atualizarValor(antigo, jogo.moeda, 'moeda'));
     }
 
+    atualizarBotaoAldeao();
     await Promise.all(promessas);
+}
+
+function atualizarBotaoAldeao() {
+    const botao = document.getElementById('btn-comprar-aldeao');
+    if (!botao || !usuario.jogo) {
+        return;
+    }
+
+    const moeda = Number(usuario.jogo.moeda) || 0;
+    const podeComprar = moeda >= CUSTO_ALDEAO;
+    botao.disabled = comprandoAldeao;
+    botao.classList.toggle('btn-comprar-aldeao--indisponivel', !podeComprar);
+    botao.title = podeComprar
+        ? 'Comprar um novo aldeão por 10.000 moedas'
+        : 'Você precisa de 10.000 moedas para comprar um aldeão';
 }
 
 function atualizarSuditos() {
@@ -548,6 +566,65 @@ async function venderRecurso(recurso, linha) {
         mostrarMensagem('erro', 'Não foi possível vender o recurso.');
     } finally {
         atualizarCeleiro();
+    }
+}
+
+async function comprarAldeao() {
+    const botao = document.getElementById('btn-comprar-aldeao');
+    if (!botao || botao.disabled || !usuario.jogo) {
+        return;
+    }
+
+    if ((Number(usuario.jogo.moeda) || 0) < CUSTO_ALDEAO) {
+        mostrarMensagem('erro', 'Você precisa de 10.000 moedas para comprar um novo aldeão.', 'SEM MOEDAS SUFICIENTES');
+        return;
+    }
+
+    comprandoAldeao = true;
+    botao.disabled = true;
+
+    try {
+        const resposta = await fetch('/comprarAldeao', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        });
+        const dados = await resposta.json();
+
+        if (!resposta.ok || !dados.ok) {
+            const semMoedas = dados.msg === 'moedasInsuficientes';
+            if (semMoedas && typeof dados.moeda === 'number') {
+                usuario.jogo.moeda = dados.moeda;
+                await atualizarHud();
+            }
+            const mensagem = semMoedas
+                ? 'Você precisa de 10.000 moedas para comprar um novo aldeão.'
+                : 'Não foi possível comprar o aldeão.';
+            mostrarMensagem('erro', mensagem, semMoedas ? 'SEM MOEDAS SUFICIENTES' : 'COMPRA NÃO REALIZADA');
+            return;
+        }
+
+        usuario.jogo.moeda = dados.moeda;
+        usuario.jogo.suditos = dados.suditos;
+        usuario.jogo.suditosTrabalhando = dados.suditosTrabalhando;
+
+        await atualizarHud();
+        atualizarSuditos();
+        atualizarFormularioOrdens();
+        atualizarBotaoAldeao();
+        tocarSom('moeda');
+        await pausa(400);
+
+        mostrarMensagem(
+            'acerto',
+            'Um novo aldeão juntou-se ao seu povo. <strong>-10.000 moedas</strong>',
+            'NOVO ALDEÃO'
+        );
+    } catch (erro) {
+        console.error('Falha ao comprar aldeão:', erro);
+        mostrarMensagem('erro', 'Não foi possível comprar o aldeão.');
+    } finally {
+        comprandoAldeao = false;
+        atualizarBotaoAldeao();
     }
 }
 

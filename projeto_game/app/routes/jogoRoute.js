@@ -39,6 +39,10 @@ module.exports = function (application) {
 		application.app.controllers.jogoController.venderRecurso(application, req, res);
 	});
 
+	application.post('/comprarAldeao', function (req, res) {
+		application.app.controllers.jogoController.comprarAldeao(application, req, res);
+	});
+
 	application
 		.get('/buscaJogoUsuario', function (req, res) {
 			application.app.controllers.jogoController.buscaJogoUsuario(application, req, res);

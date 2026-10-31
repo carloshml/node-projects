@@ -18,6 +18,9 @@ const RECOMPENSAS = {
 /* preço base de venda de cada recurso (em moedas) */
 const PRECOS = { madeira: 1, comida: 2, ferro: 3 };
 
+/* custo para contratar um novo aldeão */
+const CUSTO_ALDEAO = 10000;
+
 /* recursos ficam dentro de jogo.recursos; habilidades ficam na raiz */
 const CAMPOS_RECURSO = ['madeira', 'comida', 'ferro'];
 
@@ -486,6 +489,48 @@ JogoDAO.prototype.historicoAcoes = async function (req, res) {
         });
 
         responderJson(res, 200, { ok: true, historico: historico });
+    } catch (error) {
+        console.log('  algum erro foi encontrado  ', error);
+        responderJson(res, 500, { ok: false, msg: 'erro' });
+    } finally {
+        await conexao.client.close();
+    }
+}
+
+JogoDAO.prototype.comprarAldeao = async function (req, res) {
+    const conexao = await this._connection.getDB();
+    const filtro = { idUsuario: new ObjectId(req.session._id) };
+
+    try {
+        const atualizado = await conexao.db.collection("jogo").findOneAndUpdate(
+            { ...filtro, moeda: { $gte: CUSTO_ALDEAO } },
+            { $inc: { moeda: -CUSTO_ALDEAO, suditos: 1 } },
+            { returnDocument: 'after' }
+        );
+
+        const jogo = documentoDe(atualizado);
+        if (!jogo) {
+            const existente = await conexao.db.collection("jogo").findOne(filtro);
+            if (!existente) {
+                responderJson(res, 404, { ok: false, msg: 'jogoNaoEncontrado' });
+                return;
+            }
+            responderJson(res, 400, {
+                ok: false,
+                msg: 'moedasInsuficientes',
+                moeda: Number(existente.moeda) || 0,
+                custo: CUSTO_ALDEAO
+            });
+            return;
+        }
+
+        responderJson(res, 200, {
+            ok: true,
+            moeda: Number(jogo.moeda) || 0,
+            suditos: Number(jogo.suditos) || 0,
+            suditosTrabalhando: Number(jogo.suditosTrabalhando) || 0,
+            custo: CUSTO_ALDEAO
+        });
     } catch (error) {
         console.log('  algum erro foi encontrado  ', error);
         responderJson(res, 500, { ok: false, msg: 'erro' });

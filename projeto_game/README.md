@@ -97,6 +97,7 @@ Para produção, mova esses valores para variáveis de ambiente e troque o segre
 6. Venda madeira, comida e ferro no **Celeiro** para ganhar moedas.
 7. Acompanhe sua posição no **Ranking**.
 8. Abra **Pergaminhos** para consultar o histórico de ordens concluídas, recompensas e caçadas.
+9. Contrate novos aldeões por **10.000 moedas** no botão abaixo de **Atividades**.
 
 ### Estado inicial
 
@@ -199,6 +200,7 @@ O `consign` carrega automaticamente `app/routes`, `config/dbConection.js`, `app/
 | GET | `/revogar_acao` | Revoga uma ordem e estorna o custo |
 | GET | `/buscaJogoUsuario` | Dados atuais do jogo (JSON) |
 | POST | `/venderRecurso` | Vende recurso no celeiro (JSON) |
+| POST | `/comprarAldeao` | Contrata um aldeão por 10.000 moedas (JSON) |
 | GET | `/buscarUsuarios` | Tela de usuários do sistema |
 | GET | `/verRanking` | Ranking por moedas |
 | POST | `/inserirUsuarioCrud` | Cadastro pela tela de administração |
