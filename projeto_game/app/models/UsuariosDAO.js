@@ -113,7 +113,7 @@ UsuarioDAO.prototype.autenticar = async function (usuario, req, res) {
             res.redirect('/home');
         } else {
             const errors = [
-                { msg: 'Usuario ou senha Incorreto' }
+                { msg: 'Usuário ou senha incorretos' }
             ];
             res.render('index', { validacao: errors, aviso: {} });
         }

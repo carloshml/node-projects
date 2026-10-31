@@ -2,6 +2,334 @@
   background: #e6e6e6;
 }
 
+/* Tela de login */
+.body-login {
+  min-height: 100vh;
+  overflow-x: hidden;
+  color: #f4e7cf;
+  background:
+    radial-gradient(circle at 18% 20%, rgba(255, 211, 77, 0.08), transparent 30%),
+    linear-gradient(rgba(10, 7, 5, 0.86), rgba(10, 7, 5, 0.96)),
+    url("../images/mapa.gif") center / cover fixed;
+}
+
+.login-pagina {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(360px, 420px);
+  align-items: center;
+  gap: 56px;
+  width: min(1120px, 100%);
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: 40px 22px;
+}
+
+.login-marca {
+  min-width: 0;
+}
+
+.login-eyebrow {
+  margin: 0 0 14px;
+  color: #c9a227;
+  font-size: 10px;
+  font-weight: bold;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+}
+
+.login-logo {
+  display: block;
+  width: min(390px, 100%);
+  height: auto;
+  margin-bottom: 22px;
+  border: 1px solid rgba(255, 211, 77, 0.24);
+  border-radius: 8px;
+  object-fit: contain;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
+}
+
+.login-marca h1 {
+  max-width: 560px;
+  margin: 0;
+  color: #f4e7cf;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: clamp(34px, 4.4vw, 54px);
+  font-weight: normal;
+  line-height: 1.04;
+  text-shadow: 0 3px 20px #000;
+}
+
+.login-marca__texto {
+  max-width: 500px;
+  margin: 16px 0 0;
+  color: #c9b896;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.login-destaques {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin: 22px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.login-destaques li {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: #d9c9ad;
+  font-size: 12px;
+}
+
+.login-destaques li::before {
+  content: '◆';
+  color: #c9a227;
+  font-size: 8px;
+}
+
+.login-casas {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 24px;
+}
+
+.login-casas img {
+  width: 34px;
+  height: 34px;
+  border: 1px solid rgba(255, 211, 77, 0.28);
+  border-radius: 50%;
+  object-fit: cover;
+  opacity: 0.85;
+}
+
+.login-card {
+  padding: 30px;
+  border: 1px solid rgba(255, 211, 77, 0.32);
+  border-radius: 12px;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255, 211, 77, 0.07), transparent 45%),
+    linear-gradient(160deg, rgba(28, 18, 12, 0.97), rgba(10, 7, 5, 0.99));
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.55);
+}
+
+.login-card__eyebrow {
+  margin: 0 0 6px;
+  color: #c9a227;
+  font-size: 9px;
+  font-weight: bold;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.login-card__topo h2 {
+  margin: 0;
+  color: #f4e7cf;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 30px;
+  font-weight: normal;
+  line-height: 1.1;
+}
+
+.login-card__texto {
+  margin: 7px 0 20px;
+  color: #9b8668;
+  font-size: 12px;
+}
+
+.login-campo {
+  margin-bottom: 14px;
+}
+
+.login-campo label {
+  display: block;
+  margin-bottom: 5px;
+  color: #c9b896;
+  font-size: 9px;
+  font-weight: bold;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.login-campo .form-control {
+  border: 1px solid #3b2c1c;
+  border-radius: 5px;
+  background: rgba(8, 6, 4, 0.8);
+  color: #f4e7cf;
+  font-size: 13px;
+}
+
+.login-campo .form-control::placeholder {
+  color: #776348;
+}
+
+.login-campo .form-control:focus {
+  border-color: #ffd34d;
+  background: rgba(8, 6, 4, 0.9);
+  color: #fff;
+  box-shadow: 0 0 0 0.2rem rgba(255, 211, 77, 0.1);
+}
+
+.login-entrar {
+  width: 100%;
+  margin-top: 4px;
+  padding: 10px;
+  border: 1px solid #ffd34d;
+  border-radius: 4px;
+  background: #ffd34d;
+  color: #1b0f0a;
+  font-size: 12px;
+  font-weight: bold;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.login-entrar:hover,
+.login-entrar:focus {
+  border-color: #ffe485;
+  background: #ffe485;
+  color: #1b0f0a;
+}
+
+.login-divisor {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 18px 0;
+  color: #776348;
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.login-divisor::before,
+.login-divisor::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: rgba(255, 211, 77, 0.16);
+}
+
+.login-cadastro {
+  width: 100%;
+  padding: 9px;
+  border: 1px solid rgba(255, 211, 77, 0.4);
+  border-radius: 4px;
+  background: transparent;
+  color: #ffd34d;
+  font-size: 11px;
+  font-weight: bold;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.login-cadastro:hover,
+.login-cadastro:focus {
+  border-color: #ffd34d;
+  background: rgba(255, 211, 77, 0.1);
+  color: #ffe485;
+}
+
+.login-rodape {
+  margin: 16px 0 0;
+  color: #776348;
+  font-size: 10px;
+  text-align: center;
+}
+
+.login-alerta {
+  margin-bottom: 16px;
+  padding: 9px 11px;
+  border: 1px solid;
+  border-radius: 5px;
+  font-size: 11px;
+}
+
+.login-alerta strong {
+  display: block;
+  margin-bottom: 3px;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.login-alerta ul {
+  margin: 0;
+  padding-left: 14px;
+}
+
+.login-alerta--erro {
+  border-color: #6b3030;
+  background: rgba(58, 24, 24, 0.6);
+  color: #ffb4b4;
+}
+
+.login-alerta--sucesso {
+  border-color: #2f6b4a;
+  background: rgba(24, 58, 40, 0.6);
+  color: #9fe3b8;
+}
+
+@media (max-width: 900px) {
+  .login-pagina {
+    grid-template-columns: 1fr;
+    gap: 28px;
+    max-width: 560px;
+    padding: 32px 18px;
+  }
+
+  .login-logo {
+    width: min(320px, 100%);
+    max-height: none;
+  }
+
+  .login-marca h1 {
+    font-size: 38px;
+  }
+
+  .login-marca__texto {
+    font-size: 13px;
+  }
+
+  .login-card {
+    width: 100%;
+  }
+}
+
+@media (max-width: 575px) {
+  .login-pagina {
+    padding: 24px 12px;
+  }
+
+  .login-logo {
+    width: min(250px, 100%);
+    margin-bottom: 16px;
+  }
+
+  .login-marca h1 {
+    font-size: 31px;
+  }
+
+  .login-destaques {
+    margin-top: 16px;
+  }
+
+  .login-casas {
+    margin-top: 18px;
+  }
+
+  .login-card {
+    padding: 20px;
+  }
+
+  .login-card__topo h2 {
+    font-size: 26px;
+  }
+}
+
 .titulo {
   background: rgb(88, 88, 88);
   color: white;

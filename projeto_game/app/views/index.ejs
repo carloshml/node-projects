@@ -10,56 +10,91 @@
 	<link href="css/style.css" rel="stylesheet">
 </head>
 
-<body class="body-index">
+<body class="body-login">
+	<%
+	const erros = Array.isArray(validacao) ? validacao : [];
+	const avisos = Array.isArray(aviso) ? aviso : [];
+	%>
 
-	<nav class="navbar bg-light">
-		<div class="container">
-			<div class="w-100">
-				<% if (validacao.length > 0) { %>
-					<div class="alert alert-danger">
-						<strong>Atenção</strong>
-						<ul class="mb-0">
-							<% for (var i = 0; i < validacao.length; i++) { %>
-								<li><%= validacao[i].msg %></li>
-							<% } %>
-						</ul>
-					</div>
-				<% } %>
+	<main class="login-pagina">
+		<section class="login-marca">
+			<p class="login-eyebrow">Os Sete Reinos esperam</p>
 
-				<% if (aviso.length > 0) { %>
-					<div class="alert alert-success">
-						<strong>Atenção</strong>
-						<ul class="mb-0">
-							<% for (var i = 0; i < aviso.length; i++) { %>
-								<li><%= aviso[i].msg %></li>
-							<% } %>
-						</ul>
-					</div>
-				<% } %>
+			<img class="login-logo" src="images/game_of_thrones_logo.jpg" alt="Game of Thrones">
+
+			<h1>Dispute o Trono de Ferro.</h1>
+			<p class="login-marca__texto">
+				Comande aldeões, colete recursos e cace feras lendárias para construir
+				seu nome entre as grandes casas de Westeros.
+			</p>
+
+			<ul class="login-destaques">
+				<li>Colete madeira, comida e ferro</li>
+				<li>Cace feras e conquiste recompensas</li>
+				<li>Dispute o topo do ranking</li>
+			</ul>
+
+			<div class="login-casas" aria-label="Casas de Westeros">
+				<img src="images/casa_stark.jpg" alt="Casa Stark">
+				<img src="images/casa_lannister.jpg" alt="Casa Lannister">
+				<img src="images/casa_targaryen.jpg" alt="Casa Targaryen">
+				<img src="images/casa_baratheon.jpg" alt="Casa Baratheon">
+				<img src="images/casa_martell.jpg" alt="Casa Martell">
 			</div>
+		</section>
 
-			<form class="d-flex flex-wrap gap-2 align-items-center form-entrar" action="/autenticar" method="POST">
-				<input type="text" name="usuario" id="usuario" placeholder="Usuário" class="form-control"
-					autocomplete="username" />
-				<input type="password" name="senha" id="senha" placeholder="Senha" class="form-control"
-					autocomplete="current-password" />
-				<button type="submit" class="btn btn-success">Entrar</button>
-				<a href="/cadastro" class="btn btn-info">Cadastro</a>
+		<section class="login-card" aria-labelledby="login-titulo">
+			<header class="login-card__topo">
+				<p class="login-card__eyebrow">Bem-vindo de volta</p>
+				<h2 id="login-titulo">Entrar no reino</h2>
+				<p class="login-card__texto">Use sua conta para retomar sua jornada.</p>
+			</header>
+
+			<% if (erros.length > 0) { %>
+				<div class="login-alerta login-alerta--erro" role="alert">
+					<strong>Não foi possível entrar</strong>
+					<ul>
+						<% for (var i = 0; i < erros.length; i++) { %>
+							<li><%= erros[i].msg %></li>
+						<% } %>
+					</ul>
+				</div>
+			<% } %>
+
+			<% if (avisos.length > 0) { %>
+				<div class="login-alerta login-alerta--sucesso" role="status">
+					<strong>Tudo certo</strong>
+					<ul>
+						<% for (var i = 0; i < avisos.length; i++) { %>
+							<li><%= avisos[i].msg %></li>
+						<% } %>
+					</ul>
+				</div>
+			<% } %>
+
+			<form class="login-form" action="/autenticar" method="POST">
+				<div class="login-campo">
+					<label for="usuario">Usuário</label>
+					<input type="text" name="usuario" id="usuario" class="form-control"
+						placeholder="Seu nome de usuário" autocomplete="username" autofocus required>
+				</div>
+
+				<div class="login-campo">
+					<label for="senha">Senha</label>
+					<input type="password" name="senha" id="senha" class="form-control"
+						placeholder="Sua senha" autocomplete="current-password" required>
+				</div>
+
+				<button type="submit" class="btn login-entrar">Entrar</button>
 			</form>
-		</div>
-	</nav>
 
-	<div class="container">
-		<div class="row">
-			<div class="col-md-2"></div>
+			<div class="login-divisor"><span>ou</span></div>
 
-			<div class="col-md-8 text-center">
-				<img src="images/game_of_thrones_logo.jpg" class="img-fluid" alt="Game of Thrones" />
-			</div>
+			<a href="/cadastro" class="btn login-cadastro">Criar uma conta</a>
 
-			<div class="col-md-2"></div>
-		</div>
-	</div>
+			<p class="login-rodape">Escolha sua casa e comece sua história.</p>
+		</section>
+	</main>
 </body>
 
 </html>
