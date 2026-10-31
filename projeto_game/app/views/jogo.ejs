@@ -144,10 +144,52 @@
 			<button type="button" class="toolbar-botao" onclick="verPergaminhos()">
 				<img src="images/outros/pergaminho.jpg" alt=""> Pergaminhos
 			</button>
+
+			<button type="button" class="toolbar-botao" onclick="abrirSonsBatalha()">
+				<span class="toolbar-nota" aria-hidden="true">♪</span> Sons da batalha
+			</button>
 		</div>
 	</div>
 
 	<div id="mensagens" aria-live="assertive" aria-atomic="true"></div>
+
+	<div id="som-batalha-modal" class="som-batalha-modal" hidden>
+		<div class="som-batalha-painel" role="dialog" aria-modal="true" aria-labelledby="som-batalha-titulo">
+			<header class="som-batalha-topo">
+				<div>
+					<p class="som-batalha-eyebrow">Trilha da caçada</p>
+					<h2 id="som-batalha-titulo">Sons da batalha</h2>
+				</div>
+				<button type="button" class="som-batalha-fechar" onclick="fecharSonsBatalha()"
+					aria-label="Fechar sons da batalha">×</button>
+			</header>
+
+			<p class="som-batalha-intro">
+				Escolha o som dos guerreiros e o da fera. Durante a caçada, os dois se alternam.
+			</p>
+
+			<div class="som-batalha-colunas">
+				<section>
+					<h3>Guerreiros</h3>
+					<div id="opcoes-guerreiros" class="som-opcoes"></div>
+				</section>
+
+				<section>
+					<h3>Fera</h3>
+					<div id="opcoes-feras" class="som-opcoes"></div>
+				</section>
+			</div>
+
+			<footer class="som-batalha-rodape">
+				<small>As escolhas ficam salvas neste navegador.</small>
+				<div class="som-batalha-acoes">
+					<button type="button" id="btn-mudo-batalha" class="som-batalha-mudo"
+						onclick="alternarSomBatalha()">Som: on</button>
+					<button type="button" class="btn btn-sm som-batalha-pronto" onclick="fecharSonsBatalha()">Pronto</button>
+				</div>
+			</footer>
+		</div>
+	</div>
 </body>
 
 </html>

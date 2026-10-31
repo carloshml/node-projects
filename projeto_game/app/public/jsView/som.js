@@ -1,9 +1,40 @@
 (function () {
     const CHAVE = 'got-som-ativo';
+    const CHAVE_GUERREIRO = 'got-som-guerreiro';
+    const CHAVE_FERA = 'got-som-fera';
     let ctx = null;
     let somAtivo = false;
     let ambiente = null;
     let botao = null;
+    let batalhaAtiva = false;
+    let batalhaTimer = null;
+    let turnoBatalha = 'guerreiro';
+
+    const GUERREIROS = [
+        { id: 'trompa', nome: 'Trompa de guerra', descricao: 'Chamado grave de corneta' },
+        { id: 'tambores', nome: 'Tambores de marcha', descricao: 'Batida pesada e cadente' },
+        { id: 'grito', nome: 'Grito de batalha', descricao: 'Vozes e ruído de investida' },
+        { id: 'acos', nome: 'Aço e escudos', descricao: 'Metal, impacto e clangor' }
+    ];
+
+    const FERAS = [
+        { id: 'rugido', nome: 'Rugido grave', descricao: 'Grunhido profundo e ameaçador' },
+        { id: 'rosnado', nome: 'Rosnado', descricao: 'Ameaça baixa e gutural' },
+        { id: 'bramido', nome: 'Bramido selvagem', descricao: 'Urro longo e feroz' },
+        { id: 'sibilo', nome: 'Sibilo agudo', descricao: 'Assobio e grito estridente' }
+    ];
+
+    function lerEscolha(chave, opcoes, padrao) {
+        try {
+            const salvo = localStorage.getItem(chave);
+            return opcoes.some(function (opcao) { return opcao.id === salvo; }) ? salvo : padrao;
+        } catch (erro) {
+            return padrao;
+        }
+    }
+
+    let guerreiroSelecionado = lerEscolha(CHAVE_GUERREIRO, GUERREIROS, GUERREIROS[0].id);
+    let feraSelecionada = lerEscolha(CHAVE_FERA, FERAS, FERAS[0].id);
 
     try {
         const salvo = localStorage.getItem(CHAVE);
@@ -45,7 +76,7 @@
         osc.stop(inicio + duracao + 0.03);
     }
 
-    function ruido(duracao, volume) {
+    function ruido(duracao, volume, frequencia) {
         const c = garantirContexto();
         if (!c) {
             return;
@@ -61,7 +92,7 @@
         const filtro = c.createBiquadFilter();
         fonte.buffer = buffer;
         filtro.type = 'lowpass';
-        filtro.frequency.value = 900;
+        filtro.frequency.value = frequencia || 900;
         ganho.gain.value = volume || 0.05;
         fonte.connect(filtro);
         filtro.connect(ganho);
@@ -158,6 +189,124 @@
         }
     }
 
+    function salvarEscolha(chave, valor) {
+        try {
+            localStorage.setItem(chave, valor);
+        } catch (erro) {
+            /* armazenamento indisponível */
+        }
+    }
+
+    function tocarGuerreiro(id) {
+        if (!somAtivo) {
+            return;
+        }
+        switch (id) {
+            case 'tambores':
+                tom(80, 0, 0.16, 'sine', 0.075);
+                ruido(0.08, 0.035, 320);
+                tom(80, 0.27, 0.16, 'sine', 0.075);
+                ruido(0.08, 0.035, 320);
+                tom(80, 0.54, 0.22, 'sine', 0.08);
+                ruido(0.12, 0.04, 280);
+                break;
+            case 'grito':
+                ruido(0.52, 0.05, 1100);
+                tom(220, 0, 0.28, 'sawtooth', 0.032);
+                tom(330, 0.12, 0.38, 'sawtooth', 0.028);
+                break;
+            case 'acos':
+                ruido(0.1, 0.05, 3200);
+                tom(1250, 0, 0.1, 'square', 0.022);
+                tom(1680, 0.09, 0.14, 'square', 0.02);
+                ruido(0.12, 0.03, 2100);
+                break;
+            case 'trompa':
+            default:
+                tom(110, 0, 0.4, 'sawtooth', 0.045);
+                tom(146.83, 0.16, 0.48, 'sawtooth', 0.038);
+                tom(220, 0.34, 0.5, 'triangle', 0.032);
+                break;
+        }
+    }
+
+    function tocarFera(id) {
+        if (!somAtivo) {
+            return;
+        }
+        switch (id) {
+            case 'rosnado':
+                ruido(0.85, 0.05, 700);
+                tom(85, 0, 0.75, 'square', 0.03);
+                tom(110, 0.24, 0.6, 'sawtooth', 0.02);
+                break;
+            case 'bramido':
+                tom(90, 0, 0.85, 'sawtooth', 0.045);
+                tom(140, 0.18, 0.85, 'sawtooth', 0.04);
+                ruido(0.55, 0.03, 600);
+                break;
+            case 'sibilo':
+                ruido(0.9, 0.045, 2600);
+                tom(420, 0, 0.42, 'sawtooth', 0.02);
+                tom(300, 0.28, 0.55, 'sawtooth', 0.018);
+                break;
+            case 'rugido':
+            default:
+                tom(65, 0, 1.05, 'sawtooth', 0.05);
+                tom(48, 0.15, 1.05, 'sine', 0.045);
+                ruido(0.65, 0.035, 450);
+                break;
+        }
+    }
+
+    function notificarBatalha(quem) {
+        try {
+            window.dispatchEvent(new CustomEvent('batalha-som', {
+                detail: { quem: quem }
+            }));
+        } catch (erro) {
+            /* navegador sem CustomEvent */
+        }
+    }
+
+    function passoBatalha() {
+        if (!batalhaAtiva) {
+            return;
+        }
+        if (!somAtivo) {
+            pararBatalha();
+            return;
+        }
+
+        const quem = turnoBatalha;
+        if (quem === 'guerreiro') {
+            tocarGuerreiro(guerreiroSelecionado);
+        } else {
+            tocarFera(feraSelecionada);
+        }
+        notificarBatalha(quem);
+
+        turnoBatalha = quem === 'guerreiro' ? 'fera' : 'guerreiro';
+        batalhaTimer = setTimeout(passoBatalha, quem === 'guerreiro' ? 1850 : 2150);
+    }
+
+    function iniciarBatalha() {
+        if (batalhaAtiva || !somAtivo) {
+            return;
+        }
+        batalhaAtiva = true;
+        turnoBatalha = 'guerreiro';
+        passoBatalha();
+    }
+
+    function pararBatalha() {
+        batalhaAtiva = false;
+        if (batalhaTimer) {
+            clearTimeout(batalhaTimer);
+            batalhaTimer = null;
+        }
+    }
+
     function alternar() {
         somAtivo = !somAtivo;
         salvar();
@@ -165,9 +314,17 @@
             iniciarAmbiente();
             tom(520, 0, 0.08, 'triangle', 0.04);
         } else {
+            pararBatalha();
             pararAmbiente();
         }
         atualizarBotao();
+        try {
+            window.dispatchEvent(new CustomEvent('som-jogo-alterado', {
+                detail: { ativo: somAtivo }
+            }));
+        } catch (erro) {
+            /* navegador sem CustomEvent */
+        }
     }
 
     function aoPrimeiroGesto() {
@@ -180,6 +337,62 @@
         estaAtivo: function () { return somAtivo; },
 
         alternar: alternar,
+
+        opcoesGuerreiros: function () {
+            return GUERREIROS.map(function (opcao) { return Object.assign({}, opcao); });
+        },
+
+        opcoesFeras: function () {
+            return FERAS.map(function (opcao) { return Object.assign({}, opcao); });
+        },
+
+        guerreiroSelecionado: function () {
+            return guerreiroSelecionado;
+        },
+
+        feraSelecionada: function () {
+            return feraSelecionada;
+        },
+
+        selecionarGuerreiro: function (id) {
+            const existe = GUERREIROS.some(function (opcao) { return opcao.id === id; });
+            if (existe) {
+                guerreiroSelecionado = id;
+                salvarEscolha(CHAVE_GUERREIRO, id);
+            }
+        },
+
+        selecionarFera: function (id) {
+            const existe = FERAS.some(function (opcao) { return opcao.id === id; });
+            if (existe) {
+                feraSelecionada = id;
+                salvarEscolha(CHAVE_FERA, id);
+            }
+        },
+
+        previaGuerreiro: function (id) {
+            if (!somAtivo) {
+                return false;
+            }
+            tocarGuerreiro(id);
+            return true;
+        },
+
+        previaFera: function (id) {
+            if (!somAtivo) {
+                return false;
+            }
+            tocarFera(id);
+            return true;
+        },
+
+        iniciarBatalha: iniciarBatalha,
+
+        pararBatalha: pararBatalha,
+
+        estaEmBatalha: function () {
+            return batalhaAtiva;
+        },
 
         clique: function () {
             if (somAtivo) {

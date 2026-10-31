@@ -119,6 +119,263 @@
   box-shadow: 0 0 18px rgba(255, 200, 60, 0.35);
 }
 
+.toolbar-nota {
+  display: grid;
+  width: 22px;
+  height: 22px;
+  place-items: center;
+  color: #ffd34d;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.toolbar-botao:hover .toolbar-nota {
+  color: #1b0f0a;
+}
+
+/* Seletor de sons da batalha */
+body.som-modal-aberto {
+  overflow: hidden;
+}
+
+.som-batalha-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 3600;
+  display: grid;
+  padding: 16px;
+  place-items: center;
+  background: rgba(5, 3, 2, 0.78);
+  backdrop-filter: blur(4px);
+}
+
+.som-batalha-modal[hidden] {
+  display: none;
+}
+
+.som-batalha-painel {
+  width: min(760px, 100%);
+  max-height: 88vh;
+  overflow-y: auto;
+  padding: 22px;
+  border: 1px solid rgba(255, 211, 77, 0.42);
+  border-radius: 10px;
+  background:
+    radial-gradient(circle at 20% 0%, rgba(255, 211, 77, 0.08), transparent 38%),
+    linear-gradient(160deg, #1b110b, #0b0806);
+  box-shadow: 0 22px 70px rgba(0, 0, 0, 0.7);
+}
+
+.som-batalha-topo {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.som-batalha-eyebrow {
+  margin: 0 0 4px;
+  color: #c9a227;
+  font-size: 9px;
+  font-weight: bold;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.som-batalha-topo h2 {
+  margin: 0;
+  color: #f4e7cf;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 28px;
+  font-weight: normal;
+}
+
+.som-batalha-fechar {
+  width: 30px;
+  height: 30px;
+  border: 1px solid rgba(255, 211, 77, 0.3);
+  border-radius: 50%;
+  background: transparent;
+  color: #c9b896;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.som-batalha-fechar:hover {
+  border-color: #ffd34d;
+  color: #ffd34d;
+}
+
+.som-batalha-intro {
+  margin: 10px 0 16px;
+  color: #c9b896;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.som-batalha-colunas {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.som-batalha-colunas h3 {
+  margin: 0 0 7px;
+  color: #ffd34d;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 13px;
+  font-weight: normal;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.som-opcao {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 7px;
+  padding: 8px;
+  border: 1px solid rgba(255, 211, 77, 0.14);
+  border-radius: 7px;
+  background: rgba(0, 0, 0, 0.25);
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.som-opcao:hover {
+  border-color: rgba(255, 211, 77, 0.35);
+}
+
+.som-opcao--selecionada {
+  border-color: rgba(255, 211, 77, 0.65);
+  background: rgba(255, 211, 77, 0.07);
+}
+
+.som-opcao__escolha {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  cursor: pointer;
+}
+
+.som-opcao__escolha input {
+  flex-shrink: 0;
+  accent-color: #ffd34d;
+}
+
+.som-opcao__texto {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.som-opcao__texto strong {
+  color: #f4e7cf;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.som-opcao__texto small {
+  overflow: hidden;
+  color: #9b8668;
+  font-size: 10px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.som-opcao__ouvir {
+  flex-shrink: 0;
+  padding: 4px 8px;
+  border: 1px solid rgba(255, 211, 77, 0.35);
+  border-radius: 4px;
+  background: transparent;
+  color: #ffd34d;
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.som-opcao__ouvir:hover {
+  background: #ffd34d;
+  color: #1b0f0a;
+}
+
+.som-batalha-rodape {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 211, 77, 0.14);
+}
+
+.som-batalha-rodape small {
+  color: #9b8668;
+  font-size: 10px;
+}
+
+.som-batalha-acoes {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.som-batalha-mudo {
+  padding: 5px 9px;
+  border: 1px solid rgba(255, 211, 77, 0.25);
+  border-radius: 4px;
+  background: transparent;
+  color: #c9b896;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.som-batalha-mudo:hover {
+  border-color: #ffd34d;
+  color: #ffd34d;
+}
+
+.som-batalha-pronto {
+  border: 1px solid #ffd34d;
+  border-radius: 4px;
+  background: #ffd34d;
+  color: #1b0f0a;
+  font-size: 11px;
+  font-weight: bold;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.som-batalha-pronto:hover {
+  background: #ffe485;
+  color: #1b0f0a;
+}
+
+@media (max-width: 575px) {
+  .som-batalha-painel {
+    padding: 16px;
+  }
+
+  .som-batalha-colunas {
+    grid-template-columns: 1fr;
+  }
+
+  .som-batalha-topo h2 {
+    font-size: 23px;
+  }
+
+  .som-batalha-rodape {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
 .barra-superior,
 .acoes,
 .pergaminhos {
@@ -2194,6 +2451,127 @@ img {
   background: #111;
   box-shadow: 0 0 18px var(--acao-brilho, rgba(255, 200, 60, 0.3));
   object-fit: cover;
+  animation: feraRespira 2.8s ease-in-out infinite;
+}
+
+.batalha {
+  position: relative;
+}
+
+.batalha-turno-guerreiro .batalha-atacantes {
+  animation: ladoGuerreiro 0.55s ease-out;
+}
+
+.batalha-turno-guerreiro .batalha-centro {
+  color: #ffd34d;
+  animation: vsPulso 0.55s ease-out;
+}
+
+.batalha-turno-guerreiro .aldeao {
+  filter: drop-shadow(0 0 6px rgba(255, 211, 77, 0.65));
+}
+
+.batalha-turno-fera {
+  animation: tremorBatalha 0.45s ease-out;
+}
+
+.batalha-turno-fera .batalha-fera {
+  animation: ladoFera 0.65s ease-out;
+}
+
+.batalha-turno-fera .batalha-fera::after {
+  content: '';
+  position: absolute;
+  top: -4px;
+  left: 50%;
+  z-index: 0;
+  width: 70px;
+  height: 70px;
+  margin-left: -35px;
+  border: 2px solid rgba(255, 90, 60, 0.7);
+  border-radius: 50%;
+  animation: rugidoAnel 0.65s ease-out;
+  pointer-events: none;
+}
+
+.batalha-turno-fera .batalha-centro {
+  color: #ff5a4d;
+  animation: vsPulso 0.55s ease-out;
+}
+
+.batalha-turno-fera .fera-imagem {
+  box-shadow: 0 0 34px rgba(255, 75, 45, 0.75);
+  filter: drop-shadow(0 0 8px rgba(255, 90, 60, 0.55));
+}
+
+@keyframes feraRespira {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-3px) scale(1.035);
+  }
+}
+
+@keyframes ladoGuerreiro {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  35% {
+    transform: translateX(8px);
+  }
+}
+
+@keyframes ladoFera {
+  0%,
+  100% {
+    transform: translateX(0) scale(1);
+  }
+  35% {
+    transform: translateX(-8px) scale(1.07);
+  }
+}
+
+@keyframes tremorBatalha {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(-2px);
+  }
+  45% {
+    transform: translateX(2px);
+  }
+  70% {
+    transform: translateX(-1px);
+  }
+}
+
+@keyframes vsPulso {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.35);
+    text-shadow: 0 0 18px currentColor;
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes rugidoAnel {
+  0% {
+    opacity: 1;
+    transform: scale(0.45);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.55);
+  }
 }
 
 .fera-nome {
@@ -3103,11 +3481,22 @@ body.flash-derrota::after {
   .valor-pulso,
   body.tremor-jogo,
   .batalha .aldeao,
+  .batalha .fera-imagem,
+  .batalha-turno-guerreiro .batalha-atacantes,
+  .batalha-turno-guerreiro .batalha-centro,
+  .batalha-turno-fera,
+  .batalha-turno-fera .batalha-fera,
+  .batalha-turno-fera .batalha-centro,
+  .batalha-turno-fera .batalha-fera::after,
   .acerto-fera .fera-imagem,
   .dano-fera,
   .historico-item,
   .loot-card {
     animation: none !important;
+  }
+
+  .batalha-turno-fera .batalha-fera::after {
+    opacity: 0;
   }
 }
 
@@ -3133,6 +3522,10 @@ body.flash-derrota::after {
 
   .barra-inferior {
     padding: 8px;
+  }
+
+  .body-jogo {
+    padding-bottom: 118px;
   }
 
   .toolbar-botao {

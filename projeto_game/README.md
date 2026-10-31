@@ -15,9 +15,10 @@ Jogo web de estratégia ambientado em **Game of Thrones**, feito com Node.js, Ex
 - Contadores animados e deltas flutuantes de ganho/perda.
 - O modal de resultado só é exibido depois que a animação dos recursos termina.
 - Ordens com tempo real: coleta, enforcamento, treinamento de história, treinamento de magia e caçada a feras.
-- Barra de progresso, vida da fera, dano flutuante e efeitos de impacto na batalha.
+- Barra de progresso, vida da fera, dano flutuante e animações de respiração/investida na batalha.
 - Recompensas ao concluir cada ordem, com modal central, loot reveal e contagem animada.
 - Efeitos sonoros e ambiente opcionais via Web Audio, com botão de som.
+- Escolha entre 4 sons de guerreiros e 4 de fera em **Sons da batalha**; as trilhas se alternam durante a caçada.
 - Celeiro para vender madeira, comida e ferro por moedas.
 - Cinco feras com vida, recompensa e imagem próprias; a fera é sorteada pelo jogo.
 - Ranking de jogadores por moedas.

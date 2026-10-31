@@ -1036,6 +1036,7 @@ async function carregarAcoes() {
     acoes = lista;
     renderizarAcoes();
     atualizarContadores();
+    atualizarSomBatalha();
 }
 
 function montarHistorico(historico) {
@@ -1085,6 +1086,144 @@ function montarHistorico(historico) {
             '</div>' +
             '</div>';
     }).join('') + '</div>';
+}
+
+function montarOpcoesSom(tipo, opcoes, selecionado, containerId) {
+    const container = document.getElementById(containerId);
+    if (!container) {
+        return;
+    }
+
+    container.innerHTML = opcoes.map(function (opcao) {
+        const marcado = opcao.id === selecionado;
+        return '<div class="som-opcao' + (marcado ? ' som-opcao--selecionada' : '') + '" data-id="' + opcao.id + '">' +
+            '<label class="som-opcao__escolha">' +
+            '<input type="radio" name="som-' + tipo + '" value="' + opcao.id + '"' + (marcado ? ' checked' : '') + '>' +
+            '<span class="som-opcao__texto"><strong>' + opcao.nome + '</strong><small>' + opcao.descricao + '</small></span>' +
+            '</label>' +
+            '<button type="button" class="som-opcao__ouvir" data-tipo="' + tipo + '" data-id="' + opcao.id + '">Ouvir</button>' +
+            '</div>';
+    }).join('');
+
+    container.querySelectorAll('input[type="radio"]').forEach(function (entrada) {
+        entrada.addEventListener('change', function () {
+            if (!window.SomJogo) {
+                return;
+            }
+            if (tipo === 'guerreiro') {
+                window.SomJogo.selecionarGuerreiro(entrada.value);
+            } else {
+                window.SomJogo.selecionarFera(entrada.value);
+            }
+            container.querySelectorAll('.som-opcao').forEach(function (linha) {
+                linha.classList.toggle('som-opcao--selecionada', linha.dataset.id === entrada.value);
+            });
+        });
+    });
+
+    container.querySelectorAll('.som-opcao__ouvir').forEach(function (botao) {
+        botao.addEventListener('click', function () {
+            if (!window.SomJogo) {
+                return;
+            }
+            const tocou = tipo === 'guerreiro'
+                ? window.SomJogo.previaGuerreiro(botao.dataset.id)
+                : window.SomJogo.previaFera(botao.dataset.id);
+
+            if (!tocou) {
+                const textoOriginal = botao.textContent;
+                botao.textContent = 'Som off';
+                setTimeout(function () {
+                    botao.textContent = textoOriginal;
+                }, 1100);
+            }
+        });
+    });
+}
+
+function abrirSonsBatalha() {
+    const modal = document.getElementById('som-batalha-modal');
+    if (!modal || !window.SomJogo) {
+        return;
+    }
+
+    montarOpcoesSom(
+        'guerreiro',
+        window.SomJogo.opcoesGuerreiros(),
+        window.SomJogo.guerreiroSelecionado(),
+        'opcoes-guerreiros'
+    );
+    montarOpcoesSom(
+        'fera',
+        window.SomJogo.opcoesFeras(),
+        window.SomJogo.feraSelecionada(),
+        'opcoes-feras'
+    );
+
+    window.SomJogo.pararBatalha();
+    const botaoMudo = document.getElementById('btn-mudo-batalha');
+    if (botaoMudo) {
+        botaoMudo.textContent = 'Som: ' + (window.SomJogo.estaAtivo() ? 'on' : 'off');
+    }
+    modal.hidden = false;
+    document.body.classList.add('som-modal-aberto');
+}
+
+function alternarSomBatalha() {
+    if (!window.SomJogo) {
+        return;
+    }
+    window.SomJogo.alternar();
+    const botaoMudo = document.getElementById('btn-mudo-batalha');
+    if (botaoMudo) {
+        botaoMudo.textContent = 'Som: ' + (window.SomJogo.estaAtivo() ? 'on' : 'off');
+    }
+}
+
+function fecharSonsBatalha() {
+    const modal = document.getElementById('som-batalha-modal');
+    if (!modal || modal.hidden) {
+        return;
+    }
+    modal.hidden = true;
+    document.body.classList.remove('som-modal-aberto');
+    atualizarSomBatalha();
+}
+
+function temBatalhaAtiva() {
+    return acoes.some(function (acao) {
+        return String(acao.acao) === '5';
+    });
+}
+
+function atualizarSomBatalha() {
+    if (!window.SomJogo) {
+        return;
+    }
+
+    const modalSom = document.getElementById('som-batalha-modal');
+    if (modalSom && !modalSom.hidden) {
+        window.SomJogo.pararBatalha();
+        return;
+    }
+
+    if (temBatalhaAtiva()) {
+        window.SomJogo.iniciarBatalha();
+    } else {
+        window.SomJogo.pararBatalha();
+    }
+}
+
+function animarTurnoBatalha(quem) {
+    document.querySelectorAll('.batalha').forEach(function (batalha) {
+        batalha.classList.remove('batalha-turno-guerreiro', 'batalha-turno-fera');
+        void batalha.offsetWidth;
+        batalha.classList.add('batalha-turno-' + quem);
+
+        setTimeout(function () {
+            batalha.classList.remove('batalha-turno-' + quem);
+        }, 700);
+    });
 }
 
 async function verPergaminhos() {
@@ -1243,6 +1382,9 @@ async function sincronizar() {
         if (resultadoModal) {
             /* deixa o contador e os deltas visíveis antes de cobrir a tela */
             await pausa(PAUSA_ANTES_MODAL);
+            if (window.SomJogo) {
+                window.SomJogo.pararBatalha();
+            }
 
             if (resultadoModal.temBatalha) {
                 efeitoBatalha(resultadoModal.derrota);
@@ -1304,6 +1446,28 @@ document.addEventListener('DOMContentLoaded', function () {
             venderRecurso(botao.dataset.recurso, botao.closest('.recurso-linha'));
         });
     }
+
+    const modalSom = document.getElementById('som-batalha-modal');
+    if (modalSom) {
+        modalSom.addEventListener('click', function (evento) {
+            if (evento.target === modalSom) {
+                fecharSonsBatalha();
+            }
+        });
+    }
+
+    document.addEventListener('keydown', function (evento) {
+        if (evento.key === 'Escape') {
+            fecharSonsBatalha();
+        }
+    });
+
+    window.addEventListener('som-jogo-alterado', atualizarSomBatalha);
+    window.addEventListener('batalha-som', function (evento) {
+        if (evento.detail && evento.detail.quem) {
+            animarTurnoBatalha(evento.detail.quem);
+        }
+    });
 
     iniciar().catch(function (erro) {
         console.error('Falha ao iniciar a tela do jogo:', erro);
