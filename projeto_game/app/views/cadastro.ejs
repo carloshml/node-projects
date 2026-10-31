@@ -4,124 +4,118 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>MMORPG - Game of Thrones</title>
+	<title>MMORPG - Criar conta</title>
 
 	<link rel="stylesheet" href="css/bootstrap.min.css">
-	<link href="css/style.css" rel="stylesheet">
+	<link rel="stylesheet" href="css/style.css">
 </head>
 
-<body class="body-index">
-	<nav class="navbar bg-light">
-		<div class="container">
-			<a href="/" class="btn btn-success">Voltar</a>
-		</div>
-	</nav>
+<body class="body-login body-register">
+	<%
+	const erros = Array.isArray(validacao) ? validacao : [];
+	const valores = dadosForm || {};
+	const casaSelecionada = valores.casa || '';
+	const casas = [
+		{ slug: 'arryn', nome: 'Arryn' },
+		{ slug: 'baratheon', nome: 'Baratheon' },
+		{ slug: 'greyjoy', nome: 'Greyjoy' },
+		{ slug: 'lannister', nome: 'Lannister' },
+		{ slug: 'martell', nome: 'Martell' },
+		{ slug: 'stark', nome: 'Stark' },
+		{ slug: 'targaryen', nome: 'Targaryen' },
+		{ slug: 'tully', nome: 'Tully' },
+		{ slug: 'tyrell', nome: 'Tyrell' }
+	];
+	%>
 
-	<div class="container">
-		<% if (validacao.length > 0) { %>
-			<div class="alert alert-danger">
-				<strong>Atenção</strong>
-				<ul class="mb-0">
-					<% for (var i = 0; i < validacao.length; i++) { %>
-						<li><%= validacao[i].msg %></li>
-					<% } %>
-				</ul>
+	<main class="register-pagina">
+		<section class="register-marca">
+			<p class="login-eyebrow">A próxima história é sua</p>
+
+			<img class="register-logo" src="images/game_of_thrones_logo.jpg" alt="Game of Thrones">
+
+			<h1>Escolha sua casa.<br>Escreva seu destino.</h1>
+			<p class="register-marca__texto">
+				Comece com dez aldeões e quinze moedas. Colete recursos, crie seu campeão
+				e dispute o Trono de Ferro com os outros senhores.
+			</p>
+
+			<ul class="register-destaques">
+				<li>Uma casa e um brasão só seus</li>
+				<li>Ordens em tempo real e caçadas</li>
+				<li>Ranking global de moedas</li>
+			</ul>
+
+			<div class="register-casas-faixa" aria-hidden="true">
+				<% for (var i = 0; i < casas.length; i++) { %>
+					<img src="images/casa_<%=casas[i].slug%>.jpg" alt="">
+				<% } %>
 			</div>
-		<% } %>
+		</section>
 
-		<form class="form-cadastro" action="/inserirUsuario" method="POST">
-			<div class="row g-3">
-				<div class="col-12 col-md-4">
-					<label for="nome" class="form-label">Nome</label>
-					<input type="text" value="<%= dadosForm.nome %>" class="form-control" id="nome"
-						name="nome" placeholder="Nome" required>
+		<section class="register-card" aria-labelledby="register-titulo">
+			<header class="register-card__topo">
+				<p class="login-card__eyebrow">Primeiro passo</p>
+				<h2 id="register-titulo">Criar sua conta</h2>
+				<p class="register-card__texto">Preencha seus dados e escolha sua casa.</p>
+			</header>
+
+			<% if (erros.length > 0) { %>
+				<div class="login-alerta login-alerta--erro" role="alert">
+					<strong>Não foi possível criar a conta</strong>
+					<ul>
+						<% for (var i = 0; i < erros.length; i++) { %>
+							<li><%= erros[i].msg %></li>
+						<% } %>
+					</ul>
+				</div>
+			<% } %>
+
+			<form class="register-form" action="/inserirUsuario" method="POST">
+				<div class="register-campos">
+					<div class="register-campo">
+						<label for="nome">Nome</label>
+						<input type="text" value="<%= valores.nome || '' %>" class="form-control" id="nome"
+							name="nome" placeholder="Como devemos chamar você?" autocomplete="name" required>
+					</div>
+
+					<div class="register-campo">
+						<label for="usuario">Usuário</label>
+						<input type="text" value="<%= valores.usuario || '' %>" class="form-control" id="usuario"
+							name="usuario" placeholder="Seu nome de acesso" autocomplete="username" required>
+					</div>
+
+					<div class="register-campo register-campo--senha">
+						<label for="senha">Senha</label>
+						<input type="password" value="" class="form-control" id="senha"
+							name="senha" placeholder="Crie uma senha" autocomplete="new-password" required>
+					</div>
 				</div>
 
-				<div class="col-12 col-md-4">
-					<label for="usuario" class="form-label">Usuário</label>
-					<input type="text" value="<%= dadosForm.usuario %>" class="form-control" id="usuario"
-						name="usuario" placeholder="Usuário" required>
-				</div>
+				<fieldset class="register-casas-escolha">
+					<legend>Escolha sua casa</legend>
 
-				<div class="col-12 col-md-4">
-					<label for="senha" class="form-label">Senha</label>
-					<input type="password" value="<%= dadosForm.senha %>" class="form-control" id="senha"
-						name="senha" placeholder="Senha" required>
-				</div>
-			</div>
+					<div class="register-casas-grid">
+						<% for (var c = 0; c < casas.length; c++) { %>
+							<label class="register-casa">
+								<input type="radio" name="casa" value="<%=casas[c].slug%>"
+									<%=casaSelecionada === casas[c].slug ? 'checked' : ''%> required>
+								<img src="images/casa_<%=casas[c].slug%>.jpg" alt="Brasão da Casa <%=casas[c].nome%>">
+								<span>Casa <%=casas[c].nome%></span>
+							</label>
+						<% } %>
+					</div>
+				</fieldset>
 
-			<div class="row g-3 center mt-3">
-				<div class="col-6 col-sm-4 col-md-2">
-					<img src="images/casa_arryn.jpg" class="img-fluid img-radio" alt="Casa Arryn">
-					<label class="d-block text-center">
-						<input type="radio" id="casa-arryn" name="casa" value="arryn" required> Casa Arryn
-					</label>
-				</div>
+				<button type="submit" class="btn register-entrar">Criar conta</button>
+			</form>
 
-				<div class="col-6 col-sm-4 col-md-2">
-					<img src="images/casa_baratheon.jpg" class="img-fluid img-radio" alt="Casa Baratheon">
-					<label class="d-block text-center">
-						<input type="radio" id="casa-baratheon" name="casa" value="baratheon" required> Casa Baratheon
-					</label>
-				</div>
-
-				<div class="col-6 col-sm-4 col-md-2">
-					<img src="images/casa_greyjoy.jpg" class="img-fluid img-radio" alt="Casa Greyjoy">
-					<label class="d-block text-center">
-						<input type="radio" id="casa-greyjoy" name="casa" value="greyjoy" required> Casa Greyjoy
-					</label>
-				</div>
-
-				<div class="col-6 col-sm-4 col-md-2">
-					<img src="images/casa_lannister.jpg" class="img-fluid img-radio" alt="Casa Lannister">
-					<label class="d-block text-center">
-						<input type="radio" id="casa-lannister" name="casa" value="lannister" required> Casa Lannister
-					</label>
-				</div>
-
-				<div class="col-6 col-sm-4 col-md-2">
-					<img src="images/casa_martell.jpg" class="img-fluid img-radio" alt="Casa Martell">
-					<label class="d-block text-center">
-						<input type="radio" id="casa-martell" name="casa" value="martell" required> Casa Martell
-					</label>
-				</div>
-
-				<div class="col-6 col-sm-4 col-md-2">
-					<img src="images/casa_stark.jpg" class="img-fluid img-radio" alt="Casa Stark">
-					<label class="d-block text-center">
-						<input type="radio" id="casa-stark" name="casa" value="stark" required> Casa Stark
-					</label>
-				</div>
-			</div>
-
-			<div class="row g-3 center mt-3 justify-content-center">
-				<div class="col-6 col-sm-4 col-md-2">
-					<img src="images/casa_targaryen.jpg" class="img-fluid img-radio" alt="Casa Targaryen">
-					<label class="d-block text-center">
-						<input type="radio" id="casa-targaryen" name="casa" value="targaryen" required> Casa Targaryen
-					</label>
-				</div>
-
-				<div class="col-6 col-sm-4 col-md-2">
-					<img src="images/casa_tully.jpg" class="img-fluid img-radio" alt="Casa Tully">
-					<label class="d-block text-center">
-						<input type="radio" id="casa-tully" name="casa" value="tully" required> Casa Tully
-					</label>
-				</div>
-
-				<div class="col-6 col-sm-4 col-md-2">
-					<img src="images/casa_tyrell.jpg" class="img-fluid img-radio" alt="Casa Tyrell">
-					<label class="d-block text-center">
-						<input type="radio" id="casa-tyrell" name="casa" value="tyrell" required> Casa Tyrell
-					</label>
-				</div>
-			</div>
-
-			<div class="mt-3">
-				<button type="submit" class="btn btn-primary">Confirmar cadastro</button>
-			</div>
-		</form>
-	</div>
+			<p class="register-rodape">
+				Já tem uma conta?
+				<a href="/">Entrar no reino</a>
+			</p>
+		</section>
+	</main>
 </body>
 
 </html>
