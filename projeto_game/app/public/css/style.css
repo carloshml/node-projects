@@ -392,6 +392,12 @@ body.som-modal-aberto {
   padding: 18px;
 }
 
+.acoes-carregando {
+  margin: 0;
+  color: #5a1f16;
+  font-size: 13px;
+}
+
 #pergaminhos {
   height: 40vh;
   overflow: auto;

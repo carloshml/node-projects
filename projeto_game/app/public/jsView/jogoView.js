@@ -810,6 +810,15 @@ function irParaCeleiro() {
     }
 }
 
+function irParaOrdens() {
+    const formulario = formularioOrdens();
+    if (formulario) {
+        formulario.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+    }
+    verSuditos();
+}
+
 /* ------------------------------- atividades -------------------------------- */
 
 function imagemDaAcao(tipo) {
@@ -1244,8 +1253,8 @@ async function verPergaminhos() {
     }
 }
 
-function verSuditos() {
-    fetch('/gerarSuditos')
+function verSuditos(rolar) {
+    return fetch('/gerarSuditos')
         .then(function (resposta) {
             if (!resposta.ok) {
                 throw new Error('HTTP ' + resposta.status);
@@ -1253,11 +1262,26 @@ function verSuditos() {
             return resposta.text();
         })
         .then(function (html) {
-            document.getElementById('acoes').innerHTML = html;
-            return buscaJogoUsuario();
+            const container = document.getElementById('acoes');
+            if (!container) {
+                return;
+            }
+            container.innerHTML = html;
+
+            if (!usuario.jogo) {
+                return buscaJogoUsuario();
+            }
+
+            atualizarSuditos();
+            atualizarFormularioOrdens();
         })
         .then(function () {
             inicializarFormularioOrdens();
+
+            if (rolar === false) {
+                return;
+            }
+
             const formulario = formularioOrdens();
             if (formulario) {
                 formulario.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -1406,6 +1430,7 @@ async function sincronizar() {
 async function iniciar() {
     await buscaJogoUsuario();
     montarCeleiro();
+    await verSuditos(false);
     await sincronizar();
 
     setInterval(function () {
