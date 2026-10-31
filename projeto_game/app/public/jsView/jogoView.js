@@ -971,6 +971,11 @@ function atualizarVidaBatalha(linha, agora) {
         texto.textContent = Math.ceil(vidaAtual) + '/' + vida;
     }
 
+    /* chegou a 0 de vida: liquida a batalha sem esperar o restante do timer */
+    if (vidaAtual <= 0 && !sincronizando) {
+        sincronizar();
+    }
+
     const base = linha.dataset.hpBase !== undefined ? Number(linha.dataset.hpBase) : vida;
     const ultimoDano = Number(linha.dataset.ultimoDano) || 0;
     if (vidaAtual < base - 0.6 && agora - ultimoDano > 900) {

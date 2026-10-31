@@ -87,6 +87,49 @@ function resultadoDaAcao(acao) {
     return { ganhos: ganhosDaAcao(acao), vitoria: null, fera: null };
 }
 
+/* instante em que o dano acumulado derruba a fera; null quando não há vitória */
+function instanteDaVitoria(acao) {
+    if (String(acao.acao) !== '5') {
+        return null;
+    }
+
+    const fera = obterFera(acao.fera);
+    if (!fera) {
+        return null;
+    }
+
+    const quantidade = Number(acao.quantidade) || 0;
+    const ataque = quantidade * PODER_ALDEAO;
+    if (ataque < fera.vida) {
+        return null;
+    }
+
+    const duracao = Number(acao.duracao_ms) || (DURACOES[5] * quantidade);
+    const inicio = Number(acao.acao_iniciada_em);
+    const termina = Number(acao.acao_termina_em);
+    const inicioConfiavel = Number.isFinite(inicio) && inicio > 0
+        ? inicio
+        : termina - duracao;
+
+    if (!Number.isFinite(inicioConfiavel) || !(duracao > 0)) {
+        return null;
+    }
+
+    return inicioConfiavel + (duracao * (fera.vida / ataque));
+}
+
+function acaoConcluida(acao, agora) {
+    if (acao.terminado === true) {
+        return true;
+    }
+    if (Number(acao.acao_termina_em) <= agora) {
+        return true;
+    }
+
+    const vitoriaEm = instanteDaVitoria(acao);
+    return vitoriaEm !== null && agora >= vitoriaEm;
+}
+
 function JogoDAO(connection) {
     this._connection = connection;
 }
@@ -187,7 +230,16 @@ JogoDAO.prototype.gerarOrdemSuditos = async function (acao) {
         }
 
         const agora = new Date().getTime();
-        const duracao = DURACOES[tipo] * quantidade;
+        let duracao = DURACOES[tipo] * quantidade;
+
+        /* a batalha termina quando o dano acumulado zera a vida da fera */
+        if (tipo === 5 && fera) {
+            const ataque = quantidade * PODER_ALDEAO;
+            if (ataque >= fera.vida) {
+                duracao = Math.max(1000, Math.round(duracao * (fera.vida / ataque)));
+            }
+        }
+
         const novaAcao = {
             usuario: acao.usuario,
             acao: String(tipo),
@@ -226,9 +278,13 @@ JogoDAO.prototype.gerarPergaminhos = async function (req, res) {
 
     try {
         const momento_atual = new Date().getTime();
-        const acoesNaoTerminadas = await conexao.db.collection("acao")
-            .find({ usuario: usuario, acao_termina_em: { $gt: momento_atual }, terminado: { $ne: true } })
+        const candidatas = await conexao.db.collection("acao")
+            .find({ usuario: usuario, terminado: { $ne: true } })
             .toArray();
+
+        const acoesNaoTerminadas = candidatas.filter(function (acao) {
+            return !acaoConcluida(acao, momento_atual);
+        });
 
         const jsonContent = JSON.stringify({ acoes: acoesNaoTerminadas });
         res.setHeader("Content-Type", "application/json");
@@ -257,16 +313,20 @@ JogoDAO.prototype.atualizarAcoesDeJogo = async function (req, res) {
         }
 
         const momento_atual = new Date().getTime();
-        const acoesTerminadas = await db.collection("acao")
+        const candidatas = await db.collection("acao")
             .find({
                 usuario: usuario,
                 $or: [
-                    { terminado: false, acao_termina_em: { $lte: momento_atual } },
+                    { terminado: { $ne: true } },
                     /* ordens antigas que o código anterior encerrou sem pagar recompensa */
                     { terminado: true, recompensado: { $ne: true } }
                 ]
             })
             .toArray();
+
+        const acoesTerminadas = candidatas.filter(function (acao) {
+            return acao.terminado === true || acaoConcluida(acao, momento_atual);
+        });
 
         const concluidas = [];
 
