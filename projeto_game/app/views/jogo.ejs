@@ -8,6 +8,8 @@
 
 	<link rel="stylesheet" href="css/bootstrap.min.css">
 	<link href="css/style.css" rel="stylesheet">
+	<script src="/socket.io/socket.io.js" defer></script>
+	<script src="jsView/chatView.js" defer></script>
 	<script src="jsView/som.js" defer></script>
 	<script src="jsView/jogoView.js" defer></script>
 </head>
@@ -145,6 +147,11 @@
 			<button type="button" class="toolbar-botao" onclick="abrirSonsBatalha()">
 				<span class="toolbar-nota" aria-hidden="true">♪</span> Sons da batalha
 			</button>
+
+			<button type="button" class="toolbar-botao" onclick="abrirChat()">
+				<span class="toolbar-chat" aria-hidden="true">💬</span> Chat
+				<span id="chat-online-badge" class="toolbar-chat__badge">0</span>
+			</button>
 		</div>
 	</div>
 
@@ -185,6 +192,44 @@
 					<button type="button" class="btn btn-sm som-batalha-pronto" onclick="fecharSonsBatalha()">Pronto</button>
 				</div>
 			</footer>
+		</div>
+	</div>
+
+	<div id="chat-modal" class="chat-modal" hidden>
+		<div class="chat-painel" role="dialog" aria-modal="true" aria-labelledby="chat-titulo">
+			<header class="chat-topo">
+				<div>
+					<p class="chat-eyebrow">Sala global</p>
+					<h2 id="chat-titulo">Chat dos Sete Reinos</h2>
+					<p class="chat-topo__status"><span id="chat-online">0</span> jogadores online</p>
+				</div>
+				<button type="button" class="chat-fechar" onclick="fecharChat()"
+					aria-label="Fechar chat">×</button>
+			</header>
+
+			<div class="chat-corpo">
+				<aside class="chat-online-painel" aria-label="Jogadores online">
+					<h3>Online <span id="chat-online-count">0</span></h3>
+					<ul id="chat-online-lista" class="chat-online-lista">
+						<li class="chat-online-vazio">Conectando...</li>
+					</ul>
+				</aside>
+
+				<section class="chat-conversa" aria-label="Mensagens do chat">
+					<div id="chat-mensagens" class="chat-mensagens" aria-live="polite">
+						<div id="chat-vazio" class="chat-vazio">Conectando ao chat...</div>
+					</div>
+
+					<form id="chat-form" class="chat-form">
+						<input id="chat-input" class="chat-input" type="text" maxlength="500"
+							placeholder="Escreva para os Sete Reinos..." autocomplete="off"
+							aria-label="Mensagem do chat">
+						<button type="submit" class="chat-enviar">Enviar</button>
+					</form>
+
+					<p id="chat-status" class="chat-status" role="status"></p>
+				</section>
+			</div>
 		</div>
 	</div>
 </body>

@@ -19,6 +19,7 @@ Jogo web de estratégia ambientado em **Game of Thrones**, feito com Node.js, Ex
 - Recompensas ao concluir cada ordem, com modal central, loot reveal e contagem animada.
 - Efeitos sonoros e ambiente opcionais via Web Audio, com botão de som.
 - Escolha entre 4 sons de guerreiros e 4 de fera em **Sons da batalha**; as trilhas se alternam durante a caçada.
+- Chat global em tempo real com jogadores online, histórico recente e lista de participantes.
 - Celeiro para vender madeira, comida e ferro por moedas.
 - Cinco feras com vida, recompensa e imagem próprias; a fera é sorteada pelo jogo.
 - Ranking de jogadores por moedas.
@@ -36,6 +37,7 @@ Jogo web de estratégia ambientado em **Game of Thrones**, feito com Node.js, Ex
 | Sessão | `express-session` (MemoryStore) |
 | Validação | `express-validator` |
 | Front-end | Bootstrap 5.3 local, CSS próprio e JavaScript puro (sem jQuery) |
+| Tempo real | Socket.IO 4.8 (cliente vanilla) |
 | Autoload | `consign` |
 
 ## Requisitos
@@ -273,6 +275,7 @@ Banco `got`, coleções principais:
 - O layout usa Bootstrap 5 e não foi testado em navegadores antigos.
 - A liquidação das ordens é feita por requisições do cliente (`/atualizarAcoesDeJogo`) e por uma verificação periódica; para produção, considerar um job no servidor.
 - A administração de usuários não possui controle de perfil/role.
+- O histórico do chat fica em memória (últimas 50 mensagens) e é perdido ao reiniciar o servidor; para produção, persistir em MongoDB/Redis e usar um adapter do Socket.IO.
 
 ## Autor
 

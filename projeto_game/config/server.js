@@ -22,11 +22,12 @@ app.use(express.urlencoded({extended: true}));
 app.use(express.json());
 
 /* configurar o middleware express-session */
-app.use(expressSession({
+const sessionMiddleware = expressSession({
 	secret:'secretkey-00045',
 	resave: false, // pois não será regravada a cada sessão
 	saveUninitialized: false
-}));
+});
+app.use(sessionMiddleware);
 
 
 /* efetua o autoload das rotas, dos models e dos controllers para o objeto app */
@@ -39,3 +40,4 @@ consign()
 
 /* exportar o objeto app */
 module.exports = app;
+module.exports.sessionMiddleware = sessionMiddleware;
