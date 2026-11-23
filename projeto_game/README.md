@@ -36,7 +36,7 @@ Jogo web de estratégia ambientado em **Game of Thrones**, feito com Node.js, Ex
 | Servidor | Express 5 |
 | Views | EJS 7 |
 | Banco | MongoDB 7.0+ (driver `mongodb` 7.x) |
-| Sessão | `express-session` (MemoryStore) |
+| Sessão | `express-session` + `connect-mongo` (MongoDB) |
 | Validação | `express-validator` |
 | Front-end | Bootstrap 5.3 local, CSS próprio e JavaScript puro (sem jQuery) |
 | Tempo real | Socket.IO 4.8 (cliente vanilla) |
@@ -67,7 +67,6 @@ Jogo web de estratégia ambientado em **Game of Thrones**, feito com Node.js, Ex
 |---|---|
 | Senhas legadas em MD5 | Re-hash automático para scrypt no próximo login; novas contas já usam scrypt |
 | Segredo da sessão e URI do MongoDB no código | Mover para variáveis de ambiente e rotacionar |
-| Sessão em `MemoryStore` | Usar store persistente (Redis ou MongoDB) |
 | Rotas administrativas sem papéis | Criar RBAC (`jogador` / `admin`) |
 | POSTs sem CSRF | Adicionar token CSRF |
 | Sem headers de segurança e rate limit | Helmet, CSP compatível e `express-rate-limit` |
@@ -343,8 +342,6 @@ Banco `got`, coleções principais:
 ## Limitações e próximos passos
 
 - Senhas antigas em MD5 são migradas automaticamente para **scrypt** no próximo login.
-- Sessões usam o `MemoryStore` padrão do `express-session`; reiniciar o servidor derruba os logins. Usar um store persistente.
-- Conexão com o MongoDB e segredo da sessão estão no código; mover para variáveis de ambiente.
 - Não há suíte de testes automatizados (`npm test` é apenas um placeholder).
 - O layout usa Bootstrap 5 e não foi testado em navegadores antigos.
 - A liquidação das ordens é feita por requisições do cliente (`/atualizarAcoesDeJogo`) e por uma verificação periódica; para produção, considerar um job no servidor.
