@@ -5462,3 +5462,59 @@ body.roleta-aberta #pergaminhos {
     padding-bottom: 190px;
   }
 }
+
+/* Conselheiro em card próprio, antes das ações rápidas */
+.conselheiro {
+  flex: none;
+  width: 100%;
+  max-width: none;
+  margin-top: 12px;
+  padding: 16px 18px;
+  gap: 14px;
+  border-radius: 10px;
+}
+
+.conselheiro__icone {
+  width: 56px;
+  height: 56px;
+}
+
+.conselheiro__nome {
+  margin-bottom: 4px;
+  font-size: 10px;
+}
+
+.conselheiro__frase {
+  display: block;
+  max-height: none;
+  overflow: visible;
+  color: #f7ead3;
+  font-size: 15px;
+  line-height: 1.45;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+  -webkit-line-clamp: unset;
+}
+
+.body-jogo {
+  padding-bottom: 84px;
+}
+
+@media (max-width: 600px) {
+  .conselheiro {
+    padding: 12px 14px;
+    gap: 10px;
+  }
+
+  .conselheiro__icone {
+    width: 44px;
+    height: 44px;
+  }
+
+  .conselheiro__frase {
+    font-size: 14px;
+  }
+
+  .body-jogo {
+    padding-bottom: 150px;
+  }
+}

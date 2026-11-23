@@ -8,11 +8,11 @@
 	<title>MMORPG - Game of Thrones</title>
 
 	<link rel="stylesheet" href="css/bootstrap.min.css">
-	<link href="css/style.css?v=20261123-roleta-15" rel="stylesheet">
+	<link href="css/style.css?v=20261123-roleta-16" rel="stylesheet">
 	<script src="/socket.io/socket.io.js" defer></script>
-	<script src="jsView/chatView.js?v=20261123-roleta-15" defer></script>
-	<script src="jsView/som.js?v=20261123-roleta-15" defer></script>
-	<script src="jsView/jogoView.js?v=20261123-roleta-15" defer></script>
+	<script src="jsView/chatView.js?v=20261123-roleta-16" defer></script>
+	<script src="jsView/som.js?v=20261123-roleta-16" defer></script>
+	<script src="jsView/jogoView.js?v=20261123-roleta-16" defer></script>
 </head>
 
 <body class="body-jogo">
@@ -123,6 +123,15 @@
 			<div class="col-sm-6">
 				<div id="pergaminhos" class="pergaminhos"></div>
 
+				<div id="conselheiro" class="conselheiro" aria-live="polite"
+					data-ultima-acao="<%= typeof ultimaAcao !== 'undefined' && ultimaAcao ? ultimaAcao.acao : '' %>">
+					<img class="conselheiro__icone" src="images/icones/conselheiro.svg" alt="">
+					<div class="conselheiro__texto">
+						<span class="conselheiro__nome">Conselheiro do reino</span>
+						<p id="conselheiro-frase" class="conselheiro__frase">O reino observa. Cada escolha conta.</p>
+					</div>
+				</div>
+
 				<%
 				const acoesRapidas = {
 					1: { nome: 'Coletar recursos', icone: 'images/walk.gif' },
@@ -192,15 +201,6 @@
 				<span class="toolbar-chat" aria-hidden="true">💬</span> Chat
 				<span id="chat-online-badge" class="toolbar-chat__badge">0</span>
 			</button>
-		</div>
-
-		<div id="conselheiro" class="conselheiro" aria-live="polite"
-			data-ultima-acao="<%= typeof ultimaAcao !== 'undefined' && ultimaAcao ? ultimaAcao.acao : '' %>">
-			<img class="conselheiro__icone" src="images/icones/conselheiro.svg" alt="">
-			<div class="conselheiro__texto">
-				<span class="conselheiro__nome">Conselheiro do reino</span>
-				<p id="conselheiro-frase" class="conselheiro__frase">O reino observa. Cada escolha conta.</p>
-			</div>
 		</div>
 	</div>
 
