@@ -22,6 +22,14 @@ app.set('views', './app/views');
 /* configurar o middleware express.static */
 app.use(express.static('./app/public')); 
 
+/* páginas e respostas dinâmicas não devem ser reutilizadas com token antigo */
+app.use(function (req, res, next) {
+	res.set('Cache-Control', 'no-store');
+	res.set('Pragma', 'no-cache');
+	res.set('Expires', '0');
+	next();
+});
+
 /* configurar os parsers nativos do Express 5 */
 app.use(express.urlencoded({extended: true}));
 app.use(express.json());

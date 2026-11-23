@@ -41,6 +41,17 @@ function csrfProtection(req, res, next) {
         if (req.is('application/json')) {
             return res.status(403).json({ ok: false, msg: 'csrfInvalido' });
         }
+
+        /* login antigo/cacheado: devolve o formulário já com um token novo */
+        if (req.path === '/autenticar' && req.accepts('html')) {
+            return res.status(403).render('index', {
+                validacao: [{
+                    msg: 'Sua sessão expirou ou a página estava desatualizada. Tente entrar novamente.'
+                }],
+                aviso: {}
+            });
+        }
+
         return res.status(403).send('Requisição inválida ou sessão expirada. Recarregue a página e tente novamente.');
     }
 
