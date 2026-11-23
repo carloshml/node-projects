@@ -291,7 +291,13 @@
     }
 
     function iniciarBatalha() {
-        if (batalhaAtiva || !somAtivo) {
+        if (!somAtivo) {
+            return;
+        }
+        if (batalhaAtiva) {
+            if (!batalhaTimer) {
+                passoBatalha();
+            }
             return;
         }
         batalhaAtiva = true;

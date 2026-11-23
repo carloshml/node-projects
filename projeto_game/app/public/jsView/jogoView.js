@@ -2237,6 +2237,11 @@ async function iniciar() {
         atualizarContadores();
     }, 1000);
 
+    /* recupera a trilha se uma ordem anterior interromper o loop de batalha */
+    setInterval(function () {
+        atualizarSomBatalha();
+    }, 3000);
+
     /* rede de segurança para ações que terminaram com a aba em segundo plano */
     setInterval(function () {
         sincronizar();
