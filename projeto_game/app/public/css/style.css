@@ -4939,3 +4939,78 @@ body.roleta-aberta #pergaminhos {
   line-height: 1.35;
   text-align: center;
 }
+
+
+/* Legibilidade do painel de ordens e atividades */
+.acoes,
+.pergaminhos {
+  opacity: 1;
+  filter: none;
+  border: 1px solid rgba(255, 211, 77, 0.24);
+  background: linear-gradient(160deg, rgba(26, 17, 11, 0.98), rgba(8, 6, 4, 0.99));
+  color: #f4e7cf;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+}
+
+#acoes h3 {
+  color: #f4e7cf;
+  text-shadow: 0 2px 4px #000;
+}
+
+.acoes-carregando {
+  color: #d8c6a4;
+}
+
+.card-acao {
+  border-color: rgba(255, 211, 77, 0.4);
+  background: linear-gradient(155deg, rgba(34, 20, 12, 0.99), rgba(9, 6, 4, 0.99));
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2);
+}
+
+.card-acao--campeao {
+  border-color: rgba(255, 211, 77, 0.6);
+  background: linear-gradient(120deg, rgba(74, 38, 16, 0.99), rgba(11, 7, 4, 0.99));
+}
+
+.card-acao__titulo {
+  color: #ffe06a;
+  font-size: 13px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.95);
+}
+
+.card-acao__info {
+  color: #f0dfc4;
+  font-size: 11px;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+}
+
+.card-acao__requisito {
+  color: #e4cbbb;
+  font-size: 10px;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+}
+
+.form-ordens .form-text {
+  color: #e4d3b8;
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.ordem-status {
+  color: #d8c6a4;
+  font-size: 11px;
+}
+
+.btn-repetir-acao {
+  padding: 9px;
+  border-color: rgba(255, 211, 77, 0.7);
+  background: rgba(255, 211, 77, 0.16);
+  color: #ffe08a;
+  font-size: 12px;
+  text-shadow: 0 1px 3px #000;
+}
+
+.repetir-acao__texto {
+  color: #c9b896;
+  font-size: 10px;
+}
