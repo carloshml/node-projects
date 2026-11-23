@@ -7,6 +7,7 @@ var consign = require('consign');
 /* importar o módulo do express-session */
 var expressSession = require('express-session');
 var MongoStore = require('connect-mongo').MongoStore;
+var csrfProtection = require('../app/security/csrf');
 
 /* carregar e validar as variáveis de ambiente */
 var env = require('./env');
@@ -49,6 +50,9 @@ const sessionMiddleware = expressSession({
 	}
 });
 app.use(sessionMiddleware);
+
+/* exigir token CSRF em requisições que alteram estado */
+app.use(csrfProtection);
 
 
 /* efetua o autoload das rotas, dos models e dos controllers para o objeto app */

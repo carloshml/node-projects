@@ -143,6 +143,7 @@
 		<div class="modal-dialog modal-dialog-centered">
 			<div class="modal-content admin-modal">
 				<form id="form-update" action="/atualizarUsuario" method="post">
+					<input type="hidden" name="_csrf" value="<%= csrfToken %>">
 					<div class="modal-header">
 						<h2 class="modal-title h5" id="modal-update-label">Editar usuário</h2>
 						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
@@ -181,6 +182,7 @@
 		<div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
 			<div class="modal-content admin-modal">
 				<form action="/inserirUsuarioCrud" method="post">
+					<input type="hidden" name="_csrf" value="<%= csrfToken %>">
 					<div class="modal-header">
 						<h2 class="modal-title h5" id="modal-create-label">Novo usuário</h2>
 						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>

@@ -1,6 +1,7 @@
 
 <div id="aldecoes">
 	<form class="form-cadastro form-ordens" action="/gerarOrdemSuditos" method="post">
+		<input type="hidden" name="_csrf" value="<%= csrfToken %>">
 		<input type="hidden" name="jogo" id="jogo" value="<%=JSON.stringify(jogo)%>">
 		<input type="hidden" name="acao" id="acao" value="">
 		<input type="hidden" name="quantidade" id="quantidade" value="1">

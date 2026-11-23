@@ -65,21 +65,22 @@ Jogo web de estratégia ambientado em **Game of Thrones**, feito com Node.js, Ex
 
 | Risco | Ação prioritária |
 |---|---|
-| Senhas legadas em MD5 | Re-hash automático para scrypt no próximo login; novas contas já usam scrypt |
-| Segredo da sessão e URI do MongoDB no código | Mover para variáveis de ambiente e rotacionar |
-| POSTs sem CSRF | Adicionar token CSRF |
 | Sem headers de segurança e rate limit | Helmet, CSP compatível e `express-rate-limit` |
 | Testes de segurança ausentes | Cobrir autenticação, autorização, IDOR e abuso |
 
+### CSRF
+
+Formulários que alteram estado incluem o campo `_csrf`. Chamadas `fetch` com JSON enviam o token no header `X-CSRF-Token`, lido da meta tag `csrf-token` da página.
+
 ### Roadmap inicial — 0 a 30 dias
 
-- Variáveis de ambiente e `.env.example`.
-- Hash de senha forte.
-- Store de sessão persistente.
-- RBAC nas rotas administrativas.
-- CSRF nos POSTs.
-- Helmet e rate limit.
-- Gitleaks no pré-commit.
+- [x] Variáveis de ambiente e `.env.example`.
+- [x] Hash de senha forte.
+- [x] Store de sessão persistente.
+- [x] RBAC nas rotas administrativas.
+- [x] CSRF nos POSTs.
+- [ ] Helmet e rate limit.
+- [ ] Gitleaks no pré-commit.
 
 ### Ferramentas de apoio
 
@@ -283,6 +284,8 @@ O `consign` carrega automaticamente `app/routes`, `config/dbConection.js`, `app/
 | POST | `/inserirUsuarioCrud` | Cadastro pela tela de administração |
 | POST | `/atualizarUsuario` | Atualização de usuário pela administração |
 
+Requisições `POST` exigem o token CSRF. As rotas administrativas também exigem `papel = admin`.
+
 ## Modelo de dados
 
 Banco `got`, coleções principais:
@@ -332,6 +335,10 @@ Banco `got`, coleções principais:
   "recompensado": false
 }
 ```
+
+### `sessoes`
+
+Sessões persistidas pelo `connect-mongo`, com expiração de 7 dias e remoção automática pelo TTL do MongoDB. Cada sessão guarda também o token CSRF.
 
 ## Scripts
 

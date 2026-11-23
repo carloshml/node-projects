@@ -58,6 +58,18 @@ const CUSTO_ALDEAO = 10000;
 const PRECOS_PADRAO = { madeira: 1, comida: 2, ferro: 3 };
 const DURACAO_DELTA = 2000;
 const PAUSA_ANTES_MODAL = 1400;
+
+function tokenCsrf() {
+    const meta = document.querySelector('meta[name="csrf-token"]');
+    return meta ? meta.getAttribute('content') : '';
+}
+
+function cabecalhosJson() {
+    return {
+        'Content-Type': 'application/json',
+        'X-CSRF-Token': tokenCsrf()
+    };
+}
 const ATRASO_ENVIO_ORDEM = 4050;
 
 function formatarDuracao(segundos) {
@@ -582,7 +594,7 @@ async function venderRecurso(recurso, linha) {
     try {
         const resposta = await fetch('/venderRecurso', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: cabecalhosJson(),
             body: JSON.stringify({ recurso: recurso, quantidade: quantidade })
         });
         const dados = await resposta.json();
@@ -625,7 +637,7 @@ async function comprarAldeao() {
     try {
         const resposta = await fetch('/comprarAldeao', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' }
+            headers: cabecalhosJson()
         });
         const dados = await resposta.json();
 
