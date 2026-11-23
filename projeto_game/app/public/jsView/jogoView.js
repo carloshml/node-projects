@@ -51,78 +51,78 @@ const NOMES_ACAO = {
 };
 const FRASES_CONSELHEIRO = {
     coleta: [
-        'Hoje a colheita vai ser boa.',
-        'O celeiro logo estará cheio; os aldeões sabem o caminho.',
-        'Mãos calejadas constroem reinos mais duradouros que espadas.',
-        'A terra respondeu ao chamado. Isso é um bom sinal.',
-        'Cada tronco derrubado é uma viga a mais no futuro da casa.',
-        'Bom trabalho. A madeira sustenta tanto quanto a fé.',
-        'Os aldeões trabalham em silêncio, mas o reino escuta.',
-        'Madeira, comida e ferro: a trindade que mantém o inverno longe.'
+        'Isso aí! Hoje a colheita promete — e eu já estou sentindo cheiro de fartura.',
+        'Boa! O celeiro vai ficar cheio e a concorrência que se cuide.',
+        'Manda ver! Cada tronco derrubado é lucro no seu bolso.',
+        'Os aldeões estão caprichando. Eu adoro ver esse reino trabalhando.',
+        'Olha só essa produção! Se continuar assim, vou pedir um aumento.',
+        'Madeira, comida e ferro: o combo perfeito pra um reino bem alimentado.',
+        'Trabalho em equipe é isso! O celeiro agradece e eu também.',
+        'Boa colheita! Hoje o reino acorda com o pé direito.'
     ],
     caca: [
-        'As feras sentem o cheiro do medo. Que seja o medo delas.',
-        'Ouvi um rugido ao longe. Talvez o reino devesse responder.',
-        'A caçada começou; os deuses apreciam os corajosos.',
-        'O reino prende a respiração enquanto os aldeões avançam.',
-        'Ferro e coragem, senhor. É disso que as lendas são feitas.',
-        'Não subestime a fera. Ela também luta pelo território.',
-        'A fera escolhida não saberá o que a atingiu.'
+        'Uhul! A fera não sabe o que vem por aí. Bora pra cima!',
+        'Caçada começou! Já separei uma aposta imaginária em você.',
+        'Olha o tamanho dessa fera... Mas aposto em você, sempre.',
+        'A tensão tá no ar. Eu adoro isso! Mostra o que sabe.',
+        'Ferro, coragem e uma boa dose de ousadia. Vai dar certo.',
+        'Se a fera soubesse quem está caçando, já teria fugido.',
+        'Bora! Quero ver essa história virar lenda.'
     ],
     vitoria: [
-        'A fera caiu. Os bardos terão muito o que cantar.',
-        'Hoje os corredores da fortaleza ouvirão gritos de vitória.',
-        'Sangue e glória: o preço e a recompensa da caçada.',
-        'O reino celebra mais uma presa derrotada.',
-        'Os deuses sorriram para os seus aldeões hoje.',
-        'Mais uma história para os pergaminhos da casa.',
-        'A caçada foi digna de canção. E de uma boa mesa.',
-        'O troféu é seu, senhor. Que os rivais tomem nota.'
+        'É ISSO! A fera caiu e a taverna já está pedindo uma rodada.',
+        'Que vitória! Hoje você merece a melhor cadeira do salão.',
+        'Eu sabia! Assistir você caçar é melhor que torneio.',
+        'A fera não teve chance. Anota mais essa, senhor das feras.',
+        'Vitória bonita! Até os bardos vão querer autógrafo.',
+        'Boa demais! O reino inteiro devia estar vendo isso.',
+        'Caçada impecável. Eu já estou comemorando por aqui.',
+        'Tá voando! Mais uma fera pra coleção de histórias.'
     ],
     derrota: [
-        'A fera escapou. Nem toda caçada termina em glória.',
-        'Os aldeões voltaram vivos. Já é uma vitória silenciosa.',
-        'A lição foi dura, mas o reino aprende com cicatrizes.',
-        'A próxima caçada pedirá mais aço e menos pressa.',
-        'O reino aprende. A fera, infelizmente, também.',
-        'Há derrotas que ensinam mais que dez vitórias.'
+        'Relaxa, acontece. A próxima a gente acerta — e eu já tenho uma ideia.',
+        'A fera escapou, mas você voltou com história. Isso também vale.',
+        'Não foi dessa vez. Sacode a poeira e bora de novo!',
+        'Derrota? Eu chamaria de treino caro. A próxima é sua.',
+        'Levanta a cabeça! Até os maiores caçadores já voltaram sem troféu.',
+        'Tudo bem, a fera teve sorte. Na próxima, a sorte é nossa.'
     ],
     venda: [
-        'Hoje nosso reino recebe as graças divinas do ouro.',
-        'A realeza celebra tanta fartura.',
-        'O ouro muda de mãos, mas o poder permanece.',
-        'Bom negócio. O celeiro agradece e a bolsa também.',
-        'O mercado reconhece o valor de um reino organizado.',
-        'Cada moeda conquistada é uma promessa de inverno menos cruel.',
-        'O celeiro esvazia, mas as arcas ficam mais pesadas.',
-        'Comércio é uma guerra travada com sorrisos e contratos.'
+        'Olha o ouro entrando! Hoje ninguém segura essa fartura.',
+        'A realeza que celebre, porque o cofre tá sorrindo.',
+        'Bom negócio! Eu já estou imaginando o que fazer com essas moedas.',
+        'Vendeu bem! O mercado hoje acordou generoso.',
+        'Cada moeda dessa é um passo mais perto do topo.',
+        'Isso sim é jeito de fazer comércio. O reino agradece.',
+        'O celeiro esvaziou, mas a bolsa ficou linda.',
+        'Comércio afiado! Até eu fiquei com inveja.'
     ],
     treino: [
-        'Mentes afiadas vencem batalhas antes de elas começarem.',
-        'A sabedoria é a única espada que nunca enferruja.',
-        'O conhecimento dos seus aldeões logo será temido.',
-        'Um povo instruído é um reino difícil de enganar.',
-        'Histórias antigas guardam armadilhas que novos exércitos repetem.'
+        'Boa! Cabeça afiada hoje, lenda amanhã.',
+        'Investir em conhecimento é aposta certa. Eu aprovo.',
+        'Olha o pessoal aprendendo! O reino tá evoluindo.',
+        'Um povo esperto é um povo difícil de enganar. Continua!',
+        'Conhecimento é poder — e você está acumulando os dois.'
     ],
     campeao: [
-        'O campeão cresce, e com ele a fama da sua casa.',
-        'Aço e disciplina formam um guerreiro; o resto é conversa.',
-        'Nosso campeão está mais perto de virar lenda.',
-        'O reino tem agora um nome para temer nas caçadas.',
-        'Cada treino aproxima o campeão do seu destino.'
+        'O campeão tá ficando monstro! Eu não apostaria contra ele.',
+        'Aço e disciplina. Esse aí vai dar trabalho pro inimigo.',
+        'Nosso campeão está mais forte, e eu estou aqui vibrando.',
+        'Treino rendendo! Já quero ver a cara dos rivais.',
+        'Cada treino deixa o campeão mais perto de virar lenda.'
     ],
     missao: [
-        'O pergaminho foi cumprido. O reino reconhece o esforço.',
-        'Dever cumprido, senhor. Há recompensas para quem honra a palavra.',
-        'A recompensa chegou. Que seja usada com sabedoria.',
-        'O reino registra mais um dia de serviço bem feito.'
+        'Missão cumprida! Pode comemorar, você mereceu.',
+        'Dever feito e recompensa no bolso. Que dia bom!',
+        'Olha o pergaminho assinado! Eu sabia que você ia conseguir.',
+        'Mais uma pra conta. Tô orgulhoso de ser seu conselheiro.'
     ],
     geral: [
-        'O reino observa. Cada escolha conta.',
-        'Cada ação move uma peça no grande jogo.',
-        'O Trono de Ferro não pertence aos ociosos.',
-        'Inverno se aproxima. Mantenha o povo trabalhando.',
-        'Os corvos veem tudo. Este conselheiro também.'
+        'Tô aqui do seu lado. Bora fazer esse reino crescer?',
+        'Cada escolha sua vira história. E eu adoro estar nela.',
+        'O Trono de Ferro não vai se conquistar sozinho. Mas com você, eu acredito.',
+        'O reino tá vivo, e a gente tá no meio da ação. Que fase boa!',
+        'Eu vejo tudo daqui, e posso dizer: você está indo bem.'
     ]
 };
 const LABEL_GANHO = {

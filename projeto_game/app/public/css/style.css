@@ -5335,3 +5335,130 @@ body.roleta-aberta #pergaminhos {
     -webkit-line-clamp: 2;
   }
 }
+
+/* Conselheiro maior e mais amigável */
+.conselheiro {
+  position: relative;
+  flex: 0 1 480px;
+  width: min(480px, 100%);
+  padding: 9px 14px;
+  gap: 12px;
+  overflow: hidden;
+  border-radius: 10px;
+}
+
+.conselheiro__icone {
+  width: 42px;
+  height: 42px;
+}
+
+.conselheiro__nome {
+  margin-bottom: 3px;
+  font-size: 9px;
+}
+
+.conselheiro__frase {
+  font-size: 12.5px;
+  line-height: 1.35;
+  -webkit-line-clamp: 2;
+}
+
+.conselheiro::after {
+  content: '';
+  position: absolute;
+  top: -70%;
+  left: -35%;
+  width: 26%;
+  height: 240%;
+  background: linear-gradient(90deg, transparent, rgba(255, 232, 170, 0.22), transparent);
+  transform: rotate(18deg);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.conselheiro--falando {
+  animation: conselheiroPulso 0.7s ease;
+}
+
+.conselheiro--falando .conselheiro__icone {
+  animation: conselheiroOlho 0.7s ease;
+}
+
+.conselheiro--falando .conselheiro__frase {
+  animation: conselheiroFala 0.45s ease;
+}
+
+.conselheiro--falando::after {
+  animation: conselheiroBrilho 0.8s ease;
+}
+
+@keyframes conselheiroPulso {
+  0%,
+  100% {
+    border-color: rgba(255, 211, 77, 0.35);
+    box-shadow: 0 0 16px rgba(0, 0, 0, 0.35);
+  }
+  45% {
+    border-color: #ffe485;
+    box-shadow: 0 0 30px rgba(255, 211, 77, 0.38);
+  }
+}
+
+@keyframes conselheiroOlho {
+  0%,
+  100% {
+    transform: scale(1) rotate(0);
+  }
+  45% {
+    transform: scale(1.12) rotate(-5deg);
+  }
+}
+
+@keyframes conselheiroBrilho {
+  0% {
+    left: -35%;
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    left: 120%;
+    opacity: 0;
+  }
+}
+
+.body-jogo {
+  padding-bottom: 112px;
+}
+
+@media (max-width: 1100px) {
+  .conselheiro {
+    flex-basis: 100%;
+    max-width: 560px;
+  }
+
+  .body-jogo {
+    padding-bottom: 178px;
+  }
+}
+
+@media (max-width: 600px) {
+  .conselheiro {
+    max-width: 100%;
+    padding: 8px 10px;
+  }
+
+  .conselheiro__icone {
+    width: 36px;
+    height: 36px;
+  }
+
+  .conselheiro__frase {
+    font-size: 11px;
+  }
+
+  .body-jogo {
+    padding-bottom: 190px;
+  }
+}
