@@ -5233,3 +5233,105 @@ body.roleta-aberta #pergaminhos {
     box-shadow: 0 0 22px rgba(255, 211, 77, 0.75);
   }
 }
+
+/* Conselheiro fake no rodapé */
+.barra-inferior {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.conselheiro {
+  display: flex;
+  flex: 0 1 330px;
+  align-items: center;
+  gap: 9px;
+  width: min(330px, 100%);
+  padding: 5px 10px;
+  border: 1px solid rgba(255, 211, 77, 0.35);
+  border-radius: 8px;
+  background: linear-gradient(160deg, rgba(27, 18, 11, 0.98), rgba(8, 6, 4, 0.99));
+  text-align: left;
+  box-shadow: 0 0 16px rgba(0, 0, 0, 0.35);
+}
+
+.conselheiro__icone {
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  object-fit: contain;
+}
+
+.conselheiro__texto {
+  min-width: 0;
+}
+
+.conselheiro__nome {
+  display: block;
+  margin-bottom: 2px;
+  color: #c9a227;
+  font-size: 8px;
+  font-weight: bold;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.conselheiro__frase {
+  display: -webkit-box;
+  margin: 0;
+  overflow: hidden;
+  color: #f4e7cf;
+  font-size: 10px;
+  line-height: 1.22;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.conselheiro--falando .conselheiro__frase {
+  animation: conselheiroFala 0.35s ease;
+}
+
+@keyframes conselheiroFala {
+  from {
+    opacity: 0.25;
+    transform: translateY(2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 1100px) {
+  .barra-inferior {
+    gap: 8px;
+  }
+
+  .conselheiro {
+    flex-basis: 100%;
+    max-width: 430px;
+    order: 2;
+  }
+
+  .toolbar-jogo {
+    order: 1;
+  }
+
+  .body-jogo {
+    padding-bottom: 142px;
+  }
+}
+
+@media (max-width: 600px) {
+  .conselheiro {
+    max-width: 100%;
+  }
+
+  .conselheiro__frase {
+    font-size: 9px;
+    -webkit-line-clamp: 2;
+  }
+}

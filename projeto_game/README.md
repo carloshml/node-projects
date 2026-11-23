@@ -26,6 +26,7 @@ Jogo web de estratégia ambientado em **Game of Thrones**, feito com Node.js, Ex
 - Ranking de jogadores por moedas.
 - Treinamento de campeão com bônus permanentes de ataque e recompensa.
 - Uma missão diária nos pergaminhos, com progresso e recompensa resgatável.
+- Conselheiro do reino com frases contextuais ao coletar, caçar, vender e concluir missões.
 - Tela de administração/CRUD de usuários.
 - Visual temático com mapa, casas, ícones e cards de atividade.
 

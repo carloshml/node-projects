@@ -11,6 +11,8 @@ let roletaFila = [];
 let roletaAnimando = false;
 const roletasVistas = new Set();
 let missaoDiariaAtual = null;
+let ultimaFraseConselheiro = '';
+let temporizadorConselheiro = null;
 
 const DURACAO_BASE = { '1': 10000, '2': 120000, '3': 180000, '4': 240000, '5': 30000, '6': 180000 };
 const PODER_ALDEAO = 5;
@@ -46,6 +48,82 @@ const NOMES_ACAO = {
     '4': 'Ensinar magia',
     '5': 'Matar a fera',
     '6': 'Treinar campeão'
+};
+const FRASES_CONSELHEIRO = {
+    coleta: [
+        'Hoje a colheita vai ser boa.',
+        'O celeiro logo estará cheio; os aldeões sabem o caminho.',
+        'Mãos calejadas constroem reinos mais duradouros que espadas.',
+        'A terra respondeu ao chamado. Isso é um bom sinal.',
+        'Cada tronco derrubado é uma viga a mais no futuro da casa.',
+        'Bom trabalho. A madeira sustenta tanto quanto a fé.',
+        'Os aldeões trabalham em silêncio, mas o reino escuta.',
+        'Madeira, comida e ferro: a trindade que mantém o inverno longe.'
+    ],
+    caca: [
+        'As feras sentem o cheiro do medo. Que seja o medo delas.',
+        'Ouvi um rugido ao longe. Talvez o reino devesse responder.',
+        'A caçada começou; os deuses apreciam os corajosos.',
+        'O reino prende a respiração enquanto os aldeões avançam.',
+        'Ferro e coragem, senhor. É disso que as lendas são feitas.',
+        'Não subestime a fera. Ela também luta pelo território.',
+        'A fera escolhida não saberá o que a atingiu.'
+    ],
+    vitoria: [
+        'A fera caiu. Os bardos terão muito o que cantar.',
+        'Hoje os corredores da fortaleza ouvirão gritos de vitória.',
+        'Sangue e glória: o preço e a recompensa da caçada.',
+        'O reino celebra mais uma presa derrotada.',
+        'Os deuses sorriram para os seus aldeões hoje.',
+        'Mais uma história para os pergaminhos da casa.',
+        'A caçada foi digna de canção. E de uma boa mesa.',
+        'O troféu é seu, senhor. Que os rivais tomem nota.'
+    ],
+    derrota: [
+        'A fera escapou. Nem toda caçada termina em glória.',
+        'Os aldeões voltaram vivos. Já é uma vitória silenciosa.',
+        'A lição foi dura, mas o reino aprende com cicatrizes.',
+        'A próxima caçada pedirá mais aço e menos pressa.',
+        'O reino aprende. A fera, infelizmente, também.',
+        'Há derrotas que ensinam mais que dez vitórias.'
+    ],
+    venda: [
+        'Hoje nosso reino recebe as graças divinas do ouro.',
+        'A realeza celebra tanta fartura.',
+        'O ouro muda de mãos, mas o poder permanece.',
+        'Bom negócio. O celeiro agradece e a bolsa também.',
+        'O mercado reconhece o valor de um reino organizado.',
+        'Cada moeda conquistada é uma promessa de inverno menos cruel.',
+        'O celeiro esvazia, mas as arcas ficam mais pesadas.',
+        'Comércio é uma guerra travada com sorrisos e contratos.'
+    ],
+    treino: [
+        'Mentes afiadas vencem batalhas antes de elas começarem.',
+        'A sabedoria é a única espada que nunca enferruja.',
+        'O conhecimento dos seus aldeões logo será temido.',
+        'Um povo instruído é um reino difícil de enganar.',
+        'Histórias antigas guardam armadilhas que novos exércitos repetem.'
+    ],
+    campeao: [
+        'O campeão cresce, e com ele a fama da sua casa.',
+        'Aço e disciplina formam um guerreiro; o resto é conversa.',
+        'Nosso campeão está mais perto de virar lenda.',
+        'O reino tem agora um nome para temer nas caçadas.',
+        'Cada treino aproxima o campeão do seu destino.'
+    ],
+    missao: [
+        'O pergaminho foi cumprido. O reino reconhece o esforço.',
+        'Dever cumprido, senhor. Há recompensas para quem honra a palavra.',
+        'A recompensa chegou. Que seja usada com sabedoria.',
+        'O reino registra mais um dia de serviço bem feito.'
+    ],
+    geral: [
+        'O reino observa. Cada escolha conta.',
+        'Cada ação move uma peça no grande jogo.',
+        'O Trono de Ferro não pertence aos ociosos.',
+        'Inverno se aproxima. Mantenha o povo trabalhando.',
+        'Os corvos veem tudo. Este conselheiro também.'
+    ]
 };
 const LABEL_GANHO = {
     madeira: 'madeira',
@@ -345,7 +423,27 @@ function descreverConcluida(concluida) {
 
 function lerNotificacoes() {
     const parametros = new URLSearchParams(window.location.search);
-    switch (parametros.get('msg')) {
+    const mensagem = parametros.get('msg');
+
+    if (mensagem === 'acerto' || mensagem === 'cacada') {
+        const painel = document.getElementById('conselheiro');
+        const acao = painel ? String(painel.dataset.ultimaAcao || '') : '';
+        let categoria = 'geral';
+
+        if (mensagem === 'cacada' || acao === '5') {
+            categoria = 'caca';
+        } else if (acao === '1') {
+            categoria = 'coleta';
+        } else if (acao === '3' || acao === '4') {
+            categoria = 'treino';
+        } else if (acao === '6') {
+            categoria = 'campeao';
+        }
+
+        falarConselheiro(categoria);
+    }
+
+    switch (mensagem) {
         case 'erro':
             mostrarMensagem('erro', 'Operação inválida, verifique se todos os campos foram informados!', 'ORDEM INVÁLIDA');
             break;
@@ -810,6 +908,7 @@ async function venderRecurso(recurso, linha) {
         await Promise.all([atualizarHud(), atualizarCeleiro()]);
         tocarSom('moeda');
         atualizarMissaoDiaria();
+        falarConselheiro('venda');
 
         /* espera o contador terminar antes de abrir o modal */
         await pausa(PAUSA_ANTES_MODAL);
@@ -1535,6 +1634,71 @@ async function atualizarMissaoDiaria() {
     }
 }
 
+function falarConselheiro(categoria) {
+    const fraseEl = document.getElementById('conselheiro-frase');
+    const painel = document.getElementById('conselheiro');
+    if (!fraseEl || !painel) {
+        return;
+    }
+
+    const frases = FRASES_CONSELHEIRO[categoria] || FRASES_CONSELHEIRO.geral;
+    let frase = frases[Math.floor(Math.random() * frases.length)];
+
+    if (frases.length > 1 && frase === ultimaFraseConselheiro) {
+        const indice = frases.indexOf(frase);
+        frase = frases[(indice + 1) % frases.length];
+    }
+
+    ultimaFraseConselheiro = frase;
+    fraseEl.textContent = frase;
+    painel.classList.remove('conselheiro--falando');
+    void painel.offsetWidth;
+    painel.classList.add('conselheiro--falando');
+
+    clearTimeout(temporizadorConselheiro);
+    temporizadorConselheiro = setTimeout(function () {
+        painel.classList.remove('conselheiro--falando');
+    }, 700);
+}
+
+function conselheiroParaConcluidas(concluidas) {
+    if (!Array.isArray(concluidas) || !concluidas.length) {
+        return;
+    }
+
+    const batalhas = concluidas.filter(function (item) {
+        return String(item.acao) === '5';
+    });
+
+    if (batalhas.length > 0) {
+        if (batalhas.length === concluidas.length) {
+            const todasVitorias = batalhas.every(function (item) { return item.vitoria === true; });
+            const todasDerrotas = batalhas.every(function (item) { return item.vitoria === false; });
+            if (todasVitorias) {
+                falarConselheiro('vitoria');
+                return;
+            }
+            if (todasDerrotas) {
+                falarConselheiro('derrota');
+                return;
+            }
+        }
+        falarConselheiro('caca');
+        return;
+    }
+
+    const tipos = concluidas.map(function (item) { return String(item.acao); });
+    if (tipos.indexOf('1') !== -1) {
+        falarConselheiro('coleta');
+    } else if (tipos.indexOf('3') !== -1 || tipos.indexOf('4') !== -1) {
+        falarConselheiro('treino');
+    } else if (tipos.indexOf('6') !== -1) {
+        falarConselheiro('campeao');
+    } else {
+        falarConselheiro('geral');
+    }
+}
+
 function montarMissaoDiaria(missao) {
     if (!missao) {
         return '';
@@ -1604,6 +1768,7 @@ async function resgatarMissaoDiaria(botao) {
 
         await Promise.all([atualizarHud(), atualizarCeleiro()]);
         tocarSom('moeda');
+        falarConselheiro('missao');
         await verPergaminhos();
     } catch (erro) {
         console.error('Falha ao resgatar a missão diária:', erro);
@@ -2013,6 +2178,7 @@ async function sincronizar() {
 
         if (dados.concluidas && dados.concluidas.length) {
             atualizarMissaoDiaria();
+            conselheiroParaConcluidas(dados.concluidas);
         }
 
         if (resultadoModal) {
