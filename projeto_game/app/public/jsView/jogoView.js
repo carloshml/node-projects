@@ -469,28 +469,36 @@ function animarRoletaFera(acao) {
         return;
     }
 
-    const ferasEmbaralhadas = feras.slice();
-    for (let indice = ferasEmbaralhadas.length - 1; indice > 0; indice--) {
-        const sorteado = Math.floor(Math.random() * (indice + 1));
-        const troca = ferasEmbaralhadas[indice];
-        ferasEmbaralhadas[indice] = ferasEmbaralhadas[sorteado];
-        ferasEmbaralhadas[sorteado] = troca;
-    }
-
-    let indiceAlvo = ferasEmbaralhadas.findIndex(function (item) {
+    const ordem = feras.slice();
+    let indiceBase = ordem.findIndex(function (item) {
         return item.id === fera.id;
     });
-    if (indiceAlvo === -1) {
-        ferasEmbaralhadas.push(fera);
-        indiceAlvo = ferasEmbaralhadas.length - 1;
+    if (indiceBase === -1) {
+        ordem.push(fera);
+        indiceBase = ordem.length - 1;
     }
 
-    trilho.innerHTML = ferasEmbaralhadas.map(function (item, indice) {
-        return '<div class="roleta-fera__carta" data-indice="' + indice + '">' +
-            '<img src="images/feras/' + item.imagem + '" alt="">' +
-            '<span>' + item.nome + '</span>' +
-            '</div>';
-    }).join('');
+    /* repete a sequência em ordem para o trilho ter comprimento suficiente para girar */
+    const ciclos = 6;
+    const cicloAlvo = 3;
+    const indiceAlvo = cicloAlvo * ordem.length + indiceBase;
+    let cartas = '';
+
+    for (let ciclo = 0; ciclo < ciclos; ciclo++) {
+        for (let indice = 0; indice < ordem.length; indice++) {
+            const item = ordem[indice];
+            const indiceCarta = ciclo * ordem.length + indice;
+            cartas +=
+                '<div class="roleta-fera__carta" data-indice="' + indiceCarta + '">' +
+                '<img src="images/feras/' + item.imagem + '" alt="">' +
+                '<span>' + item.nome + '</span>' +
+                '</div>';
+        }
+    }
+
+    trilho.innerHTML = cartas;
+    trilho.style.transition = 'none';
+    trilho.style.transform = 'translateX(0)';
 
     overlay.classList.remove('roleta-fera--revelado');
     overlay.hidden = false;
@@ -501,33 +509,25 @@ function animarRoletaFera(acao) {
     resultado.textContent = 'A roleta está decidindo...';
     tocarSom('clique');
 
-    const cartas = Array.prototype.slice.call(trilho.querySelectorAll('.roleta-fera__carta'));
-    const alvo = cartas[indiceAlvo];
+    const alvo = trilho.querySelector('[data-indice="' + indiceAlvo + '"]');
+    const janela = overlay.querySelector('.roleta-fera__janela');
 
-    if (!alvo || !cartas.length) {
+    if (!alvo || !janela) {
         fecharRoletaFera();
         return;
     }
 
-    let inicioGiro = null;
-    let indiceAnterior = -1;
-    const voltas = 6;
+    void trilho.offsetWidth;
+    const deslocamento = janela.clientWidth / 2 - (alvo.offsetLeft + alvo.offsetWidth / 2);
 
-    function destacar(indice) {
-        if (indice === indiceAnterior) {
-            return;
-        }
-        cartas.forEach(function (carta) {
-            carta.classList.remove('roleta-fera__carta--sorteando');
+    requestAnimationFrame(function () {
+        requestAnimationFrame(function () {
+            trilho.style.transition = 'transform ' + ROLETA_GIRO_MS + 'ms cubic-bezier(0.12, 0.75, 0.2, 1)';
+            trilho.style.transform = 'translateX(' + deslocamento + 'px)';
         });
-        cartas[indice].classList.add('roleta-fera__carta--sorteando');
-        indiceAnterior = indice;
-    }
+    });
 
-    function concluirGiro() {
-        cartas.forEach(function (carta) {
-            carta.classList.remove('roleta-fera__carta--sorteando');
-        });
+    setTimeout(function () {
         alvo.classList.add('roleta-fera__carta--alvo');
         overlay.classList.add('roleta-fera--revelado');
         const artigo = fera.artigo ? fera.artigo + ' ' : '';
@@ -535,26 +535,7 @@ function animarRoletaFera(acao) {
         tocarSom('batalha');
 
         setTimeout(fecharRoletaFera, ROLETA_RESULTADO_MS);
-    }
-
-    function passoGiro(agora) {
-        if (inicioGiro === null) {
-            inicioGiro = agora;
-        }
-
-        const progresso = Math.min(1, (agora - inicioGiro) / ROLETA_GIRO_MS);
-        if (progresso >= 1) {
-            concluirGiro();
-            return;
-        }
-
-        const desaceleracao = 1 - Math.pow(1 - progresso, 3);
-        const indice = Math.floor(desaceleracao * (cartas.length * voltas + indiceAlvo)) % cartas.length;
-        destacar(indice);
-        requestAnimationFrame(passoGiro);
-    }
-
-    requestAnimationFrame(passoGiro);
+    }, ROLETA_GIRO_MS + 200);
 }
 
 function fecharRoletaFera() {
