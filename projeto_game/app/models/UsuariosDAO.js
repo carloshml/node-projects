@@ -1,12 +1,11 @@
-let crypto = require('crypto');
 let ObjectId = require('mongodb').ObjectId;
+const { hashSenha, verificarSenha } = require('../security/senha');
 
 function UsuarioDAO(connection) {
     this._connection = connection;
 }
 
 UsuarioDAO.prototype.inserirUsuario = async function (usuario, application) {
-    usuario.senha = crypto.createHash('md5').update(usuario.senha).digest('hex');
     const conexao = await this._connection.getDB();
 
     try {
@@ -18,6 +17,8 @@ UsuarioDAO.prototype.inserirUsuario = async function (usuario, application) {
             return 'usuarioexiste';
         }
 
+        usuario.senha = await hashSenha(usuario.senha);
+        usuario.papel = 'jogador';
         delete usuario._id;
         const resultado = await conexao.db.collection("usuarios").insertOne(usuario);
 
@@ -96,30 +97,50 @@ UsuarioDAO.prototype.listarUsuarios = async function () {
 }
 
 UsuarioDAO.prototype.autenticar = async function (usuario, req, res) {
-    usuario.senha = crypto.createHash('md5').update(usuario.senha).digest('hex');
+    const usuarioInformado = typeof usuario.usuario === 'string' ? usuario.usuario.trim() : '';
+    const senhaInformada = typeof usuario.senha === 'string' ? usuario.senha : '';
     const conexao = await this._connection.getDB();
 
     try {
-        const result = await conexao.db.collection('usuarios').find(usuario).toArray();
+        const conta = await conexao.db.collection('usuarios').findOne({
+            usuario: usuarioInformado
+        });
 
-        if (result[0] != undefined) {
-            req.session.autorizado = true;
-            req.session.usuario = result[0].usuario;
-            req.session.casa = result[0].casa;
-            req.session.nome = result[0].nome;
-            req.session._id = result[0]._id;
-        } else {
-            req.session.autorizado = false;
+        let verificacao = { valida: false, precisaRehash: false };
+        if (conta) {
+            verificacao = await verificarSenha(senhaInformada, conta.senha);
         }
 
-        if (req.session.autorizado) {
-            res.redirect('/home');
-        } else {
+        if (!conta || !verificacao.valida) {
+            req.session.autorizado = false;
             const errors = [
                 { msg: 'Usuário ou senha incorretos' }
             ];
             res.render('index', { validacao: errors, aviso: {} });
+            return;
         }
+
+        /* atualiza contas antigas em MD5 para o hash forte no próximo login */
+        if (verificacao.precisaRehash) {
+            try {
+                const novoSenha = await hashSenha(senhaInformada);
+                await conexao.db.collection('usuarios').updateOne(
+                    { _id: conta._id },
+                    { $set: { senha: novoSenha } }
+                );
+            } catch (erro) {
+                console.log('  não foi possível atualizar o hash da senha  ', erro);
+            }
+        }
+
+        req.session.autorizado = true;
+        req.session.usuario = conta.usuario;
+        req.session.casa = conta.casa;
+        req.session.nome = conta.nome;
+        req.session._id = conta._id;
+        req.session.papel = conta.papel || 'jogador';
+
+        res.redirect('/home');
     } catch (error) {
         console.log('  algum erro foi encontrado  ', error);
         const errors = [

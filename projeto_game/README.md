@@ -65,7 +65,7 @@ Jogo web de estratégia ambientado em **Game of Thrones**, feito com Node.js, Ex
 
 | Risco | Ação prioritária |
 |---|---|
-| Senhas com MD5 | Migrar para Argon2id ou bcrypt e re-hash no login |
+| Senhas legadas em MD5 | Re-hash automático para scrypt no próximo login; novas contas já usam scrypt |
 | Segredo da sessão e URI do MongoDB no código | Mover para variáveis de ambiente e rotacionar |
 | Sessão em `MemoryStore` | Usar store persistente (Redis ou MongoDB) |
 | Rotas administrativas sem papéis | Criar RBAC (`jogador` / `admin`) |
@@ -293,7 +293,7 @@ Banco `got`, coleções principais:
 {
   "nome": "Carlos",
   "usuario": "carlos",
-  "senha": "hash-md5",
+  "senha": "scrypt$16384$8$1$salt$hash",
   "casa": "stark"
 }
 ```
@@ -342,7 +342,7 @@ Banco `got`, coleções principais:
 
 ## Limitações e próximos passos
 
-- Senhas são armazenadas com **MD5**, o que não é seguro para produção. Migrar para bcrypt ou argon2.
+- Senhas antigas em MD5 são migradas automaticamente para **scrypt** no próximo login.
 - Sessões usam o `MemoryStore` padrão do `express-session`; reiniciar o servidor derruba os logins. Usar um store persistente.
 - Conexão com o MongoDB e segredo da sessão estão no código; mover para variáveis de ambiente.
 - Não há suíte de testes automatizados (`npm test` é apenas um placeholder).
