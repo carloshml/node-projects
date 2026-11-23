@@ -5187,3 +5187,49 @@ body.roleta-aberta #pergaminhos {
     font-size: 18px;
   }
 }
+
+/* Aviso de missão diária pronta */
+.toolbar-pergaminho__badge {
+  display: inline-grid;
+  min-width: 17px;
+  height: 17px;
+  place-items: center;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: #ffd34d;
+  color: #1b0f0a;
+  font-size: 10px;
+  font-weight: bold;
+  line-height: 1;
+}
+
+.toolbar-pergaminho__badge[hidden] {
+  display: none;
+}
+
+.toolbar-botao--missao-pronta {
+  border-color: #ffe485;
+  background: #ffd34d;
+  color: #1b0f0a;
+  animation: brilhoPergaminho 1.8s ease-in-out infinite;
+}
+
+.toolbar-botao--missao-pronta:hover {
+  background: #ffe485;
+  color: #1b0f0a;
+}
+
+.toolbar-botao--missao-pronta .toolbar-pergaminho__badge {
+  background: #1b0f0a;
+  color: #ffd34d;
+}
+
+ @keyframes brilhoPergaminho {
+  0%,
+  100% {
+    box-shadow: 0 0 0 rgba(255, 211, 77, 0);
+  }
+  50% {
+    box-shadow: 0 0 22px rgba(255, 211, 77, 0.75);
+  }
+}

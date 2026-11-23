@@ -10,6 +10,7 @@ let ultimosMaximos = {};
 let roletaFila = [];
 let roletaAnimando = false;
 const roletasVistas = new Set();
+let missaoDiariaAtual = null;
 
 const DURACAO_BASE = { '1': 10000, '2': 120000, '3': 180000, '4': 240000, '5': 30000, '6': 180000 };
 const PODER_ALDEAO = 5;
@@ -808,6 +809,7 @@ async function venderRecurso(recurso, linha) {
         usuario.jogo.recursos = dados.recursos;
         await Promise.all([atualizarHud(), atualizarCeleiro()]);
         tocarSom('moeda');
+        atualizarMissaoDiaria();
 
         /* espera o contador terminar antes de abrir o modal */
         await pausa(PAUSA_ANTES_MODAL);
@@ -1492,6 +1494,47 @@ function formatarRecompensaMissao(recompensa) {
     }).join(' · ');
 }
 
+function aplicarMissaoDiaria(missao) {
+    missaoDiariaAtual = missao || null;
+
+    const botao = document.getElementById('btn-pergaminhos');
+    if (!botao) {
+        return;
+    }
+
+    const progresso = Number(missaoDiariaAtual && missaoDiariaAtual.progresso) || 0;
+    const alvo = Number(missaoDiariaAtual && missaoDiariaAtual.alvo) || 0;
+    const pronta = Boolean(missaoDiariaAtual &&
+        !missaoDiariaAtual.resgatada &&
+        alvo > 0 &&
+        progresso >= alvo);
+
+    botao.classList.toggle('toolbar-botao--missao-pronta', pronta);
+    botao.setAttribute('title', pronta
+        ? 'Missão diária pronta para resgatar'
+        : 'Abrir pergaminhos e missão diária');
+
+    const badge = document.getElementById('pergaminhos-badge');
+    if (badge) {
+        badge.hidden = !pronta;
+    }
+}
+
+async function atualizarMissaoDiaria() {
+    try {
+        const resposta = await fetch('/missaoDiaria');
+        if (!resposta.ok) {
+            return;
+        }
+        const dados = await resposta.json();
+        if (dados && dados.ok) {
+            aplicarMissaoDiaria(dados.missao);
+        }
+    } catch (erro) {
+        console.error('Falha ao atualizar o brilho da missão diária:', erro);
+    }
+}
+
 function montarMissaoDiaria(missao) {
     if (!missao) {
         return '';
@@ -1781,15 +1824,21 @@ async function verPergaminhos() {
         }
 
         let missao = null;
+        let missaoCarregada = false;
         try {
             if (respostaMissao.ok) {
                 const dadosMissao = await respostaMissao.json();
                 if (dadosMissao && dadosMissao.ok) {
                     missao = dadosMissao.missao;
+                    missaoCarregada = true;
                 }
             }
         } catch (erroMissao) {
             console.error('Falha ao carregar a missão diária:', erroMissao);
+        }
+
+        if (missaoCarregada) {
+            aplicarMissaoDiaria(missao);
         }
 
         mostrarMensagem(
@@ -1962,6 +2011,10 @@ async function sincronizar() {
             console.error('Falha ao recarregar as atividades:', erroAcoes);
         }
 
+        if (dados.concluidas && dados.concluidas.length) {
+            atualizarMissaoDiaria();
+        }
+
         if (resultadoModal) {
             /* deixa o contador e os deltas visíveis antes de cobrir a tela */
             await pausa(PAUSA_ANTES_MODAL);
@@ -1988,6 +2041,7 @@ async function sincronizar() {
 
 async function iniciar() {
     await buscaJogoUsuario();
+    await atualizarMissaoDiaria();
     montarCeleiro();
     await verSuditos(false);
     await sincronizar();

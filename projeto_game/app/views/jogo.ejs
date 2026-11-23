@@ -8,11 +8,11 @@
 	<title>MMORPG - Game of Thrones</title>
 
 	<link rel="stylesheet" href="css/bootstrap.min.css">
-	<link href="css/style.css?v=20261123-roleta-12" rel="stylesheet">
+	<link href="css/style.css?v=20261123-roleta-13" rel="stylesheet">
 	<script src="/socket.io/socket.io.js" defer></script>
-	<script src="jsView/chatView.js?v=20261123-roleta-12" defer></script>
-	<script src="jsView/som.js?v=20261123-roleta-12" defer></script>
-	<script src="jsView/jogoView.js?v=20261123-roleta-12" defer></script>
+	<script src="jsView/chatView.js?v=20261123-roleta-13" defer></script>
+	<script src="jsView/som.js?v=20261123-roleta-13" defer></script>
+	<script src="jsView/jogoView.js?v=20261123-roleta-13" defer></script>
 </head>
 
 <body class="body-jogo">
@@ -179,8 +179,9 @@
 				<img src="images/icones/madeira.svg" alt=""> Celeiro
 			</button>
 
-			<button type="button" class="toolbar-botao" onclick="verPergaminhos()">
+			<button type="button" id="btn-pergaminhos" class="toolbar-botao" onclick="verPergaminhos()">
 				<img src="images/outros/pergaminho.jpg" alt=""> Pergaminhos
+				<span id="pergaminhos-badge" class="toolbar-pergaminho__badge" hidden>!</span>
 			</button>
 
 			<button type="button" class="toolbar-botao" onclick="abrirSonsBatalha()">
