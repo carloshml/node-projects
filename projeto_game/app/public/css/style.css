@@ -5518,3 +5518,30 @@ body.roleta-aberta #pergaminhos {
     padding-bottom: 150px;
   }
 }
+
+/* Leve chacoalhada junto ao brilho do conselheiro */
+.conselheiro--falando {
+  animation: conselheiroPulso 0.7s ease, conselheiroTremor 0.55s ease;
+}
+
+@keyframes conselheiroTremor {
+  0%,
+  100% {
+    transform: translateX(0) rotate(0);
+  }
+  15% {
+    transform: translateX(-2px) rotate(-0.3deg);
+  }
+  30% {
+    transform: translateX(2px) rotate(0.3deg);
+  }
+  45% {
+    transform: translateX(-1.5px) rotate(-0.2deg);
+  }
+  60% {
+    transform: translateX(1.5px) rotate(0.2deg);
+  }
+  80% {
+    transform: translateX(-1px) rotate(-0.1deg);
+  }
+}
