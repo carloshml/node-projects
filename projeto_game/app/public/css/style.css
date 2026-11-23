@@ -4910,3 +4910,32 @@ body.roleta-aberta #pergaminhos {
     height: 62px;
   }
 }
+
+.btn-repetir-acao {
+  margin-top: 8px;
+  border: 1px solid rgba(255, 211, 77, 0.45);
+  background: rgba(255, 211, 77, 0.08);
+  color: #ffd34d;
+  font-size: 11px;
+  font-weight: bold;
+}
+
+.btn-repetir-acao:hover,
+.btn-repetir-acao:focus {
+  border-color: #ffd34d;
+  background: #ffd34d;
+  color: #1b0f0a;
+}
+
+.btn-repetir-acao:disabled {
+  opacity: 0.55;
+}
+
+.repetir-acao__texto {
+  display: block;
+  margin-top: 5px;
+  color: #6f6250;
+  font-size: 9px;
+  line-height: 1.35;
+  text-align: center;
+}

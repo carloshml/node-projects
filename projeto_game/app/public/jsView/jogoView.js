@@ -38,6 +38,14 @@ const TEXTOS_ACAO = {
     '5': 'aldeão(ões) atacando a fera',
     '6': 'aldeão treinando um campeão'
 };
+const NOMES_ACAO = {
+    '1': 'Coletar recursos',
+    '2': 'Enforcar aldeão',
+    '3': 'Ensinar história',
+    '4': 'Ensinar magia',
+    '5': 'Matar a fera',
+    '6': 'Treinar campeão'
+};
 const LABEL_GANHO = {
     madeira: 'madeira',
     comida: 'comida',
@@ -1056,6 +1064,73 @@ function atualizarFormularioOrdens() {
     }
 }
 
+function repetirUltimaAcao() {
+    const form = formularioOrdens();
+    const botaoRepetir = document.getElementById('btn-repetir-acao');
+    if (!form || !botaoRepetir || !usuario.jogo) {
+        return;
+    }
+
+    const acao = String(botaoRepetir.dataset.acao || '');
+    const quantidade = parseInt(botaoRepetir.dataset.quantidade, 10);
+    const livres = Math.max(0, Number(usuario.jogo.suditos) - Number(usuario.jogo.suditosTrabalhando));
+
+    if (!NOMES_ACAO[acao] || !Number.isInteger(quantidade) || quantidade < 1) {
+        mostrarMensagem('erro', 'Não há uma última ação válida para repetir.', 'AÇÃO INDISPONÍVEL');
+        return;
+    }
+
+    if (quantidade > livres) {
+        mostrarMensagem('erro', 'Você só tem ' + livres + ' aldeão(ões) livre(s) agora.', 'SÚDITOS OCUPADOS');
+        return;
+    }
+
+    const card = form.querySelector('.card-acao[data-acao="' + acao + '"]');
+    if (!card) {
+        mostrarMensagem('erro', 'A última ação não está mais disponível.', 'AÇÃO INDISPONÍVEL');
+        return;
+    }
+
+    if (acao !== '6') {
+        const custo = (CUSTOS_ACAO[acao] || 0) * quantidade;
+        if ((Number(usuario.jogo.moeda) || 0) < custo) {
+            mostrarMensagem('erro', 'Moedas insuficientes para repetir essa ordem.', 'MOEDAS INSUFICIENTES');
+            return;
+        }
+    }
+
+    form.querySelectorAll('.card-acao').forEach(function (outro) {
+        outro.classList.remove('selecionado');
+    });
+    card.classList.add('selecionado');
+
+    const campoAcao = document.getElementById('acao');
+    if (campoAcao) {
+        campoAcao.value = acao;
+    }
+
+    const range = document.getElementById('qtd-range');
+    if (range) {
+        range.max = acao === '6' ? 1 : Math.max(1, livres);
+        range.value = acao === '6' ? 1 : quantidade;
+        range.disabled = acao === '6';
+    }
+
+    atualizarSuditos();
+    atualizarFormularioOrdens();
+
+    const botaoEnviar = document.getElementById('btn-enviar-ordem');
+    if (botaoEnviar && botaoEnviar.disabled) {
+        const status = document.getElementById('ordem-status');
+        mostrarMensagem('erro', status && status.textContent
+            ? status.textContent
+            : 'Essa ação não está disponível no momento.', 'AÇÃO INDISPONÍVEL');
+        return;
+    }
+
+    form.requestSubmit();
+}
+
 function inicializarFormularioOrdens() {
     const form = formularioOrdens();
     if (!form) {
@@ -1100,6 +1175,17 @@ function inicializarFormularioOrdens() {
             }
             atualizarFormularioOrdens();
         });
+    }
+
+    const repetir = document.getElementById('btn-repetir-acao');
+    if (repetir && repetir.dataset.eventos !== '1') {
+        repetir.dataset.eventos = '1';
+        const acaoRepetir = String(repetir.dataset.acao || '');
+        const quantidadeRepetir = parseInt(repetir.dataset.quantidade, 10);
+        const nomeAcao = NOMES_ACAO[acaoRepetir] || 'última ação';
+        repetir.textContent = 'Repetir: ' + nomeAcao +
+            (Number.isInteger(quantidadeRepetir) ? ' · ' + quantidadeRepetir + ' aldeão(ões)' : '');
+        repetir.addEventListener('click', repetirUltimaAcao);
     }
 
     form.addEventListener('submit', function (evento) {

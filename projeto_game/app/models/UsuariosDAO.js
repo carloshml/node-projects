@@ -194,6 +194,7 @@ UsuarioDAO.prototype.buscarUsuarioGerarAldeoes = async function (res, req, casa,
             img_casa: casa,
             jogo: result[0],
             msg: msg,
+            ultimaAcao: req.session.ultimaAcao || null,
             feras: require('./feras').FERAS
         });
     } catch (error) {
