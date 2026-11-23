@@ -7,6 +7,9 @@ let divMensagens = null;
 let temporizadorMensagem = null;
 let temporizadorFlash = null;
 let ultimosMaximos = {};
+let roletaFila = [];
+let roletaAnimando = false;
+const roletasVistas = new Set();
 
 const DURACAO_BASE = { '1': 10000, '2': 120000, '3': 180000, '4': 240000, '5': 30000, '6': 180000 };
 const PODER_ALDEAO = 5;
@@ -338,6 +341,9 @@ function lerNotificacoes() {
         case 'acerto':
             mostrarMensagem('acerto', 'Operação realizada com sucesso!', 'ORDEM RECEBIDA');
             break;
+        case 'cacada':
+            /* a própria roleta apresenta a fera e inicia a caçada */
+            break;
         case 'todoSutidosOcupados':
             mostrarMensagem('erro', 'Todos os súditos estão ocupados!', 'SÚDITOS OCUPADOS');
             break;
@@ -389,6 +395,172 @@ function apagaMensagem() {
     if (divMensagens) {
         divMensagens.innerHTML = '';
     }
+}
+
+/* ---------------------------- roleta da fera ------------------------------- */
+
+function chaveRoleta(id) {
+    return 'got-roleta-fera-' + String(id);
+}
+
+function roletaJaVista(id) {
+    if (roletasVistas.has(String(id))) {
+        return true;
+    }
+    try {
+        return sessionStorage.getItem(chaveRoleta(id)) === '1';
+    } catch (erro) {
+        return false;
+    }
+}
+
+function marcarRoletaVista(id) {
+    roletasVistas.add(String(id));
+    try {
+        sessionStorage.setItem(chaveRoleta(id), '1');
+    } catch (erro) {
+        /* armazenamento indisponível; a lista em memória evita repetição nesta página */
+    }
+}
+
+function ferasDaRoleta() {
+    return ((usuario.jogo && usuario.jogo.feras) || []).filter(function (fera) {
+        return fera && fera.imagem && fera.nome;
+    });
+}
+
+function enfileirarRoleta(acao) {
+    if (!acao || !acao._id || !acao.fera || roletaJaVista(acao._id)) {
+        return;
+    }
+
+    const fera = acharFera(acao.fera);
+    if (!fera || !ferasDaRoleta().length) {
+        return;
+    }
+
+    marcarRoletaVista(acao._id);
+    roletaFila.push(acao);
+    processarFilaRoleta();
+}
+
+function processarFilaRoleta() {
+    if (roletaAnimando || !roletaFila.length) {
+        return;
+    }
+
+    const proxima = roletaFila.shift();
+    roletaAnimando = true;
+    animarRoletaFera(proxima);
+}
+
+function animarRoletaFera(acao) {
+    const overlay = document.getElementById('roleta-fera');
+    const trilho = document.getElementById('roleta-trilho');
+    const resultado = document.getElementById('roleta-resultado');
+    const fera = acharFera(acao.fera);
+    const feras = ferasDaRoleta();
+
+    if (!overlay || !trilho || !resultado || !fera || !feras.length) {
+        roletaAnimando = false;
+        processarFilaRoleta();
+        return;
+    }
+
+    const totalCartas = 36;
+    const indiceAlvo = 30;
+    let cartas = '';
+
+    for (let indice = 0; indice < totalCartas; indice++) {
+        const item = indice === indiceAlvo ? fera : feras[(indice * 5 + 3) % feras.length];
+        cartas +=
+            '<div class="roleta-fera__carta" data-indice="' + indice + '">' +
+            '<img src="images/feras/' + item.imagem + '" alt="">' +
+            '<span>' + item.nome + '</span>' +
+            '</div>';
+    }
+
+    trilho.innerHTML = cartas;
+    trilho.style.transition = 'none';
+    trilho.style.transform = 'translateX(0)';
+
+    overlay.classList.remove('roleta-fera--revelado');
+    overlay.hidden = false;
+    overlay.setAttribute('aria-hidden', 'false');
+    if (document.body) {
+        document.body.classList.add('roleta-aberta');
+    }
+    resultado.textContent = 'A roleta está decidindo...';
+    tocarSom('clique');
+
+    const alvo = trilho.querySelector('[data-indice="' + indiceAlvo + '"]');
+    const janela = overlay.querySelector('.roleta-fera__janela');
+
+    if (!alvo || !janela) {
+        fecharRoletaFera();
+        return;
+    }
+
+    void trilho.offsetWidth;
+    const deslocamento = janela.clientWidth / 2 - (alvo.offsetLeft + alvo.offsetWidth / 2);
+
+    requestAnimationFrame(function () {
+        requestAnimationFrame(function () {
+            trilho.style.transition = 'transform 2800ms cubic-bezier(0.12, 0.75, 0.2, 1)';
+            trilho.style.transform = 'translateX(' + deslocamento + 'px)';
+        });
+    });
+
+    setTimeout(function () {
+        alvo.classList.add('roleta-fera__carta--alvo');
+        overlay.classList.add('roleta-fera--revelado');
+        const artigo = fera.artigo ? fera.artigo + ' ' : '';
+        resultado.textContent = artigo + fera.nome + ' foi escolhida para a caçada.';
+        tocarSom('batalha');
+
+        setTimeout(fecharRoletaFera, 1400);
+    }, 3000);
+}
+
+function fecharRoletaFera() {
+    const overlay = document.getElementById('roleta-fera');
+    if (overlay) {
+        overlay.hidden = true;
+        overlay.setAttribute('aria-hidden', 'true');
+        overlay.classList.remove('roleta-fera--revelado');
+    }
+    if (document.body) {
+        document.body.classList.remove('roleta-aberta');
+    }
+
+    roletaAnimando = false;
+    atualizarSomBatalha();
+
+    if (!roletaFila.length && temBatalhaAtiva()) {
+        const atividades = document.getElementById('pergaminhos');
+        if (atividades) {
+            atividades.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    }
+
+    processarFilaRoleta();
+}
+
+function talvezMostrarRoleta() {
+    const agora = Date.now();
+
+    acoes.forEach(function (acao) {
+        if (String(acao.acao) !== '5' || !acao.fera) {
+            return;
+        }
+
+        const inicio = Number(acao.acao_iniciada_em) || 0;
+        if (!inicio || agora - inicio > 15000) {
+            return;
+        }
+
+        enfileirarRoleta(acao);
+    });
 }
 
 /* -------------------------------- HUD ------------------------------------- */
@@ -1197,6 +1369,7 @@ async function carregarAcoes() {
     acoes = lista;
     renderizarAcoes();
     atualizarContadores();
+    talvezMostrarRoleta();
     atualizarSomBatalha();
 }
 
@@ -1362,6 +1535,11 @@ function temBatalhaAtiva() {
 
 function atualizarSomBatalha() {
     if (!window.SomJogo) {
+        return;
+    }
+
+    if (roletaAnimando || roletaFila.length) {
+        window.SomJogo.pararBatalha();
         return;
     }
 

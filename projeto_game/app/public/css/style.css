@@ -4693,3 +4693,203 @@ body.chat-aberto {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
+
+
+/* Roleta da fera */
+.roleta-fera {
+  position: fixed;
+  inset: 0;
+  z-index: 5000;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+  background: rgba(3, 2, 1, 0.84);
+  backdrop-filter: blur(5px);
+}
+
+.roleta-fera[hidden] {
+  display: none;
+}
+
+.roleta-fera__painel {
+  width: min(640px, 100%);
+  padding: 26px 22px 22px;
+  border: 1px solid rgba(255, 211, 77, 0.38);
+  border-radius: 12px;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255, 211, 77, 0.09), transparent 48%),
+    linear-gradient(160deg, rgba(28, 18, 12, 0.98), rgba(8, 6, 4, 0.99));
+  box-shadow: 0 28px 80px rgba(0, 0, 0, 0.7);
+  text-align: center;
+}
+
+.roleta-fera__eyebrow {
+  margin: 0 0 6px;
+  color: #c9a227;
+  font-size: 9px;
+  font-weight: bold;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.roleta-fera__titulo {
+  margin: 0;
+  color: #f4e7cf;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: clamp(26px, 4vw, 34px);
+  font-weight: normal;
+}
+
+.roleta-fera__janela {
+  position: relative;
+  height: 150px;
+  margin: 20px auto 14px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 211, 77, 0.28);
+  border-radius: 9px;
+  background: rgba(0, 0, 0, 0.38);
+  box-shadow: inset 0 0 28px rgba(0, 0, 0, 0.8);
+}
+
+.roleta-fera__janela::before,
+.roleta-fera__janela::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  z-index: 2;
+  width: 68px;
+  pointer-events: none;
+}
+
+.roleta-fera__janela::before {
+  left: 0;
+  background: linear-gradient(90deg, rgba(8, 6, 4, 0.95), transparent);
+}
+
+.roleta-fera__janela::after {
+  right: 0;
+  background: linear-gradient(270deg, rgba(8, 6, 4, 0.95), transparent);
+}
+
+.roleta-fera__trilho {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 100%;
+  padding: 0 10px;
+  will-change: transform;
+}
+
+.roleta-fera__carta {
+  display: flex;
+  flex: 0 0 110px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  height: 122px;
+  padding: 7px;
+  border: 1px solid #2f2519;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.28);
+  transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+}
+
+.roleta-fera__carta img {
+  width: 76px;
+  height: 76px;
+  object-fit: contain;
+  filter: drop-shadow(0 5px 8px rgba(0, 0, 0, 0.6));
+}
+
+.roleta-fera__carta span {
+  color: #c9b896;
+  font-size: 9px;
+  line-height: 1.2;
+  text-align: center;
+}
+
+.roleta-fera__carta--alvo {
+  border-color: #ffd34d;
+  background: rgba(255, 211, 77, 0.1);
+  box-shadow: 0 0 22px rgba(255, 200, 60, 0.2);
+  transform: scale(1.04);
+}
+
+.roleta-fera__carta--alvo span {
+  color: #ffd34d;
+}
+
+.roleta-fera__ponteiro {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  z-index: 3;
+  width: 2px;
+  background: #ffd34d;
+  box-shadow: 0 0 12px rgba(255, 211, 77, 0.7);
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.roleta-fera__ponteiro::before,
+.roleta-fera__ponteiro::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  border: 7px solid transparent;
+  transform: translateX(-50%);
+}
+
+.roleta-fera__ponteiro::before {
+  top: -1px;
+  border-top-color: #ffd34d;
+}
+
+.roleta-fera__ponteiro::after {
+  bottom: -1px;
+  border-bottom-color: #ffd34d;
+}
+
+.roleta-fera__resultado {
+  min-height: 20px;
+  margin: 0;
+  color: #b8a78a;
+  font-size: 12px;
+}
+
+.roleta-fera--revelado .roleta-fera__resultado {
+  color: #ffd34d;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+body.roleta-aberta {
+  overflow: hidden;
+}
+
+body.roleta-aberta #pergaminhos {
+  visibility: hidden;
+}
+
+@media (max-width: 575px) {
+  .roleta-fera__painel {
+    padding: 20px 14px 16px;
+  }
+
+  .roleta-fera__janela {
+    height: 124px;
+  }
+
+  .roleta-fera__carta {
+    flex-basis: 92px;
+    height: 104px;
+  }
+
+  .roleta-fera__carta img {
+    width: 62px;
+    height: 62px;
+  }
+}

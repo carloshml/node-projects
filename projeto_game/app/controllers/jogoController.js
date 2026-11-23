@@ -118,7 +118,7 @@ module.exports.gerarOrdemSuditos = async function (application, req, res, valida
             res.redirect('/jogo?msg=' + resultado.msg);
             return;
         }
-        res.redirect('/jogo?msg=acerto');
+        res.redirect('/jogo?msg=' + (parseInt(dadosForm.acao, 10) === 5 ? 'cacada' : 'acerto'));
     } catch (erro) {
         console.log('  algum erro foi encontrado  ', erro);
         res.redirect('/jogo?msg=erro');

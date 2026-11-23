@@ -189,6 +189,8 @@ Para produção, mova esses valores para variáveis de ambiente e troque o segre
 
 O custo é debitado e os aldeões são ocupados no momento da ordem. Ao terminar, a ordem é liquidada uma única vez e os aldeões são liberados.
 
+Na caçada, a fera sorteada pelo servidor é revelada em uma roleta animada antes do combate.
+
 ### Campeão
 
 Treinar um campeão custa **2.000 moedas**, **100 madeira**, **50 ferro**, ocupa **1 aldeão por 3 minutos** e exige **150 temor**, **150 sabedoria** e **100 magia**.
