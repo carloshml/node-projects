@@ -68,13 +68,5 @@
 		</p>
 
 		<div id="ordem-status" class="ordem-status"></div>
-
-		<% if (typeof ultimaAcao !== 'undefined' && ultimaAcao) { %>
-			<button type="button" class="btn btn-repetir-acao w-100" id="btn-repetir-acao"
-				data-acao="<%=ultimaAcao.acao%>" data-quantidade="<%=ultimaAcao.quantidade%>">
-				Repetir última ação
-			</button>
-			<small class="repetir-acao__texto">Envia novamente a última ordem, se ainda houver aldeões e recursos disponíveis.</small>
-		<% } %>
 	</form>
 </div>

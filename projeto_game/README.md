@@ -189,7 +189,7 @@ Para produção, mova esses valores para variáveis de ambiente e troque o segre
 
 O custo é debitado e os aldeões são ocupados no momento da ordem. Ao terminar, a ordem é liquidada uma única vez e os aldeões são liberados.
 
-A última ordem bem-sucedida fica guardada na sessão e pode ser repetida pelo botão **Repetir última ação**, que revalida aldeões livres e recursos antes de enviar.
+A última ordem bem-sucedida fica guardada na sessão e pode ser repetida pelo botão **Repetir ação**, exibido ao lado de **Contratar aldeão**; ele revalida aldeões livres e recursos antes de enviar.
 
 Na caçada, a fera sorteada pelo servidor é revelada em uma roleta animada antes do combate.
 

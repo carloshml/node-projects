@@ -199,7 +199,12 @@ JogoDAO.prototype.iniciaJogo = async function (res, req, casa, msg) {
         jogo.campeao = Number(jogo.campeao) || 0;
         jogo.campeaoAtaque = jogo.campeao * CAMPEAO.ataquePorNivel;
         jogo.campeaoBonusMoeda = Math.floor(jogo.campeao / CAMPEAO.niveisPorBonus) * CAMPEAO.bonusMoeda;
-        res.render('jogo', { img_casa: casa, jogo: jogo, msg: msg });
+        res.render('jogo', {
+            img_casa: casa,
+            jogo: jogo,
+            msg: msg,
+            ultimaAcao: req.session.ultimaAcao || null
+        });
     } catch (error) {
         console.log('  algum erro foi encontrado  ', error);
     } finally {

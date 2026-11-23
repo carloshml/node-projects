@@ -1183,8 +1183,14 @@ function inicializarFormularioOrdens() {
         const acaoRepetir = String(repetir.dataset.acao || '');
         const quantidadeRepetir = parseInt(repetir.dataset.quantidade, 10);
         const nomeAcao = NOMES_ACAO[acaoRepetir] || 'última ação';
-        repetir.textContent = 'Repetir: ' + nomeAcao +
+        const detalhe = document.getElementById('btn-repetir-detalhe');
+        const texto = nomeAcao +
             (Number.isInteger(quantidadeRepetir) ? ' · ' + quantidadeRepetir + ' aldeão(ões)' : '');
+        if (detalhe) {
+            detalhe.textContent = texto;
+        } else {
+            repetir.textContent = texto;
+        }
         repetir.addEventListener('click', repetirUltimaAcao);
     }
 
