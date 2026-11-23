@@ -1269,13 +1269,8 @@ function mostrarDanoFera(linha, dano) {
     numero.style.left = (35 + Math.random() * 30) + '%';
     alvo.appendChild(numero);
 
-    alvo.classList.remove('acerto-fera');
-    void alvo.offsetWidth;
-    alvo.classList.add('acerto-fera');
-
     setTimeout(function () {
         numero.remove();
-        alvo.classList.remove('acerto-fera');
     }, 800);
 }
 

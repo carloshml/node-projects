@@ -3708,7 +3708,7 @@ body.modal-aberto {
   }
 }
 
-.acerto-fera .fera-imagem {
+.batalha-turno-guerreiro .batalha-fera .fera-imagem {
   animation: feraAtingida 0.65s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
@@ -3948,7 +3948,7 @@ body.flash-derrota::after {
   .batalha-turno-fera .batalha-fera,
   .batalha-turno-fera .batalha-centro,
   .batalha-turno-fera .batalha-fera::after,
-  .acerto-fera .fera-imagem,
+  .batalha-turno-guerreiro .batalha-fera .fera-imagem,
   .dano-fera,
   .historico-item,
   .loot-card {
