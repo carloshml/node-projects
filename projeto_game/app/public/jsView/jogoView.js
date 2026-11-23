@@ -579,6 +579,10 @@ async function venderRecurso(recurso, linha) {
     const disponivel = Number((usuario.jogo.recursos || {})[recurso]) || 0;
     let quantidade = parseInt(input.value, 10);
 
+    if (botao.disabled || document.body.classList.contains('modal-aberto')) {
+        return;
+    }
+
     if (!Number.isInteger(quantidade) || quantidade <= 0) {
         mostrarMensagem('erro', 'Informe uma quantidade válida para vender.');
         return;
@@ -1617,6 +1621,12 @@ document.addEventListener('DOMContentLoaded', function () {
     document.addEventListener('keydown', function (evento) {
         if (evento.key === 'Escape') {
             apagaMensagem();
+            return;
+        }
+
+        if (evento.key === 'Enter' && divMensagens && divMensagens.querySelector('.modal-jogo')) {
+            evento.preventDefault();
+            apagaMensagem();
         }
     });
 
@@ -1628,6 +1638,22 @@ document.addEventListener('DOMContentLoaded', function () {
                 return;
             }
             venderRecurso(botao.dataset.recurso, botao.closest('.recurso-linha'));
+        });
+
+        listaRecursos.addEventListener('keydown', function (evento) {
+            if (evento.key !== 'Enter') {
+                return;
+            }
+            const input = evento.target.closest('.recurso-input');
+            if (!input) {
+                return;
+            }
+            const linha = input.closest('.recurso-linha');
+            if (!linha) {
+                return;
+            }
+            evento.preventDefault();
+            venderRecurso(linha.dataset.recurso, linha);
         });
     }
 
