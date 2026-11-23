@@ -122,7 +122,10 @@ const FRASES_CONSELHEIRO = {
         'Cada escolha sua vira história. E eu adoro estar nela.',
         'O Trono de Ferro não vai se conquistar sozinho. Mas com você, eu acredito.',
         'O reino tá vivo, e a gente tá no meio da ação. Que fase boa!',
-        'Eu vejo tudo daqui, e posso dizer: você está indo bem.'
+        'Eu vejo tudo daqui, e posso dizer: você está indo bem.',
+        'Repete essa aí!',
+        'Falei que ia dar certo!',
+        'Parece que você não tem recurso. Tenta de novo quando tiver!!!'
     ]
 };
 const LABEL_GANHO = {
@@ -424,13 +427,25 @@ function descreverConcluida(concluida) {
 function lerNotificacoes() {
     const parametros = new URLSearchParams(window.location.search);
     const mensagem = parametros.get('msg');
+    let repetindo = false;
+
+    try {
+        repetindo = sessionStorage.getItem('got-repetindo') === '1';
+        if (mensagem) {
+            sessionStorage.removeItem('got-repetindo');
+        }
+    } catch (erro) {
+        /* armazenamento indisponível */
+    }
 
     if (mensagem === 'acerto' || mensagem === 'cacada') {
         const painel = document.getElementById('conselheiro');
         const acao = painel ? String(painel.dataset.ultimaAcao || '') : '';
         let categoria = 'geral';
 
-        if (mensagem === 'cacada' || acao === '5') {
+        if (repetindo) {
+            categoria = 'geral';
+        } else if (mensagem === 'cacada' || acao === '5') {
             categoria = 'caca';
         } else if (acao === '1') {
             categoria = 'coleta';
@@ -1227,6 +1242,12 @@ function repetirUltimaAcao() {
             ? status.textContent
             : 'Essa ação não está disponível no momento.', 'AÇÃO INDISPONÍVEL');
         return;
+    }
+
+    try {
+        sessionStorage.setItem('got-repetindo', '1');
+    } catch (erro) {
+        /* armazenamento indisponível */
     }
 
     form.requestSubmit();
