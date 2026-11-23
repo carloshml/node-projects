@@ -39,17 +39,55 @@ UsuarioDAO.prototype.atualizarUsuario = async function (usuario, req, res) {
     const conexao = await this._connection.getDB();
 
     try {
+        const id = new ObjectId(usuario._id);
+        const contaAtual = await conexao.db.collection("usuarios").findOne({ "_id": id });
+        const papelNovo = usuario.papel === 'admin' ? 'admin' : 'jogador';
+
         await conexao.db.collection("usuarios").updateOne(
-            { "_id": new ObjectId(usuario._id) },
-            { $set: { "nome": usuario.nome, "usuario": usuario.usuario } },
+            { "_id": id },
+            {
+                $set: {
+                    "nome": usuario.nome,
+                    "usuario": usuario.usuario,
+                    "papel": papelNovo
+                }
+            },
             { upsert: true }
         );
+
+        /* papel ou login alterados exigem nova autenticação */
+        if (contaAtual && (contaAtual.papel !== papelNovo || contaAtual.usuario !== usuario.usuario)) {
+            await invalidarSessoesDoUsuario(conexao.db, contaAtual.usuario);
+        }
+
         return true;
     } catch (error) {
         console.log('  algum erro foi encontrado  ', error);
         return false;
     } finally {
         await conexao.client.close();
+    }
+}
+
+async function invalidarSessoesDoUsuario(db, usuario) {
+    const sessoes = await db.collection('sessoes')
+        .find({}, { projection: { session: 1 } })
+        .toArray();
+
+    const ids = [];
+    for (const doc of sessoes) {
+        try {
+            const dados = JSON.parse(doc.session);
+            if (dados && dados.usuario === usuario) {
+                ids.push(doc._id);
+            }
+        } catch (erro) {
+            /* sessão inválida é ignorada; o TTL remove depois */
+        }
+    }
+
+    if (ids.length > 0) {
+        await db.collection('sessoes').deleteMany({ _id: { $in: ids } });
     }
 }
 

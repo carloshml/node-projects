@@ -40,7 +40,8 @@ module.exports = function (application) {
 	application
 		.post('/atualizarUsuario', [
 			check('nome', 'nome não pode ser vazio').notEmpty(),
-			check('usuario', 'usuário não pode ser vazio').notEmpty()
+			check('usuario', 'usuário não pode ser vazio').notEmpty(),
+			check('papel', 'perfil inválido').isIn(['jogador', 'admin'])
 		], function (req, res) {
 			application.app.controllers.usuarioController.atualizarUsuario(application, req, res, validationResult);
 		});

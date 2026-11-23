@@ -2320,6 +2320,27 @@ img {
   font-size: 11px;
 }
 
+.admin-papel {
+  display: inline-block;
+  align-self: flex-start;
+  margin-top: 3px;
+  padding: 1px 6px;
+  border: 1px solid #3b4a58;
+  border-radius: 3px;
+  color: #9aa8b5;
+  font-size: 9px;
+  font-weight: bold;
+  letter-spacing: 0.04em;
+  line-height: 1.5;
+  text-transform: uppercase;
+}
+
+.admin-papel--admin {
+  border-color: rgba(255, 211, 77, 0.55);
+  background: rgba(255, 211, 77, 0.1);
+  color: #ffd34d;
+}
+
 .admin-casa {
   display: flex;
   align-items: center;

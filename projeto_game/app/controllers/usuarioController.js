@@ -1,4 +1,5 @@
 const { ehAdmin } = require('../security/autorizacao');
+const env = require('../../config/env');
 
 module.exports.buscarUsuarios = function (application, req, res) {
     /* URLs antigas carregavam o JSON do jogo; a tela administrativa usa a sessão */
@@ -19,7 +20,8 @@ async function listaUsuarios(application, req, res, errors) {
             resultados: result,
             validacao: errors,
             nome: req.session.nome,
-            img_casa: req.session.casa
+            img_casa: req.session.casa,
+            adminUsers: env.adminUsers
         });
     } else if (req.session.autorizado) {
         var errors = [

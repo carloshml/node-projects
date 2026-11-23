@@ -149,7 +149,7 @@ node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"
 
 O `.env` real é ignorado pelo Git. Nunca versione segredos.
 
-A área administrativa exige `papel = admin`. Os usuários listados em `ADMIN_USERS` recebem esse papel no login; novas contas começam como `jogador`.
+A área administrativa exige `papel = admin`. Os usuários listados em `ADMIN_USERS` recebem esse papel no login; novas contas começam como `jogador`. Na tela de administração, o campo **Perfil** permite promover ou rebaixar um usuário; a mudança invalida as sessões dele e exige novo login.
 | Views | `config/server.js` | `./app/views` |
 | Arquivos estáticos | `config/server.js` | `./app/public` |
 

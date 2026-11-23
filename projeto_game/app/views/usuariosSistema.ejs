@@ -99,7 +99,8 @@
 					<% for (var i = 0; i < usuarios.length; i++) {
 						var usuario = usuarios[i];
 						var casa = usuario.casa || 'stark';
-						var busca = (usuario.nome + ' ' + usuario.usuario + ' ' + nomeCasa(casa)).toLowerCase();
+						var papel = usuario.papel === 'admin' || (adminUsers || []).indexOf(usuario.usuario) !== -1 ? 'admin' : 'jogador';
+						var busca = (usuario.nome + ' ' + usuario.usuario + ' ' + nomeCasa(casa) + ' ' + papel).toLowerCase();
 					%>
 						<div class="admin-linha" data-busca="<%=busca%>">
 							<div class="admin-pessoa">
@@ -107,6 +108,7 @@
 								<span class="admin-pessoa__dados">
 									<strong><%=usuario.nome%></strong>
 									<small>@<%=usuario.usuario%></small>
+									<span class="admin-papel <%= papel === 'admin' ? 'admin-papel--admin' : '' %>"><%= papel === 'admin' ? 'Administrador' : 'Jogador' %></span>
 								</span>
 							</div>
 
@@ -120,7 +122,8 @@
 									data-bs-toggle="modal" data-bs-target="#modal-update"
 									data-id="<%=usuario._id%>"
 									data-nome="<%=usuario.nome%>"
-									data-usuario="<%=usuario.usuario%>">
+									data-usuario="<%=usuario.usuario%>"
+									data-papel="<%=papel%>">
 									Editar
 								</button>
 							</div>
@@ -165,6 +168,15 @@
 						<div class="mb-3">
 							<label for="update-usuario" class="form-label">Usuário</label>
 							<input id="update-usuario" name="usuario" class="form-control" type="text" required>
+						</div>
+
+						<div class="mb-3">
+							<label for="update-papel" class="form-label">Perfil</label>
+							<select id="update-papel" name="papel" class="form-select" required>
+								<option value="jogador">Jogador</option>
+								<option value="admin">Administrador</option>
+							</select>
+							<div class="form-text">Administradores podem gerenciar contas e acessar a área administrativa.</div>
 						</div>
 					</div>
 
@@ -255,6 +267,7 @@
 				document.getElementById('update-id-display').value = botao.getAttribute('data-id') || '';
 				document.getElementById('update-nome').value = botao.getAttribute('data-nome') || '';
 				document.getElementById('update-usuario').value = botao.getAttribute('data-usuario') || '';
+				document.getElementById('update-papel').value = botao.getAttribute('data-papel') || 'jogador';
 			});
 
 			const busca = document.getElementById('busca-usuarios');
