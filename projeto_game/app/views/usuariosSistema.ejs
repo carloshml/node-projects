@@ -178,9 +178,20 @@
 							</select>
 							<div class="form-text">Administradores podem gerenciar contas e acessar a área administrativa.</div>
 						</div>
+
+						<div id="reset-senha-resultado" class="admin-reset-resultado" hidden>
+							<strong>Senha temporária gerada</strong>
+							<p>Entregue esta senha para <span id="reset-senha-usuario"></span>:</p>
+							<div class="admin-reset-resultado__senha">
+								<code id="reset-senha-valor"></code>
+								<button type="button" id="btn-copiar-reset" class="btn btn-sm btn-admin-secundario">Copiar</button>
+							</div>
+							<small>Anote agora. Ela não será exibida novamente e o usuário deverá trocá-la no próximo login.</small>
+						</div>
 					</div>
 
 					<div class="modal-footer">
+						<button type="button" id="btn-resetar-senha" class="btn btn-admin-perigo">Resetar senha</button>
 						<button type="button" class="btn btn-admin-secundario" data-bs-dismiss="modal">Cancelar</button>
 						<button type="submit" class="btn btn-admin-primary">Salvar alterações</button>
 					</div>
@@ -256,6 +267,8 @@
 	<script>
 		document.addEventListener('DOMContentLoaded', function () {
 			const modalUpdate = document.getElementById('modal-update');
+			const resultadoReset = document.getElementById('reset-senha-resultado');
+			const botaoReset = document.getElementById('btn-resetar-senha');
 
 			modalUpdate.addEventListener('show.bs.modal', function (evento) {
 				const botao = evento.relatedTarget;
@@ -263,11 +276,69 @@
 					return;
 				}
 
+				resultadoReset.hidden = true;
+				botaoReset.disabled = false;
 				document.getElementById('update-id').value = botao.getAttribute('data-id') || '';
 				document.getElementById('update-id-display').value = botao.getAttribute('data-id') || '';
 				document.getElementById('update-nome').value = botao.getAttribute('data-nome') || '';
 				document.getElementById('update-usuario').value = botao.getAttribute('data-usuario') || '';
 				document.getElementById('update-papel').value = botao.getAttribute('data-papel') || 'jogador';
+			});
+
+			botaoReset.addEventListener('click', async function () {
+				const id = document.getElementById('update-id').value;
+				if (!id) {
+					return;
+				}
+
+				if (!window.confirm('Resetar a senha deste usuário? A senha atual deixará de funcionar.')) {
+					return;
+				}
+
+				const csrf = document.querySelector('#form-update input[name="_csrf"]');
+				botaoReset.disabled = true;
+
+				try {
+					const resposta = await fetch('/resetarSenhaUsuario', {
+						method: 'POST',
+						headers: {
+							'Content-Type': 'application/json',
+							'X-CSRF-Token': csrf ? csrf.value : ''
+						},
+						body: JSON.stringify({ _id: id })
+					});
+					const dados = await resposta.json();
+
+					if (!resposta.ok || !dados.ok) {
+						window.alert(dados.msg === 'semPermissao'
+							? 'Apenas administradores podem resetar senhas.'
+							: 'Não foi possível resetar a senha. Tente novamente.');
+						return;
+					}
+
+					document.getElementById('reset-senha-usuario').textContent = dados.nome || dados.usuario || 'este usuário';
+					document.getElementById('reset-senha-valor').textContent = dados.senhaTemporaria;
+					resultadoReset.hidden = false;
+				} catch (erro) {
+					console.error('Falha ao resetar senha:', erro);
+					window.alert('Não foi possível resetar a senha. Tente novamente.');
+				} finally {
+					botaoReset.disabled = false;
+				}
+			});
+
+			const botaoCopiarReset = document.getElementById('btn-copiar-reset');
+			botaoCopiarReset.addEventListener('click', function () {
+				const valor = document.getElementById('reset-senha-valor').textContent;
+				if (!valor) {
+					return;
+				}
+				if (navigator.clipboard && navigator.clipboard.writeText) {
+					navigator.clipboard.writeText(valor).then(function () {
+						botaoCopiarReset.textContent = 'Copiado';
+						setTimeout(function () { botaoCopiarReset.textContent = 'Copiar'; }, 1500);
+					});
+				}
 			});
 
 			const busca = document.getElementById('busca-usuarios');

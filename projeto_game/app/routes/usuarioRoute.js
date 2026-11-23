@@ -47,6 +47,28 @@ module.exports = function (application) {
 		});
 
 	application
+		.post('/resetarSenhaUsuario', [
+			check('_id', 'usuário inválido').isMongoId()
+		], function (req, res) {
+			application.app.controllers.usuarioController.resetarSenhaUsuario(application, req, res, validationResult);
+		});
+
+	application
+		.get('/trocarSenha', function (req, res) {
+			application.app.controllers.usuarioController.renderTrocarSenha(application, req, res);
+		});
+
+	application
+		.post('/trocarSenha', [
+			check('senha', 'A nova senha deve ter pelo menos 8 caracteres').isLength({ min: 8 }),
+			check('confirmarSenha', 'As senhas não conferem').custom(function (valor, { req }) {
+				return valor === req.body.senha;
+			})
+		], function (req, res) {
+			application.app.controllers.usuarioController.trocarSenha(application, req, res, validationResult);
+		});
+
+	application
 		.get('/buscarUsuarios', function (req, res) {
 			application.app.controllers.usuarioController.buscarUsuarios(application, req, res);
 		});

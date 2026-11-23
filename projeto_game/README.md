@@ -149,7 +149,7 @@ node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"
 
 O `.env` real é ignorado pelo Git. Nunca versione segredos.
 
-A área administrativa exige `papel = admin`. Os usuários listados em `ADMIN_USERS` recebem esse papel no login; novas contas começam como `jogador`. Na tela de administração, o campo **Perfil** permite promover ou rebaixar um usuário; a mudança invalida as sessões dele e exige novo login.
+A área administrativa exige `papel = admin`. Os usuários listados em `ADMIN_USERS` recebem esse papel no login; novas contas começam como `jogador`. Na tela de administração, o campo **Perfil** permite promover ou rebaixar um usuário; a mudança invalida as sessões dele e exige novo login. O botão **Resetar senha** gera uma senha temporária exibida uma única vez ao administrador; o usuário entra com ela e é obrigado a cadastrar uma nova senha antes de acessar o jogo.
 | Views | `config/server.js` | `./app/views` |
 | Arquivos estáticos | `config/server.js` | `./app/public` |
 
@@ -283,6 +283,9 @@ O `consign` carrega automaticamente `app/routes`, `config/dbConection.js`, `app/
 | GET | `/verRanking` | Ranking por moedas |
 | POST | `/inserirUsuarioCrud` | Cadastro pela tela de administração |
 | POST | `/atualizarUsuario` | Atualização de usuário pela administração |
+| POST | `/resetarSenhaUsuario` | Gera senha temporária e força a troca (admin) |
+| GET | `/trocarSenha` | Formulário de troca obrigatória de senha |
+| POST | `/trocarSenha` | Salva a nova senha e libera o acesso |
 
 Requisições `POST` exigem o token CSRF. As rotas administrativas também exigem `papel = admin`.
 
@@ -298,7 +301,8 @@ Banco `got`, coleções principais:
   "usuario": "carlos",
   "senha": "scrypt$16384$8$1$salt$hash",
   "casa": "stark",
-  "papel": "jogador"
+  "papel": "jogador",
+  "precisaTrocarSenha": false
 }
 ```
 

@@ -136,6 +136,84 @@ module.exports.inserirUsuarioCrud = async function (application, req, res, valid
     }
 }
 
+module.exports.resetarSenhaUsuario = async function (application, req, res, validationResult) {
+    if (!ehAdmin(req)) {
+        res.status(403).json({ ok: false, msg: 'semPermissao' });
+        return;
+    }
+
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        res.status(400).json({ ok: false, msg: 'usuarioInvalido' });
+        return;
+    }
+
+    const connection = application.config.dbConection;
+    const UsuarioDAO = new application.app.models.UsuariosDAO(connection);
+    const resultado = await UsuarioDAO.resetarSenha(req.body._id);
+
+    if (!resultado.ok) {
+        res.status(400).json(resultado);
+        return;
+    }
+
+    res.json(resultado);
+}
+
+module.exports.renderTrocarSenha = function (application, req, res) {
+    if (!req.session.autorizado) {
+        res.redirect('/');
+        return;
+    }
+    if (!req.session.precisaTrocarSenha) {
+        res.redirect('/home');
+        return;
+    }
+
+    res.render('trocarSenha', {
+        validacao: [],
+        nome: req.session.nome,
+        usuario: req.session.usuario
+    });
+}
+
+module.exports.trocarSenha = async function (application, req, res, validationResult) {
+    if (!req.session.autorizado) {
+        res.redirect('/');
+        return;
+    }
+    if (!req.session.precisaTrocarSenha) {
+        res.redirect('/home');
+        return;
+    }
+
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        res.status(400).render('trocarSenha', {
+            validacao: errors.array(),
+            nome: req.session.nome,
+            usuario: req.session.usuario
+        });
+        return;
+    }
+
+    const connection = application.config.dbConection;
+    const UsuarioDAO = new application.app.models.UsuariosDAO(connection);
+    const alterou = await UsuarioDAO.trocarSenha(req.session._id, req.body.senha);
+
+    if (!alterou) {
+        res.status(400).render('trocarSenha', {
+            validacao: [{ msg: 'Não foi possível alterar a senha. Tente novamente.' }],
+            nome: req.session.nome,
+            usuario: req.session.usuario
+        });
+        return;
+    }
+
+    req.session.precisaTrocarSenha = false;
+    res.redirect('/home');
+}
+
 module.exports.verRanking = async function (application, req, res) {
     /* links antigos carregavam o JSON do jogo na query; o ranking usa a sessão */
     if (req.query.jogo || req.query.img_casa) {

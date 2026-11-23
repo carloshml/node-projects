@@ -24,6 +24,17 @@
   padding: 40px 22px;
 }
 
+.trocar-pagina {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 34px 18px;
+}
+
+.trocar-card {
+  width: min(440px, 100%);
+}
+
 .login-marca {
   min-width: 0;
 }
@@ -2339,6 +2350,69 @@ img {
   border-color: rgba(255, 211, 77, 0.55);
   background: rgba(255, 211, 77, 0.1);
   color: #ffd34d;
+}
+
+.btn-admin-perigo {
+  border: 1px solid #7a3d3d;
+  background: #3a1f1f;
+  color: #ffb4b4;
+}
+
+.btn-admin-perigo:hover,
+.btn-admin-perigo:focus {
+  border-color: #a95555;
+  background: #4d2727;
+  color: #ffd0d0;
+}
+
+.admin-reset-resultado {
+  margin-top: 14px;
+  padding: 12px;
+  border: 1px solid rgba(255, 211, 77, 0.35);
+  border-radius: 6px;
+  background: rgba(255, 211, 77, 0.06);
+  color: #d8c6a4;
+  font-size: 11px;
+}
+
+.admin-reset-resultado strong {
+  display: block;
+  margin-bottom: 5px;
+  color: #ffd34d;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.admin-reset-resultado p {
+  margin: 0 0 8px;
+}
+
+.admin-reset-resultado small {
+  display: block;
+  margin-top: 7px;
+  color: #b8a78a;
+  line-height: 1.4;
+}
+
+.admin-reset-resultado__senha {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.admin-reset-resultado code {
+  flex: 1;
+  min-width: 0;
+  padding: 6px 8px;
+  border: 1px solid #4a3a24;
+  border-radius: 4px;
+  background: #0d0a07;
+  color: #ffe08a;
+  font-size: 13px;
+  letter-spacing: 0.05em;
+  overflow-wrap: anywhere;
+  user-select: all;
 }
 
 .admin-casa {

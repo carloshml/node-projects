@@ -32,6 +32,10 @@ function ehMd5Legado(valor) {
     return typeof valor === 'string' && /^[a-f0-9]{32}$/i.test(valor);
 }
 
+function gerarSenhaTemporaria() {
+    return crypto.randomBytes(12).toString('base64url');
+}
+
 async function hashSenha(senha) {
     if (!senhaValida(senha)) {
         throw new Error('Senha inválida.');
@@ -107,5 +111,6 @@ async function verificarSenha(senha, armazenada) {
 module.exports = {
     hashSenha,
     verificarSenha,
-    ehMd5Legado
+    ehMd5Legado,
+    gerarSenhaTemporaria
 };

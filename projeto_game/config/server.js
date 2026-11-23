@@ -62,6 +62,20 @@ app.use(sessionMiddleware);
 /* exigir token CSRF em requisições que alteram estado */
 app.use(csrfProtection);
 
+/* enquanto a senha temporária não for trocada, bloquear o restante do sistema */
+app.use(function (req, res, next) {
+	if (req.session && req.session.autorizado && req.session.precisaTrocarSenha) {
+		if (req.path === '/trocarSenha' || req.path === '/sair') {
+			return next();
+		}
+		if (req.is('application/json')) {
+			return res.status(403).json({ ok: false, msg: 'trocaSenhaObrigatoria' });
+		}
+		return res.redirect('/trocarSenha');
+	}
+	next();
+});
+
 
 /* efetua o autoload das rotas, dos models e dos controllers para o objeto app */
 consign()

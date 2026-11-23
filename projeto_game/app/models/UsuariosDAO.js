@@ -1,5 +1,5 @@
 let ObjectId = require('mongodb').ObjectId;
-const { hashSenha, verificarSenha } = require('../security/senha');
+const { hashSenha, verificarSenha, gerarSenhaTemporaria } = require('../security/senha');
 const { papelDoUsuario, ehAdmin } = require('../security/autorizacao');
 
 function UsuarioDAO(connection) {
@@ -20,6 +20,7 @@ UsuarioDAO.prototype.inserirUsuario = async function (usuario, application) {
 
         usuario.senha = await hashSenha(usuario.senha);
         usuario.papel = 'jogador';
+        usuario.precisaTrocarSenha = false;
         delete usuario._id;
         const resultado = await conexao.db.collection("usuarios").insertOne(usuario);
 
@@ -61,6 +62,86 @@ UsuarioDAO.prototype.atualizarUsuario = async function (usuario, req, res) {
         }
 
         return true;
+    } catch (error) {
+        console.log('  algum erro foi encontrado  ', error);
+        return false;
+    } finally {
+        await conexao.client.close();
+    }
+}
+
+UsuarioDAO.prototype.resetarSenha = async function (idUsuario) {
+    const conexao = await this._connection.getDB();
+
+    try {
+        if (!ObjectId.isValid(idUsuario)) {
+            return { ok: false, msg: 'usuarioInvalido' };
+        }
+
+        const id = new ObjectId(idUsuario);
+        const conta = await conexao.db.collection('usuarios').findOne({ _id: id });
+
+        if (!conta) {
+            return { ok: false, msg: 'usuarioNaoEncontrado' };
+        }
+
+        const senhaTemporaria = gerarSenhaTemporaria();
+        const hash = await hashSenha(senhaTemporaria);
+
+        await conexao.db.collection('usuarios').updateOne(
+            { _id: id },
+            {
+                $set: {
+                    senha: hash,
+                    precisaTrocarSenha: true,
+                    senhaResetadaEm: new Date()
+                }
+            }
+        );
+
+        await invalidarSessoesDoUsuario(conexao.db, conta.usuario);
+
+        return {
+            ok: true,
+            senhaTemporaria: senhaTemporaria,
+            usuario: conta.usuario,
+            nome: conta.nome
+        };
+    } catch (error) {
+        console.log('  algum erro foi encontrado  ', error);
+        return { ok: false, msg: 'erroResetarSenha' };
+    } finally {
+        await conexao.client.close();
+    }
+}
+
+UsuarioDAO.prototype.trocarSenha = async function (idUsuario, novaSenha) {
+    const conexao = await this._connection.getDB();
+
+    try {
+        if (!ObjectId.isValid(idUsuario)) {
+            return false;
+        }
+
+        const hash = await hashSenha(novaSenha);
+        const resultado = await conexao.db.collection('usuarios').updateOne(
+            {
+                _id: new ObjectId(idUsuario),
+                precisaTrocarSenha: true
+            },
+            {
+                $set: {
+                    senha: hash,
+                    precisaTrocarSenha: false,
+                    senhaTrocadaEm: new Date()
+                },
+                $unset: {
+                    senhaResetadaEm: ''
+                }
+            }
+        );
+
+        return resultado.modifiedCount === 1;
     } catch (error) {
         console.log('  algum erro foi encontrado  ', error);
         return false;
@@ -152,6 +233,7 @@ UsuarioDAO.prototype.autenticar = async function (usuario, req, res) {
 
         if (!conta || !verificacao.valida) {
             req.session.autorizado = false;
+            req.session.precisaTrocarSenha = false;
             const errors = [
                 { msg: 'Usuário ou senha incorretos' }
             ];
@@ -178,8 +260,9 @@ UsuarioDAO.prototype.autenticar = async function (usuario, req, res) {
         req.session.nome = conta.nome;
         req.session._id = conta._id;
         req.session.papel = papelDoUsuario(conta);
+        req.session.precisaTrocarSenha = conta.precisaTrocarSenha === true;
 
-        res.redirect('/home');
+        res.redirect(req.session.precisaTrocarSenha ? '/trocarSenha' : '/home');
     } catch (error) {
         console.log('  algum erro foi encontrado  ', error);
         const errors = [

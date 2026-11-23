@@ -1,0 +1,67 @@
+<!DOCTYPE HTML>
+<html lang="pt-br">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>MMORPG - Trocar senha</title>
+
+	<link rel="stylesheet" href="css/bootstrap.min.css">
+	<link href="css/style.css" rel="stylesheet">
+</head>
+
+<body class="body-login">
+	<%
+	const erros = Array.isArray(validacao) ? validacao : [];
+	%>
+
+	<main class="login-pagina trocar-pagina">
+		<section class="login-card trocar-card" aria-labelledby="trocar-titulo">
+			<header class="login-card__topo">
+				<p class="login-card__eyebrow">Segurança da conta</p>
+				<h2 id="trocar-titulo">Crie uma nova senha</h2>
+				<p class="login-card__texto">
+					<%= nome || usuario || 'Sua conta' %>, sua senha foi resetada por um administrador.
+					Defina uma nova senha para continuar.
+				</p>
+			</header>
+
+			<% if (erros.length > 0) { %>
+				<div class="login-alerta login-alerta--erro" role="alert">
+					<strong>Não foi possível salvar</strong>
+					<ul>
+						<% for (var i = 0; i < erros.length; i++) { %>
+							<li><%= erros[i].msg %></li>
+						<% } %>
+					</ul>
+				</div>
+			<% } %>
+
+			<form class="login-form" action="/trocarSenha" method="POST">
+				<input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+				<div class="login-campo">
+					<label for="senha">Nova senha</label>
+					<input type="password" name="senha" id="senha" class="form-control"
+						placeholder="Mínimo de 8 caracteres" autocomplete="new-password"
+						minlength="8" required autofocus>
+				</div>
+
+				<div class="login-campo">
+					<label for="confirmarSenha">Confirmar nova senha</label>
+					<input type="password" name="confirmarSenha" id="confirmarSenha" class="form-control"
+						placeholder="Repita a nova senha" autocomplete="new-password"
+						minlength="8" required>
+				</div>
+
+				<button type="submit" class="btn login-entrar">Salvar nova senha</button>
+			</form>
+
+			<p class="login-rodape">
+				<a href="/sair">Sair e entrar com outra conta</a>
+			</p>
+		</section>
+	</main>
+</body>
+
+</html>
