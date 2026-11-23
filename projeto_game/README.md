@@ -126,14 +126,29 @@ Abra <http://localhost:8200>.
 
 ## Configuração
 
-O projeto não usa arquivo `.env`; os valores estão no código:
+Copie o arquivo de exemplo e ajuste os valores:
 
-| Configuração | Arquivo | Valor padrão |
-|---|---|---|
-| Porta HTTP | `app.js` | `8200` |
-| Conexão MongoDB | `config/dbConection.js` | `mongodb://127.0.0.1:27017/got` |
-| Banco | `config/dbConection.js` | `got` |
-| Segredo da sessão | `config/server.js` | `secretkey-00045` |
+```bash
+cp .env.example .env
+```
+
+Gere um segredo de sessão aleatório:
+
+```bash
+node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"
+```
+
+| Variável | Uso |
+|---|---|
+| `NODE_ENV` | `development` ou `production` |
+| `PORT` | Porta HTTP (padrão `8200`) |
+| `MONGODB_URI` | String de conexão do MongoDB |
+| `MONGODB_DB` | Nome do banco (padrão `got`) |
+| `SESSION_SECRET` | Segredo da sessão, mínimo de 32 caracteres |
+| `SESSION_NAME` | Nome do cookie de sessão |
+| `ADMIN_USERS` | Usuários com acesso administrativo, separados por vírgula |
+
+O `.env` real é ignorado pelo Git. Nunca versione segredos.
 | Views | `config/server.js` | `./app/views` |
 | Arquivos estáticos | `config/server.js` | `./app/public` |
 

@@ -7,6 +7,9 @@ var consign = require('consign');
 /* importar o módulo do express-session */
 var expressSession = require('express-session');
 
+/* carregar e validar as variáveis de ambiente */
+var env = require('./env');
+
 /* iniciar o objeto do express */
 var app = express();
 
@@ -23,9 +26,16 @@ app.use(express.json());
 
 /* configurar o middleware express-session */
 const sessionMiddleware = expressSession({
-	secret:'secretkey-00045',
+	secret: env.sessionSecret,
+	name: env.sessionName,
 	resave: false, // pois não será regravada a cada sessão
-	saveUninitialized: false
+	saveUninitialized: false,
+	cookie: {
+		httpOnly: true,
+		sameSite: 'lax',
+		secure: env.secureCookie,
+		maxAge: env.sessionMaxAge
+	}
 });
 app.use(sessionMiddleware);
 

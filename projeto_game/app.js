@@ -2,6 +2,7 @@
 const http = require('http');
 const { Server } = require('socket.io');
 const app = require('./config/server');
+const env = require('./config/env');
 const iniciarChat = require('./app/chat/chatServer');
 
 /* criar o servidor HTTP e acoplar o Socket.IO */
@@ -16,7 +17,7 @@ if (app.sessionMiddleware) {
 iniciarChat(io);
 
 /* parametrizar a porta de escuta */
-server.listen(8200, function () {
+server.listen(env.port, function () {
 	console.log('Servidor online');
-	console.log('Servidor rodando em localhost:8200');
+	console.log('Servidor rodando em localhost:' + env.port);
 });
