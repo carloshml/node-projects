@@ -1759,7 +1759,7 @@ async function sincronizar() {
             /* deixa o contador e os deltas visíveis antes de cobrir a tela */
             await pausa(PAUSA_ANTES_MODAL);
             if (window.SomJogo) {
-                window.SomJogo.pararBatalha();
+                atualizarSomBatalha();
             }
 
             if (resultadoModal.temBatalha) {
