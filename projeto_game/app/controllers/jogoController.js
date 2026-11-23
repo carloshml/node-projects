@@ -57,6 +57,26 @@ module.exports.historicoAcoes = function (application, req, res) {
     JogoDAO.historicoAcoes(req, res);
 }
 
+module.exports.missaoDiaria = function (application, req, res) {
+    if (!req.session.autorizado) {
+        res.status(401).json({ ok: false, msg: 'naoAutorizado' });
+        return;
+    }
+    const connection = application.config.dbConection;
+    const JogoDAO = new application.app.models.JogoDAO(connection);
+    JogoDAO.obterMissaoDiaria(req, res);
+}
+
+module.exports.resgatarMissaoDiaria = function (application, req, res) {
+    if (!req.session.autorizado) {
+        res.status(401).json({ ok: false, msg: 'naoAutorizado' });
+        return;
+    }
+    const connection = application.config.dbConection;
+    const JogoDAO = new application.app.models.JogoDAO(connection);
+    JogoDAO.resgatarMissaoDiaria(req, res);
+}
+
 module.exports.atualizarAcoesDeJogo = function (application, req, res) {
     if (!req.session.autorizado) {
         const errors = [

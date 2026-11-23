@@ -20,6 +20,14 @@ module.exports = function (application) {
 		application.app.controllers.jogoController.historicoAcoes(application, req, res);
 	});
 
+	application.get('/missaoDiaria', function (req, res) {
+		application.app.controllers.jogoController.missaoDiaria(application, req, res);
+	});
+
+	application.post('/resgatarMissaoDiaria', function (req, res) {
+		application.app.controllers.jogoController.resgatarMissaoDiaria(application, req, res);
+	});
+
 	application.get('/atualizarAcoesDeJogo', function (req, res) {
 		application.app.controllers.jogoController.atualizarAcoesDeJogo(application, req, res);
 	});

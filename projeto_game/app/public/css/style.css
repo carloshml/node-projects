@@ -5078,3 +5078,112 @@ body.roleta-aberta #pergaminhos {
 .btn-repetir-acao-grande:focus-visible {
   box-shadow: 0 0 0 1px rgba(255, 211, 77, 0.25);
 }
+
+/* Missão diária nos pergaminhos */
+.missao-diaria {
+  margin-bottom: 16px;
+  padding: 14px;
+  border: 1px solid rgba(255, 211, 77, 0.42);
+  border-radius: 8px;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(255, 211, 77, 0.08), transparent 42%),
+    rgba(0, 0, 0, 0.24);
+  text-align: left;
+}
+
+.missao-diaria__topo {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 6px;
+  color: #c9a227;
+  font-size: 9px;
+  font-weight: bold;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.missao-diaria__titulo {
+  margin: 8px 0 4px;
+  color: #ffe06a;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 21px;
+  font-weight: normal;
+}
+
+.missao-diaria__texto {
+  margin: 0 0 10px;
+  color: #d8c6a4;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.missao-diaria__barra {
+  height: 7px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 211, 77, 0.25);
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.missao-diaria__barra span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #c9a227, #ffe06a);
+  transition: width 0.4s ease;
+}
+
+.missao-diaria__rodape {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 6px 12px;
+  margin-top: 7px;
+  color: #d8c6a4;
+  font-size: 11px;
+}
+
+.missao-diaria__progresso {
+  font-weight: bold;
+}
+
+.missao-diaria__recompensa {
+  color: #ffd34d;
+}
+
+.missao-diaria__botao {
+  width: 100%;
+  margin-top: 10px;
+  border: 1px solid rgba(255, 211, 77, 0.6);
+  background: rgba(255, 211, 77, 0.14);
+  color: #ffe08a;
+  font-size: 11px;
+  font-weight: bold;
+}
+
+.missao-diaria__botao:hover:not(:disabled),
+.missao-diaria__botao:focus:not(:disabled) {
+  border-color: #ffd34d;
+  background: #ffd34d;
+  color: #1b0f0a;
+}
+
+.missao-diaria__botao:disabled {
+  opacity: 0.65;
+}
+
+.missao-diaria--completa {
+  border-color: #ffd34d;
+  box-shadow: 0 0 18px rgba(255, 200, 60, 0.16);
+}
+
+.missao-diaria--resgatada {
+  opacity: 0.72;
+}
+
+@media (max-width: 575px) {
+  .missao-diaria__titulo {
+    font-size: 18px;
+  }
+}

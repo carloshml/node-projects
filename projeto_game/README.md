@@ -25,6 +25,7 @@ Jogo web de estratégia ambientado em **Game of Thrones**, feito com Node.js, Ex
 - Cinco feras com vida, recompensa e imagem próprias; a fera é sorteada pelo jogo.
 - Ranking de jogadores por moedas.
 - Treinamento de campeão com bônus permanentes de ataque e recompensa.
+- Uma missão diária nos pergaminhos, com progresso e recompensa resgatável.
 - Tela de administração/CRUD de usuários.
 - Visual temático com mapa, casas, ícones e cards de atividade.
 
@@ -193,6 +194,10 @@ A última ordem bem-sucedida fica guardada na sessão e pode ser repetida pelo b
 
 Na caçada, a fera sorteada pelo servidor é revelada em uma roleta animada antes do combate.
 
+### Missão diária
+
+Uma missão é sorteada por dia e aparece no topo dos **Pergaminhos**. O progresso é contabilizado no servidor ao concluir coletas, caçadas vitoriosas, treinamentos, treinamento de campeão ou vendas no celeiro. A recompensa só pode ser resgatada uma vez e é creditada de forma atômica.
+
 ### Campeão
 
 Treinar um campeão custa **2.000 moedas**, **100 madeira**, **50 ferro**, ocupa **1 aldeão por 3 minutos** e exige **150 temor**, **150 sabedoria** e **100 magia**.
@@ -278,6 +283,8 @@ O `consign` carrega automaticamente `app/routes`, `config/dbConection.js`, `app/
 | POST | `/gerarOrdemSuditos` | Cria uma ordem |
 | GET | `/gerarPergaminhos` | Lista as ordens em andamento (JSON) |
 | GET | `/historicoAcoes` | Histórico de ordens concluídas (JSON) |
+| GET | `/missaoDiaria` | Missão diária atual (JSON) |
+| POST | `/resgatarMissaoDiaria` | Resgata a recompensa da missão diária |
 | GET | `/atualizarAcoesDeJogo` | Liquida ordens concluídas (JSON) |
 | GET | `/revogar_acao` | Revoga uma ordem e estorna o custo |
 | GET | `/buscaJogoUsuario` | Dados atuais do jogo (JSON) |

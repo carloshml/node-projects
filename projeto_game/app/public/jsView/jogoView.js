@@ -1476,8 +1476,99 @@ async function carregarAcoes() {
     atualizarSomBatalha();
 }
 
-function montarHistorico(historico) {
-    if (!Array.isArray(historico) || !historico.length) {
+const LABEL_RECOMPENSA = {
+    moeda: 'moedas',
+    madeira: 'madeira',
+    comida: 'comida',
+    ferro: 'ferro',
+    temor: 'temor',
+    sabedoria: 'sabedoria',
+    magia: 'magia'
+};
+
+function formatarRecompensaMissao(recompensa) {
+    return Object.keys(recompensa || {}).map(function (campo) {
+        return Number(recompensa[campo]) + ' ' + (LABEL_RECOMPENSA[campo] || campo);
+    }).join(' · ');
+}
+
+function montarMissaoDiaria(missao) {
+    if (!missao) {
+        return '';
+    }
+
+    const progresso = Math.max(0, Number(missao.progresso) || 0);
+    const alvo = Math.max(1, Number(missao.alvo) || 1);
+    const percentual = Math.min(100, (progresso / alvo) * 100);
+    const completa = progresso >= alvo;
+    const resgatada = Boolean(missao.resgatada);
+    const data = String(missao.data || '').split('-');
+    const dataCurta = data.length === 3 ? data[2] + '/' + data[1] : '';
+    const classe = resgatada
+        ? ' missao-diaria--resgatada'
+        : (completa ? ' missao-diaria--completa' : '');
+    const rotulo = resgatada
+        ? 'Recompensa resgatada'
+        : (completa ? 'Resgatar recompensa' : 'Em andamento');
+
+    return '<section class="missao-diaria' + classe + '">' +
+        '<div class="missao-diaria__topo">' +
+        '<span>Pergaminho do dia' + (dataCurta ? ' · ' + dataCurta : '') + '</span>' +
+        '<span>' + (resgatada ? 'Concluída' : (completa ? 'Pronta' : 'Missão ativa')) + '</span>' +
+        '</div>' +
+        '<h3 class="missao-diaria__titulo">' + missao.titulo + '</h3>' +
+        '<p class="missao-diaria__texto">' + missao.descricao + '</p>' +
+        '<div class="missao-diaria__barra" role="progressbar" aria-valuemin="0" aria-valuemax="' + alvo + '" aria-valuenow="' + Math.min(progresso, alvo) + '">' +
+        '<span style="width:' + percentual.toFixed(1) + '%"></span>' +
+        '</div>' +
+        '<div class="missao-diaria__rodape">' +
+        '<span class="missao-diaria__progresso">' + Math.min(progresso, alvo) + ' / ' + alvo + '</span>' +
+        '<span class="missao-diaria__recompensa">Recompensa: ' + formatarRecompensaMissao(missao.recompensa) + '</span>' +
+        '</div>' +
+        '<button type="button" class="btn missao-diaria__botao" data-resgatar-missao' +
+        (resgatada || !completa ? ' disabled' : '') + '>' + rotulo + '</button>' +
+        '</section>';
+}
+
+async function resgatarMissaoDiaria(botao) {
+    if (!botao || botao.disabled) {
+        return;
+    }
+
+    botao.disabled = true;
+    botao.textContent = 'Resgatando...';
+
+    try {
+        const resposta = await fetch('/resgatarMissaoDiaria', {
+            method: 'POST',
+            headers: cabecalhosJson()
+        });
+        const dados = await resposta.json();
+
+        if (!resposta.ok || !dados.ok) {
+            const mensagem = dados.msg === 'missaoJaResgatada'
+                ? 'Essa recompensa já foi resgatada hoje.'
+                : (dados.msg === 'missaoIncompleta'
+                    ? 'A missão ainda não foi concluída.'
+                    : 'Não foi possível resgatar a recompensa.');
+            mostrarMensagem('erro', mensagem, 'MISSÃO DIÁRIA');
+            return;
+        }
+
+        if (dados.jogo) {
+            Object.assign(usuario.jogo, dados.jogo);
+        }
+
+        await Promise.all([atualizarHud(), atualizarCeleiro()]);
+        tocarSom('moeda');
+        await verPergaminhos();
+    } catch (erro) {
+        console.error('Falha ao resgatar a missão diária:', erro);
+        mostrarMensagem('erro', 'Não foi possível resgatar a recompensa.', 'MISSÃO DIÁRIA');
+    }
+}
+
+function montarHistorico(historico) {    if (!Array.isArray(historico) || !historico.length) {
         return '<div class="historico-vazio">' +
             '<img src="images/outros/pergaminho.jpg" alt="">' +
             '<p>Nenhum pergaminho escrito ainda.</p>' +
@@ -1673,15 +1764,39 @@ function animarTurnoBatalha(quem) {
 
 async function verPergaminhos() {
     try {
-        const resposta = await fetch('/historicoAcoes');
+        const respostas = await Promise.all([
+            fetch('/historicoAcoes'),
+            fetch('/missaoDiaria')
+        ]);
+        const resposta = respostas[0];
+        const respostaMissao = respostas[1];
+
         if (!resposta.ok) {
             throw new Error('HTTP ' + resposta.status);
         }
+
         const dados = await resposta.json();
         if (!dados || !dados.ok) {
             throw new Error(dados && dados.msg ? dados.msg : 'Histórico indisponível');
         }
-        mostrarMensagem('pergaminhos', montarHistorico(dados.historico), 'PERGAMINHOS');
+
+        let missao = null;
+        try {
+            if (respostaMissao.ok) {
+                const dadosMissao = await respostaMissao.json();
+                if (dadosMissao && dadosMissao.ok) {
+                    missao = dadosMissao.missao;
+                }
+            }
+        } catch (erroMissao) {
+            console.error('Falha ao carregar a missão diária:', erroMissao);
+        }
+
+        mostrarMensagem(
+            'pergaminhos',
+            montarMissaoDiaria(missao) + montarHistorico(dados.historico),
+            'PERGAMINHOS'
+        );
         tocarSom('clique');
     } catch (erro) {
         console.error('Falha ao carregar os pergaminhos:', erro);
@@ -1893,6 +2008,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
     if (divMensagens) {
         divMensagens.addEventListener('click', function (evento) {
+            const botaoMissao = evento.target.closest('[data-resgatar-missao]');
+            if (botaoMissao) {
+                evento.preventDefault();
+                resgatarMissaoDiaria(botaoMissao);
+                return;
+            }
+
             if (evento.target === divMensagens) {
                 apagaMensagem();
             }

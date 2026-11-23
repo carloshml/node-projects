@@ -1,5 +1,6 @@
 let ObjectId = require('mongodb').ObjectId;
 const { FERAS, PODER_ALDEAO, obterFera } = require('./feras');
+const { dataHoje, sortearMissao, incrementoDoEvento, incrementosRecompensa } = require('./missaoDiaria');
 
 /* custo em moedas por aldeão, por tipo de ação */
 const CUSTOS = { 1: 2, 2: 3, 3: 1, 4: 1, 5: 5, 6: 2000 };
@@ -211,6 +212,162 @@ JogoDAO.prototype.iniciaJogo = async function (res, req, casa, msg) {
         await conexao.client.close();
     }
 }
+
+async function obterOuCriarMissao(db, jogo) {
+    const data = dataHoje();
+
+    if (jogo.missao && jogo.missao.data === data) {
+        return jogo.missao;
+    }
+
+    const modelo = sortearMissao();
+    const missao = Object.assign({}, modelo, {
+        data: data,
+        progresso: 0,
+        resgatada: false,
+        criada_em: new Date()
+    });
+
+    const atualizado = await db.collection('jogo').findOneAndUpdate(
+        { _id: jogo._id },
+        { $set: { missao: missao } },
+        { returnDocument: 'after' }
+    );
+
+    const documento = documentoDe(atualizado);
+    return documento && documento.missao ? documento.missao : missao;
+}
+
+async function registrarProgressoMissao(db, usuario, evento) {
+    const jogo = await db.collection('jogo').findOne({ usuario: usuario });
+    if (!jogo) {
+        return;
+    }
+
+    const missao = (jogo.missao && jogo.missao.data === dataHoje())
+        ? jogo.missao
+        : await obterOuCriarMissao(db, jogo);
+    const incremento = incrementoDoEvento(missao, evento);
+
+    if (incremento <= 0) {
+        return;
+    }
+
+    await db.collection('jogo').updateOne(
+        {
+            _id: jogo._id,
+            'missao.data': missao.data,
+            'missao.resgatada': false
+        },
+        { $inc: { 'missao.progresso': incremento } }
+    );
+}
+
+JogoDAO.prototype.obterMissaoDiaria = async function (req, res) {
+    let conexao;
+
+    try {
+        conexao = await this._connection.getDB();
+        const jogo = await conexao.db.collection('jogo').findOne({
+            idUsuario: new ObjectId(req.session._id)
+        });
+
+        if (!jogo) {
+            responderJson(res, 404, { ok: false, msg: 'jogoNaoEncontrado' });
+            return;
+        }
+
+        const missao = await obterOuCriarMissao(conexao.db, jogo);
+        responderJson(res, 200, { ok: true, missao: missao });
+    } catch (error) {
+        console.log('  algum erro foi encontrado  ', error);
+        responderJson(res, 500, { ok: false, msg: 'erroMissao' });
+    } finally {
+        if (conexao) {
+            await conexao.client.close();
+        }
+    }
+};
+
+JogoDAO.prototype.resgatarMissaoDiaria = async function (req, res) {
+    let conexao;
+
+    try {
+        conexao = await this._connection.getDB();
+        const db = conexao.db;
+        const jogo = await db.collection('jogo').findOne({
+            idUsuario: new ObjectId(req.session._id)
+        });
+
+        if (!jogo) {
+            responderJson(res, 404, { ok: false, msg: 'jogoNaoEncontrado' });
+            return;
+        }
+
+        const missao = await obterOuCriarMissao(db, jogo);
+
+        if (missao.resgatada) {
+            responderJson(res, 409, { ok: false, msg: 'missaoJaResgatada', missao: missao });
+            return;
+        }
+
+        const alvo = Number(missao.alvo) || 0;
+        if ((Number(missao.progresso) || 0) < alvo) {
+            responderJson(res, 400, { ok: false, msg: 'missaoIncompleta', missao: missao });
+            return;
+        }
+
+        const incrementos = incrementosRecompensa(missao.recompensa);
+        const atualizado = await db.collection('jogo').findOneAndUpdate(
+            {
+                _id: jogo._id,
+                'missao.data': missao.data,
+                'missao.resgatada': false,
+                'missao.progresso': { $gte: alvo }
+            },
+            {
+                $set: {
+                    'missao.resgatada': true,
+                    'missao.resgatada_em': new Date()
+                },
+                $inc: incrementos
+            },
+            { returnDocument: 'after' }
+        );
+
+        const documento = documentoDe(atualizado);
+        if (!documento) {
+            const atual = await db.collection('jogo').findOne({ _id: jogo._id });
+            responderJson(res, 409, {
+                ok: false,
+                msg: 'missaoJaResgatada',
+                missao: atual ? atual.missao : missao
+            });
+            return;
+        }
+
+        responderJson(res, 200, {
+            ok: true,
+            missao: documento.missao,
+            recompensa: missao.recompensa,
+            jogo: {
+                moeda: documento.moeda,
+                recursos: documento.recursos || {},
+                temor: documento.temor,
+                sabedoria: documento.sabedoria,
+                magia: documento.magia,
+                comercio: documento.comercio
+            }
+        });
+    } catch (error) {
+        console.log('  algum erro foi encontrado  ', error);
+        responderJson(res, 500, { ok: false, msg: 'erroResgateMissao' });
+    } finally {
+        if (conexao) {
+            await conexao.client.close();
+        }
+    }
+};
 
 JogoDAO.prototype.gerarOrdemSuditos = async function (acao) {
     const conexao = await this._connection.getDB();
@@ -462,6 +619,15 @@ JogoDAO.prototype.atualizarAcoesDeJogo = async function (req, res) {
                 campeao: String(acao.acao) === '6',
                 pendente: pendente
             });
+
+            try {
+                await registrarProgressoMissao(db, usuario, {
+                    acao: acao.acao,
+                    vitoria: resultado.vitoria
+                });
+            } catch (erroMissao) {
+                console.log('  não foi possível atualizar a missão diária  ', erroMissao);
+            }
         }
 
         if (concluidas.length > 0) {
@@ -594,6 +760,15 @@ JogoDAO.prototype.venderRecurso = async function (req, res) {
         if (!documento) {
             responderJson(res, 409, { ok: false, msg: 'Recursos insuficientes.' });
             return;
+        }
+
+        try {
+            await registrarProgressoMissao(db, req.session.usuario, {
+                tipo: 'venda',
+                quantidade: quantidade
+            });
+        } catch (erroMissao) {
+            console.log('  não foi possível atualizar a missão diária  ', erroMissao);
         }
 
         responderJson(res, 200, {
