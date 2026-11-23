@@ -67,7 +67,6 @@ Jogo web de estratégia ambientado em **Game of Thrones**, feito com Node.js, Ex
 |---|---|
 | Senhas legadas em MD5 | Re-hash automático para scrypt no próximo login; novas contas já usam scrypt |
 | Segredo da sessão e URI do MongoDB no código | Mover para variáveis de ambiente e rotacionar |
-| Rotas administrativas sem papéis | Criar RBAC (`jogador` / `admin`) |
 | POSTs sem CSRF | Adicionar token CSRF |
 | Sem headers de segurança e rate limit | Helmet, CSP compatível e `express-rate-limit` |
 | Testes de segurança ausentes | Cobrir autenticação, autorização, IDOR e abuso |
@@ -148,6 +147,8 @@ node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"
 | `ADMIN_USERS` | Usuários com acesso administrativo, separados por vírgula |
 
 O `.env` real é ignorado pelo Git. Nunca versione segredos.
+
+A área administrativa exige `papel = admin`. Os usuários listados em `ADMIN_USERS` recebem esse papel no login; novas contas começam como `jogador`.
 | Views | `config/server.js` | `./app/views` |
 | Arquivos estáticos | `config/server.js` | `./app/public` |
 
@@ -293,7 +294,8 @@ Banco `got`, coleções principais:
   "nome": "Carlos",
   "usuario": "carlos",
   "senha": "scrypt$16384$8$1$salt$hash",
-  "casa": "stark"
+  "casa": "stark",
+  "papel": "jogador"
 }
 ```
 
@@ -345,7 +347,6 @@ Banco `got`, coleções principais:
 - Não há suíte de testes automatizados (`npm test` é apenas um placeholder).
 - O layout usa Bootstrap 5 e não foi testado em navegadores antigos.
 - A liquidação das ordens é feita por requisições do cliente (`/atualizarAcoesDeJogo`) e por uma verificação periódica; para produção, considerar um job no servidor.
-- A administração de usuários não possui controle de perfil/role.
 - O histórico do chat fica em memória (últimas 50 mensagens) e é perdido ao reiniciar o servidor; para produção, persistir em MongoDB/Redis e usar um adapter do Socket.IO.
 
 ## Autor

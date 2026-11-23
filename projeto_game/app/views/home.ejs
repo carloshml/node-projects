@@ -150,15 +150,17 @@
 			<p>Aldeões ociosos não geram moedas. Envie ordens no painel do jogo e mantenha o povo trabalhando.</p>
 		</section>
 
-		<section class="home-admin">
-			<div class="home-admin__texto">
-				<span class="home-admin__rotulo">Área administrativa</span>
-				<p>Gerenciamento de contas do sistema. Não faz parte do jogo.</p>
-			</div>
-			<a href="/buscarUsuarios" id="btn-ver-usuario" class="home-admin__link">
-				Gerenciar usuários <span aria-hidden="true">→</span>
-			</a>
-		</section>
+		<% if (admin) { %>
+			<section class="home-admin">
+				<div class="home-admin__texto">
+					<span class="home-admin__rotulo">Área administrativa</span>
+					<p>Gerenciamento de contas do sistema. Não faz parte do jogo.</p>
+				</div>
+				<a href="/buscarUsuarios" id="btn-ver-usuario" class="home-admin__link">
+					Gerenciar usuários <span aria-hidden="true">→</span>
+				</a>
+			</section>
+		<% } %>
 	</main>
 </body>
 

@@ -1,5 +1,6 @@
 let ObjectId = require('mongodb').ObjectId;
 const { hashSenha, verificarSenha } = require('../security/senha');
+const { papelDoUsuario, ehAdmin } = require('../security/autorizacao');
 
 function UsuarioDAO(connection) {
     this._connection = connection;
@@ -138,7 +139,7 @@ UsuarioDAO.prototype.autenticar = async function (usuario, req, res) {
         req.session.casa = conta.casa;
         req.session.nome = conta.nome;
         req.session._id = conta._id;
-        req.session.papel = conta.papel || 'jogador';
+        req.session.papel = papelDoUsuario(conta);
 
         res.redirect('/home');
     } catch (error) {
@@ -191,7 +192,13 @@ UsuarioDAO.prototype.irParaHome = async function (res, usuario, casa, msg, req) 
             liderMoeda: jogos[0] ? Number(jogos[0].moeda) || 0 : 0
         };
 
-        res.render('home', { img_casa: casa, jogo: result[0], msg: msg, ranking: ranking });
+        res.render('home', {
+            img_casa: casa,
+            jogo: result[0],
+            msg: msg,
+            ranking: ranking,
+            admin: ehAdmin(req)
+        });
     } catch (error) {
         console.log('  algum erro foi encontrado  ', error);
         const errors = [

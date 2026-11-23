@@ -1,3 +1,5 @@
+const { ehAdmin } = require('../security/autorizacao');
+
 module.exports.buscarUsuarios = function (application, req, res) {
     /* URLs antigas carregavam o JSON do jogo; a tela administrativa usa a sessão */
     if (req.query.jogo || req.query.img_casa || req.query.msg) {
@@ -8,7 +10,7 @@ module.exports.buscarUsuarios = function (application, req, res) {
 }
 
 async function listaUsuarios(application, req, res, errors) {
-    if (req.session.autorizado) {
+    if (ehAdmin(req)) {
         var connection = application.config.dbConection;
         var UsuarioDAO = new application.app.models.UsuariosDAO(connection);
         const result = await UsuarioDAO.listarUsuarios();
@@ -19,6 +21,11 @@ async function listaUsuarios(application, req, res, errors) {
             nome: req.session.nome,
             img_casa: req.session.casa
         });
+    } else if (req.session.autorizado) {
+        var errors = [
+            { msg: 'Acesso restrito a administradores' }
+        ];
+        res.status(403).render('index', { validacao: errors, aviso: {} });
     } else {
         var errors = [
             { msg: 'Você não tem acesso a essa área' }
@@ -49,6 +56,10 @@ module.exports.autenticar = function (application, req, res, validationResult) {
 module.exports.atualizarUsuario = async function (application, req, res, validationResult) {
     if (!req.session.autorizado) {
         res.redirect('/');
+        return;
+    }
+    if (!ehAdmin(req)) {
+        res.status(403).send('Acesso restrito a administradores');
         return;
     }
     var dadosForm = req.body;
@@ -97,6 +108,10 @@ module.exports.inserirUsuario = async function (application, req, res, validatio
 module.exports.inserirUsuarioCrud = async function (application, req, res, validationResult) {
     if (!req.session.autorizado) {
         res.redirect('/');
+        return;
+    }
+    if (!ehAdmin(req)) {
+        res.status(403).send('Acesso restrito a administradores');
         return;
     }
     var errors = validationResult(req);
