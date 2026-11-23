@@ -4781,6 +4781,7 @@ body.chat-aberto {
 .roleta-fera__trilho {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 10px;
   height: 100%;
   padding: 0 10px;
@@ -4789,7 +4790,9 @@ body.chat-aberto {
 
 .roleta-fera__carta {
   display: flex;
-  flex: 0 0 110px;
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: 106px;
   flex-direction: column;
   align-items: center;
   justify-content: center;
@@ -4804,7 +4807,9 @@ body.chat-aberto {
 
 .roleta-fera__carta img {
   width: 76px;
-  height: 76px;
+  max-width: 100%;
+  height: auto;
+  max-height: 76px;
   object-fit: contain;
   filter: drop-shadow(0 5px 8px rgba(0, 0, 0, 0.6));
 }
@@ -4814,6 +4819,17 @@ body.chat-aberto {
   font-size: 9px;
   line-height: 1.2;
   text-align: center;
+}
+
+.roleta-fera__carta--sorteando {
+  border-color: #ffd34d;
+  background: rgba(255, 211, 77, 0.12);
+  box-shadow: 0 0 22px rgba(255, 200, 60, 0.28);
+  transform: scale(1.04);
+}
+
+.roleta-fera__carta--sorteando span {
+  color: #ffd34d;
 }
 
 .roleta-fera__carta--alvo {
@@ -4889,13 +4905,22 @@ body.roleta-aberta #pergaminhos {
     height: 124px;
   }
 
+  .roleta-fera__trilho {
+    gap: 4px;
+    padding: 0 4px;
+  }
+
   .roleta-fera__carta {
-    flex-basis: 92px;
+    flex: 1 1 0;
+    max-width: none;
     height: 104px;
+    padding: 4px;
   }
 
   .roleta-fera__carta img {
-    width: 62px;
-    height: 62px;
+    width: 100%;
+    max-width: 62px;
+    height: auto;
+    max-height: 62px;
   }
 }

@@ -469,22 +469,28 @@ function animarRoletaFera(acao) {
         return;
     }
 
-    const totalCartas = 36;
-    const indiceAlvo = 30;
-    let cartas = '';
+    const ferasEmbaralhadas = feras.slice();
+    for (let indice = ferasEmbaralhadas.length - 1; indice > 0; indice--) {
+        const sorteado = Math.floor(Math.random() * (indice + 1));
+        const troca = ferasEmbaralhadas[indice];
+        ferasEmbaralhadas[indice] = ferasEmbaralhadas[sorteado];
+        ferasEmbaralhadas[sorteado] = troca;
+    }
 
-    for (let indice = 0; indice < totalCartas; indice++) {
-        const item = indice === indiceAlvo ? fera : feras[(indice * 5 + 3) % feras.length];
-        cartas +=
-            '<div class="roleta-fera__carta" data-indice="' + indice + '">' +
+    let indiceAlvo = ferasEmbaralhadas.findIndex(function (item) {
+        return item.id === fera.id;
+    });
+    if (indiceAlvo === -1) {
+        ferasEmbaralhadas.push(fera);
+        indiceAlvo = ferasEmbaralhadas.length - 1;
+    }
+
+    trilho.innerHTML = ferasEmbaralhadas.map(function (item, indice) {
+        return '<div class="roleta-fera__carta" data-indice="' + indice + '">' +
             '<img src="images/feras/' + item.imagem + '" alt="">' +
             '<span>' + item.nome + '</span>' +
             '</div>';
-    }
-
-    trilho.innerHTML = cartas;
-    trilho.style.transition = 'none';
-    trilho.style.transform = 'translateX(0)';
+    }).join('');
 
     overlay.classList.remove('roleta-fera--revelado');
     overlay.hidden = false;
@@ -495,25 +501,33 @@ function animarRoletaFera(acao) {
     resultado.textContent = 'A roleta está decidindo...';
     tocarSom('clique');
 
-    const alvo = trilho.querySelector('[data-indice="' + indiceAlvo + '"]');
-    const janela = overlay.querySelector('.roleta-fera__janela');
+    const cartas = Array.prototype.slice.call(trilho.querySelectorAll('.roleta-fera__carta'));
+    const alvo = cartas[indiceAlvo];
 
-    if (!alvo || !janela) {
+    if (!alvo || !cartas.length) {
         fecharRoletaFera();
         return;
     }
 
-    void trilho.offsetWidth;
-    const deslocamento = janela.clientWidth / 2 - (alvo.offsetLeft + alvo.offsetWidth / 2);
+    let inicioGiro = null;
+    let indiceAnterior = -1;
+    const voltas = 6;
 
-    requestAnimationFrame(function () {
-        requestAnimationFrame(function () {
-            trilho.style.transition = 'transform ' + ROLETA_GIRO_MS + 'ms cubic-bezier(0.12, 0.75, 0.2, 1)';
-            trilho.style.transform = 'translateX(' + deslocamento + 'px)';
+    function destacar(indice) {
+        if (indice === indiceAnterior) {
+            return;
+        }
+        cartas.forEach(function (carta) {
+            carta.classList.remove('roleta-fera__carta--sorteando');
         });
-    });
+        cartas[indice].classList.add('roleta-fera__carta--sorteando');
+        indiceAnterior = indice;
+    }
 
-    setTimeout(function () {
+    function concluirGiro() {
+        cartas.forEach(function (carta) {
+            carta.classList.remove('roleta-fera__carta--sorteando');
+        });
         alvo.classList.add('roleta-fera__carta--alvo');
         overlay.classList.add('roleta-fera--revelado');
         const artigo = fera.artigo ? fera.artigo + ' ' : '';
@@ -521,7 +535,26 @@ function animarRoletaFera(acao) {
         tocarSom('batalha');
 
         setTimeout(fecharRoletaFera, ROLETA_RESULTADO_MS);
-    }, ROLETA_GIRO_MS + 200);
+    }
+
+    function passoGiro(agora) {
+        if (inicioGiro === null) {
+            inicioGiro = agora;
+        }
+
+        const progresso = Math.min(1, (agora - inicioGiro) / ROLETA_GIRO_MS);
+        if (progresso >= 1) {
+            concluirGiro();
+            return;
+        }
+
+        const desaceleracao = 1 - Math.pow(1 - progresso, 3);
+        const indice = Math.floor(desaceleracao * (cartas.length * voltas + indiceAlvo)) % cartas.length;
+        destacar(indice);
+        requestAnimationFrame(passoGiro);
+    }
+
+    requestAnimationFrame(passoGiro);
 }
 
 function fecharRoletaFera() {
