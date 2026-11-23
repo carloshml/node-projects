@@ -44,8 +44,50 @@ Jogo web de estratégia ambientado em **Game of Thrones**, feito com Node.js, Ex
 
 ## Segurança
 
-O guia de boas práticas, ferramentas recomendadas, checklist de PR e roadmap de segurança está em
-[docs/boas-praticas-seguranca.md](docs/boas-praticas-seguranca.md).
+> Segurança não é uma etapa isolada. O objetivo é reduzir risco real com processos que o time consegue manter. Neste projeto, os maiores ganhos vêm de **segredos, senhas, sessão, autorização e CSRF** — antes de qualquer ferramenta nova.
+
+### Checklist antes de novas funcionalidades
+
+- [ ] A rota exige autenticação e a autorização correta (não basta estar logado)?
+- [ ] Todos os dados de entrada são validados no servidor?
+- [ ] IDs e registros são verificados contra o usuário da sessão (sem IDOR)?
+- [ ] Requisições que alteram estado têm proteção contra CSRF?
+- [ ] Segredos vêm de variáveis de ambiente e não do código?
+- [ ] Senhas usam hash forte (nunca MD5)?
+- [ ] Cookies de sessão são `HttpOnly`, `SameSite` e `Secure` em produção?
+- [ ] Saídas são escapadas ou inseridas com `textContent`?
+- [ ] Erros e logs não expõem senha, token, cookie ou stack trace?
+- [ ] Há rate limit onde faz sentido (login, ordens, admin, chat)?
+- [ ] Dependências novas são necessárias, auditadas e atualizadas?
+- [ ] Existem testes para o caminho de sucesso e para o de negação?
+
+### Pontos de atenção atuais
+
+| Risco | Ação prioritária |
+|---|---|
+| Senhas com MD5 | Migrar para Argon2id ou bcrypt e re-hash no login |
+| Segredo da sessão e URI do MongoDB no código | Mover para variáveis de ambiente e rotacionar |
+| Sessão em `MemoryStore` | Usar store persistente (Redis ou MongoDB) |
+| Rotas administrativas sem papéis | Criar RBAC (`jogador` / `admin`) |
+| POSTs sem CSRF | Adicionar token CSRF |
+| Sem headers de segurança e rate limit | Helmet, CSP compatível e `express-rate-limit` |
+| Testes de segurança ausentes | Cobrir autenticação, autorização, IDOR e abuso |
+
+### Roadmap inicial — 0 a 30 dias
+
+- Variáveis de ambiente e `.env.example`.
+- Hash de senha forte.
+- Store de sessão persistente.
+- RBAC nas rotas administrativas.
+- CSRF nos POSTs.
+- Helmet e rate limit.
+- Gitleaks no pré-commit.
+
+### Ferramentas de apoio
+
+Semgrep e SonarQube para análise estática; Gitleaks para segredos; skills da Trail of Bits na revisão de PR; Strix e OWASP ZAP para pentest; Security Audit Skill em grandes releases; Dependabot/Renovate e `npm audit` para dependências.
+
+Ferramentas não substituem revisão humana e modelagem de ameaças. Para este projeto, corrija primeiro os fundamentos acima antes de ampliar o número de scanners.
 
 ## Requisitos
 
