@@ -5064,3 +5064,17 @@ body.roleta-aberta #pergaminhos {
     font-size: 8px;
   }
 }
+
+.btn-repetir-acao-grande {
+  animation: none;
+  box-shadow: 0 0 0 1px rgba(255, 211, 77, 0.1);
+}
+
+.btn-repetir-acao-grande::after {
+  display: none;
+}
+
+.btn-repetir-acao-grande:hover,
+.btn-repetir-acao-grande:focus-visible {
+  box-shadow: 0 0 0 1px rgba(255, 211, 77, 0.25);
+}
