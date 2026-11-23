@@ -61,6 +61,8 @@ const CUSTO_ALDEAO = 10000;
 const PRECOS_PADRAO = { madeira: 1, comida: 2, ferro: 3 };
 const DURACAO_DELTA = 2000;
 const PAUSA_ANTES_MODAL = 1400;
+const ROLETA_GIRO_MS = 3000;
+const ROLETA_RESULTADO_MS = 1800;
 
 function tokenCsrf() {
     const meta = document.querySelector('meta[name="csrf-token"]');
@@ -506,7 +508,7 @@ function animarRoletaFera(acao) {
 
     requestAnimationFrame(function () {
         requestAnimationFrame(function () {
-            trilho.style.transition = 'transform 2800ms cubic-bezier(0.12, 0.75, 0.2, 1)';
+            trilho.style.transition = 'transform ' + ROLETA_GIRO_MS + 'ms cubic-bezier(0.12, 0.75, 0.2, 1)';
             trilho.style.transform = 'translateX(' + deslocamento + 'px)';
         });
     });
@@ -518,8 +520,8 @@ function animarRoletaFera(acao) {
         resultado.textContent = artigo + fera.nome + ' foi escolhida para a caçada.';
         tocarSom('batalha');
 
-        setTimeout(fecharRoletaFera, 1400);
-    }, 3000);
+        setTimeout(fecharRoletaFera, ROLETA_RESULTADO_MS);
+    }, ROLETA_GIRO_MS + 200);
 }
 
 function fecharRoletaFera() {
