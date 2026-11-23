@@ -42,6 +42,11 @@ Jogo web de estratégia ambientado em **Game of Thrones**, feito com Node.js, Ex
 | Tempo real | Socket.IO 4.8 (cliente vanilla) |
 | Autoload | `consign` |
 
+## Segurança
+
+O guia de boas práticas, ferramentas recomendadas, checklist de PR e roadmap de segurança está em
+[docs/boas-praticas-seguranca.md](docs/boas-praticas-seguranca.md).
+
 ## Requisitos
 
 - Node.js 20.19 ou superior.
