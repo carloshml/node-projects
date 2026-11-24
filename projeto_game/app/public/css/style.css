@@ -5545,3 +5545,17 @@ body.roleta-aberta #pergaminhos {
     transform: translateX(-1px) rotate(-0.1deg);
   }
 }
+
+/* Dica amigável nos modais */
+.modal-dica {
+  display: block;
+  margin-top: 9px;
+  padding: 8px 10px;
+  border-left: 2px solid #ffd34d;
+  border-radius: 3px;
+  background: rgba(255, 211, 77, 0.08);
+  color: #f4e7cf;
+  font-size: 11px;
+  line-height: 1.4;
+  text-align: left;
+}

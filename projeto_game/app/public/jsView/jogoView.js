@@ -481,7 +481,12 @@ function lerNotificacoes() {
             mostrarMensagem('erro', 'A quantidade deve ser numérica!', 'QUANTIDADE INVÁLIDA');
             break;
         case 'semMoeda':
-            mostrarMensagem('erro', 'Moedas insuficientes para essa ordem!', 'MOEDAS INSUFICIENTES');
+            mostrarMensagem(
+                'acerto',
+                'Essa ordem ainda não saiu: o cofre está leve demais.' +
+                '<span class="modal-dica">Dica: envie aldeões para coletar recursos e venda no celeiro. O ouro aparece rapidinho.</span>',
+                'AINDA SEM MOEDAS!'
+            );
             break;
         case 'acaoJaConcluida':
             mostrarMensagem('erro', 'Essa ordem já foi concluída e não pode ser revogada.', 'ORDEM JÁ CONCLUÍDA');
@@ -943,7 +948,14 @@ async function comprarAldeao() {
     }
 
     if ((Number(usuario.jogo.moeda) || 0) < CUSTO_ALDEAO) {
-        mostrarMensagem('erro', 'Você precisa de 10.000 moedas para comprar um novo aldeão.', 'SEM MOEDAS SUFICIENTES');
+        const moedasAtuais = Number(usuario.jogo.moeda) || 0;
+        mostrarMensagem(
+            'acerto',
+            'Ainda não foi dessa vez! Você tem <strong>' + moedasAtuais.toLocaleString('pt-BR') +
+            '</strong> de <strong>10.000</strong> moedas.' +
+            '<span class="modal-dica">Dica: envie aldeões para coletar recursos e venda no celeiro. O ouro aparece rapidinho.</span>',
+            'AINDA SEM MOEDAS!'
+        );
         return;
     }
 
@@ -963,10 +975,20 @@ async function comprarAldeao() {
                 usuario.jogo.moeda = dados.moeda;
                 await atualizarHud();
             }
-            const mensagem = semMoedas
-                ? 'Você precisa de 10.000 moedas para comprar um novo aldeão.'
-                : 'Não foi possível comprar o aldeão.';
-            mostrarMensagem('erro', mensagem, semMoedas ? 'SEM MOEDAS SUFICIENTES' : 'COMPRA NÃO REALIZADA');
+
+            if (semMoedas) {
+                const moedasAtuais = Number(usuario.jogo.moeda) || 0;
+                mostrarMensagem(
+                    'acerto',
+                    'Ainda não foi dessa vez! Você tem <strong>' + moedasAtuais.toLocaleString('pt-BR') +
+                    '</strong> de <strong>10.000</strong> moedas.' +
+                    '<span class="modal-dica">Dica: envie aldeões para coletar recursos e venda no celeiro. O ouro aparece rapidinho.</span>',
+                    'AINDA SEM MOEDAS!'
+                );
+                return;
+            }
+
+            mostrarMensagem('erro', 'Não foi possível comprar o aldeão.', 'COMPRA NÃO REALIZADA');
             return;
         }
 
@@ -1209,8 +1231,15 @@ function repetirUltimaAcao() {
 
     if (acao !== '6') {
         const custo = (CUSTOS_ACAO[acao] || 0) * quantidade;
-        if ((Number(usuario.jogo.moeda) || 0) < custo) {
-            mostrarMensagem('erro', 'Moedas insuficientes para repetir essa ordem.', 'MOEDAS INSUFICIENTES');
+        const moedasAtuais = Number(usuario.jogo.moeda) || 0;
+        if (moedasAtuais < custo) {
+            mostrarMensagem(
+                'acerto',
+                'Quase lá! Essa repetição custa <strong>' + custo.toLocaleString('pt-BR') +
+                '</strong> moedas e você tem <strong>' + moedasAtuais.toLocaleString('pt-BR') + '</strong>.' +
+                '<span class="modal-dica">Dica: envie aldeões para coletar recursos e venda no celeiro. O ouro aparece rapidinho.</span>',
+                'AINDA SEM MOEDAS!'
+            );
             return;
         }
     }
