@@ -296,6 +296,7 @@ const MODAL_TIPOS = {
     recompensa: { classe: 'recompensa', selo: '◆', titulo: 'RECOMPENSA', duracao: 0 },
     sucesso: { classe: 'recompensa', selo: '◆', titulo: 'SUCESSO', duracao: 0 },
     acerto: { classe: 'info', selo: '◆', titulo: 'ORDEM RECEBIDA', duracao: 4500 },
+    incentivo: { classe: 'info', selo: '!', titulo: 'AINDA SEM MOEDAS!', duracao: 0 },
     erro: { classe: 'derrota', selo: '!', titulo: 'ATENÇÃO', duracao: 6000 },
     pergaminhos: { classe: 'pergaminhos', selo: '✦', titulo: 'PERGAMINHOS', duracao: 0 }
 };
@@ -482,7 +483,7 @@ function lerNotificacoes() {
             break;
         case 'semMoeda':
             mostrarMensagem(
-                'acerto',
+                'incentivo',
                 'Essa ordem ainda não saiu: o cofre está leve demais.' +
                 '<span class="modal-dica">Dica: envie aldeões para coletar recursos e venda no celeiro. O ouro aparece rapidinho.</span>',
                 'AINDA SEM MOEDAS!'
@@ -950,7 +951,7 @@ async function comprarAldeao() {
     if ((Number(usuario.jogo.moeda) || 0) < CUSTO_ALDEAO) {
         const moedasAtuais = Number(usuario.jogo.moeda) || 0;
         mostrarMensagem(
-            'acerto',
+            'incentivo',
             'Ainda não foi dessa vez! Você tem <strong>' + moedasAtuais.toLocaleString('pt-BR') +
             '</strong> de <strong>10.000</strong> moedas.' +
             '<span class="modal-dica">Dica: envie aldeões para coletar recursos e venda no celeiro. O ouro aparece rapidinho.</span>',
@@ -979,7 +980,7 @@ async function comprarAldeao() {
             if (semMoedas) {
                 const moedasAtuais = Number(usuario.jogo.moeda) || 0;
                 mostrarMensagem(
-                    'acerto',
+                    'incentivo',
                     'Ainda não foi dessa vez! Você tem <strong>' + moedasAtuais.toLocaleString('pt-BR') +
                     '</strong> de <strong>10.000</strong> moedas.' +
                     '<span class="modal-dica">Dica: envie aldeões para coletar recursos e venda no celeiro. O ouro aparece rapidinho.</span>',
@@ -1243,7 +1244,7 @@ function repetirUltimaAcao() {
         const moedasAtuais = Number(usuario.jogo.moeda) || 0;
         if (moedasAtuais < custo) {
             mostrarMensagem(
-                'acerto',
+                'incentivo',
                 'Quase lá! Essa repetição custa <strong>' + custo.toLocaleString('pt-BR') +
                 '</strong> moedas e você tem <strong>' + moedasAtuais.toLocaleString('pt-BR') + '</strong>.' +
                 '<span class="modal-dica">Dica: envie aldeões para coletar recursos e venda no celeiro. O ouro aparece rapidinho.</span>',
