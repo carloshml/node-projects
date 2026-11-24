@@ -5559,3 +5559,9 @@ body.roleta-aberta #pergaminhos {
   line-height: 1.4;
   text-align: left;
 }
+
+/* Formulário travado enquanto a ordem é enviada */
+.form-ordens--enviando .cards-acoes,
+.form-ordens--enviando .painel-ordem {
+  opacity: 0.7;
+}

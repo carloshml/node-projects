@@ -1209,6 +1209,15 @@ function repetirUltimaAcao() {
         return;
     }
 
+    if (form.dataset.enviando === '1') {
+        mostrarMensagem(
+            'acerto',
+            'Calma! A ordem anterior ainda está sendo enviada. Espere um instante antes de repetir.',
+            'AGUARDE A ORDEM'
+        );
+        return;
+    }
+
     const acao = String(botaoRepetir.dataset.acao || '');
     const quantidade = parseInt(botaoRepetir.dataset.quantidade, 10);
     const livres = Math.max(0, Number(usuario.jogo.suditos) - Number(usuario.jogo.suditosTrabalhando));
@@ -1365,10 +1374,32 @@ function inicializarFormularioOrdens() {
             botao.textContent = 'Enviando...';
         }
 
+        const acaoEnviada = campoAcao.value;
+        const campoQuantidade = document.getElementById('quantidade');
+        const quantidadeEnviada = campoQuantidade ? campoQuantidade.value : '1';
+
+        /* trava os campos para a ordem não ser trocada durante o envio */
+        form.classList.add('form-ordens--enviando');
+        form.querySelectorAll('.card-acao').forEach(function (card) {
+            card.disabled = true;
+        });
+        const rangeEnvio = document.getElementById('qtd-range');
+        if (rangeEnvio) {
+            rangeEnvio.disabled = true;
+        }
+        const repetirEnvio = document.getElementById('btn-repetir-acao');
+        if (repetirEnvio) {
+            repetirEnvio.disabled = true;
+        }
+
         tocarSom('ordem');
         const somLigado = window.SomJogo && typeof window.SomJogo.estaAtivo === 'function' && window.SomJogo.estaAtivo();
         const atraso = somLigado ? ATRASO_ENVIO_ORDEM : 0;
         setTimeout(function () {
+            campoAcao.value = acaoEnviada;
+            if (campoQuantidade) {
+                campoQuantidade.value = quantidadeEnviada;
+            }
             HTMLFormElement.prototype.submit.call(form);
         }, atraso);
     });
